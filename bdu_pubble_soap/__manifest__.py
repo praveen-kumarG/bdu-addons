@@ -114,14 +114,14 @@ To contribute to this module, please visit https://odoo-community.org.
 """,
 
     # any module necessary for this one to work correctly
-    'depends': [sale_advertising,
+    'depends': ['sale_advertising_order',
     ],
     'external_dependencies': {
-        'python': [suds-jurko],
+        'python': ['suds'],
     },
 
     # always loaded
-    'data': [views/sale_advertising_view.xml
+    'data': ['views/sale_advertising_view.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
