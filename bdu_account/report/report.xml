@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+    <record id="paperformat_bdu_layout" model="report.paperformat">
+        <field name="name">European A4 - BDU Layout</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">23</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">40</field>
+        <field name="dpi">90</field>
+    </record>
+
+
+    <report
+        id="account.account_invoices"
+        model="account.invoice"
+        string="Invoice"
+        report_type="qweb-pdf"
+        name="account.report_invoice"
+        file="account.report_invoice"
+        paperformat="bdu_account.paperformat_bdu_layout"
+    />
+    <report
+        id="report_sale_order1"
+        string="Advertising Quotation / Order"
+        model="sale.order"
+        report_type="qweb-pdf"
+        file="bdu_account.report_saleorder1"
+        name="bdu_account.report_saleorder1"
+        paperformat="bdu_account.paperformat_bdu_layout"
+    />
+
+    </data>
+</openerp>

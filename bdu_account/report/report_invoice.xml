@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+
+
+<template id="external_layout_bdu">
+    <!-- Multicompany -->
+    <t t-if="not o and doc">
+        <t t-set="o" t-value="doc"/>
+    </t>
+    <t t-if="o and 'company_id' in o">
+        <t t-set="company" t-value="o.company_id"></t>
+    </t>
+    <t t-if="not o or not 'company_id' in o">
+        <t t-set="company" t-value="res_company"></t>
+    </t>
+
+    <t t-call="bdu_account.external_layout_bdu_header" />
+    <t t-raw="0" />
+</template>
+
+<template id="external_layout_bdu_header">
+    <div class="header">
+        <div class="row">
+            <div class="row backgroundimage" style="position:relative;font-size:3em;
+                        width:100%;height:100%;z-index:1000;padding-left:5px;">
+
+                <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.report_background_image1"
+                        style="width:100%; display: block;" height="1215"/>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="report_invoice_document1">
+    <t t-call="bdu_account.external_layout_bdu">
+
+        <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
+
+        <div class="page">
+            <div class="row" style="padding-left:45px;">
+                <div name="invoice_title" class="col-xs-5 col-xs-offset-7" style="padding:0px;">
+                    <h3>
+                        <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">INVOICE</span>
+                        <span t-if="o.type == 'out_invoice' and o.state == 'proforma2'">PRO-FORMA</span>
+                        <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft INVOICE</span>
+                        <span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Cancelled INVOICE</span>
+                        <span t-if="o.type == 'out_refund'">CREDIT INVOICE</span>
+                        <span t-if="o.type == 'in_refund'">Vendor Refund</span>
+                        <span t-if="o.type == 'in_invoice'">Vendor Bill</span>
+                    </h3>
+                </div>
+            </div>
+
+             <div class="row mt32 mb32" style="padding-left:45px;">
+                 <div class="col-xs-7" style="padding:0px;">
+                     <div class="col-xs-3" style="padding:0px;">
+                         <span><strong>Invoice Date</strong></span>
+                         <br/>
+                         <span><strong>Invoice Number</strong></span>
+                         <br/>
+                         <span><strong>Customer Code</strong></span>
+                     </div>
+                     <div class="col-xs-1" style="padding:0px;">
+                         <span><strong>:</strong></span>
+                         <br/>
+                         <span><strong>:</strong></span>
+                         <br/>
+                         <span><strong>:</strong></span>
+                     </div>
+                     <div class="col-xs-8" style="padding:0px;">
+                         <span t-field="o.date_invoice"/>
+                         <br/>
+                         <span t-field="o.number"/>
+                         <br/>
+                         <span t-field="o.partner_id.ref"/>
+                     </div>
+                 </div>
+
+                 <div name="invoice_address" class="col-xs-5" style="padding:0px;">
+                     <address t-field="o.partner_id"
+                        t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' />
+                     <span t-if="o.partner_id.vat">TIN: <span t-field="o.partner_id.vat"/></span>
+                 </div>
+
+                 <br/><br/>
+                 <div class="col-xs-7" style="padding:0px;">
+                     <div class="col-xs-3" style="padding:0px;">
+                         <strong>Advertiser</strong>
+                     </div>
+                     <div class="col-xs-1" style="padding:0px;">
+                         <span><strong>:</strong></span>
+                     </div>
+                     <div class="col-xs-8" style="padding:0px;">
+                         <span t-field="o.published_customer.name"/>
+                     </div>
+                 </div>
+            </div>
+
+            <!-- Is there a discount on at least one line? -->
+            <t t-set="display_discount" t-value="any([l.sol_discount for l in o.invoice_line_ids])"/>
+            <t t-set="display_Cdiscount" t-value="any([l.sol_computed_discount for l in o.invoice_line_ids])"/>
+            <t t-set="tot_Cdiscount" t-value="0"/>
+
+            <div t-if="not o.company_id.use_bduprint" class="row" style="padding-left:45px;padding-right:15px;">
+                <table class="table table-condensed table-padding">
+                    <thead>
+                        <tr>
+                            <th width="10%">Date</th>
+                            <th width="20%">Description/ short content</th>
+                            <th width="10%">Edition</th>
+                            <th width="10%">Product</th>
+                            <th width="10%" class="text-right">Volume</th>
+                            <th width="10%" class="text-right">Unit Price</th>
+                            <th width="10%" t-if="display_discount" class="text-right">Disc(%)</th>
+                            <th width="10%" t-if="display_Cdiscount" class="text-right">Computed Discount</th>
+                            <th width="10%" class="text-right">Tax Excluded Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="invoice_tbody">
+                        <tr t-foreach="o.invoice_line_ids" t-as="l">
+                            <t t-set="tot_Cdiscount" t-value="tot_Cdiscount + l.sol_computed_discount"/>
+
+                            <td><span t-field="l.sol_issuedt"/></td>
+                            <td><span t-field="l.name"/></td>
+                            <td><span t-field="l.sol_title"/></td>
+                            <td><span t-if="l.product_id" t-field="l.product_id.name"/></td>
+                            <td class="text-right">
+                                <span t-field="l.quantity"/>
+                                <span t-field="l.uom_id"  groups="product.group_uom"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="l.price_unit"/>
+                            </td>
+                            <td t-if="display_discount" class="text-right">
+                                <span t-field="l.sol_discount"/>
+                            </td>
+                            <td t-if="display_Cdiscount" class="text-right">
+                                <span t-field="l.sol_computed_discount"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="l.price_subtotal"
+                                    t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div t-if="o.company_id.use_bduprint" class="row" style="padding-left:45px;padding-right:15px;">
+                <table class="table table-condensed table-padding">
+                    <thead>
+                        <tr>
+                            <th width="15%">Order Number</th>
+                            <th width="15%" class="text-right">Quantity</th>
+                            <th width="55%">Description</th>
+                            <th width="15%" class="text-right">Unit Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="invoice_tbody">
+                        <tr t-foreach="o.invoice_line_ids" t-as="l">
+                            <td><span t-field="l.so_number"/></td>
+                            <td class="text-right">
+                                <span t-field="l.quantity"/>
+                                <span t-field="l.uom_id"  groups="product.group_uom"/>
+                            </td>
+                            <td>
+                                <span t-if="l.account_analytic_id" t-field="l.account_analytic_id.code"/>,
+                                <span t-if="l.product_id" t-field="l.product_id.name"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="l.price_unit"
+                                    t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row" style="padding-left:45px;">
+                <div class="col-xs-4 pull-right">
+                    <table class="table table-condensed">
+                        <tr class="border-black">
+                            <td><strong>Gross</strong></td>
+                            <td class="text-right">
+                                <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Discount</td>
+                            <td class="text-right">
+                                <span t-raw="tot_Cdiscount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                            </td>
+                        </tr>
+                        <t t-foreach="o._get_tax_amount_by_group()" t-as="amount_by_group">
+                            <tr>
+                                <td><span t-esc="amount_by_group[0] if len(o.tax_line_ids) > 1 else (o.tax_line_ids.tax_id.description or o.tax_line_ids.tax_id.name)"/></td>
+                                <td class="text-right">
+                                    <span t-esc="amount_by_group[1]" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr class="border-black">
+                            <td><strong>Total</strong></td>
+                            <td class="text-right">
+                                 <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!--&lt;!&ndash; DO NOT REMOVE THIS TABLE. MANDATORY IN SOME COUNTRIES &ndash;&gt;-->
+            <!--<div class="row" t-if="len(o.tax_line_ids) > 0">-->
+                <!--<div class="col-xs-6">-->
+                    <!--<table class="table table-condensed">-->
+                        <!--<thead>-->
+                            <!--<tr>-->
+                                <!--<th>Tax</th>-->
+                                <!--<th class="text-right">Base</th>-->
+                                <!--<th class="text-right">Amount</th>-->
+                            <!--</tr>-->
+                        <!--</thead>-->
+                        <!--<tbody>-->
+                            <!--<tr t-foreach="o.tax_line_ids" t-as="t">-->
+                                <!--<td><span t-field="t.tax_id.description"/></td>-->
+                                <!--<td class="text-right">-->
+                                    <!--<span t-field="t.base" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>-->
+                                <!--</td>-->
+                                <!--<td class="text-right">-->
+                                    <!--<span t-field="t.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                        <!--</tbody>-->
+                    <!--</table>-->
+                <!--</div>-->
+            <!--</div>-->
+
+            <p t-if="o.comment" class='text-center' style="padding-left:70px;padding-right:70px;padding-top:30px;">
+                <strong><span t-field="o.comment"/></strong>
+            </p>
+            <p t-if="o.payment_term_id" class='text-center' style="padding-left:70px;padding-right:70px;padding-top:30px;">
+                <span t-field="o.payment_term_id.note"/>
+            </p>
+        </div>
+    </t>
+</template>
+
+<template id="account.report_invoice">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="bdu_account.report_invoice_document1" t-lang="o.partner_id.lang"/>
+        </t>
+    </t>
+</template>
+
+
+
+    <!--
+        Duplicate copy
+    -->
+
+<template id="account.account_invoice_report_duplicate" inherit_id="bdu_account.report_invoice_document1" primary="True">
+    <xpath expr="//h3" position="replace">
+        <h3>
+            <span>Duplicate</span>
+            <span t-if="o.type == 'out_refund'">refund</span>
+            <span t-if="o.type == 'out_invoice'">invoice</span>
+        </h3>
+    </xpath>
+</template>
+
+<template id="account.account_invoice_report_duplicate_main">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="account.account_invoice_report_duplicate" t-lang="o.partner_id.lang"/>
+        </t>
+    </t>
+</template>
+
+
+
+
+</data>
+</odoo>
