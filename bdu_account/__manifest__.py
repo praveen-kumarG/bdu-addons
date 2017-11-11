@@ -36,17 +36,19 @@ This module adds customization as per BDU Media
 
 
     """,
-    'author'  : 'Magnus - Willem Hulshof',
-    'website' : 'http://www.magnus.nl',
+    'author'  : 'Eurogroup Consulting - Willem Hulshof',
+    'website' : 'http://www.eurogroupconsulting.nl',
     'depends' : ['account',
-		'sale_advertising_order',
+		'sale_advertising_order','purchase'
     ],
     'data' : [
 
          "report/report_invoice.xml",
          "report/report_saleorder.xml",
+         "report/purchase_quotation_templates.xml",
+         "report/purchase_order_templates.xml",
+         "report/report_deliveryslip.xml",
          "report/report.xml",
-
          "views/res_company_view.xml",
     ],
     'demo' : [],
