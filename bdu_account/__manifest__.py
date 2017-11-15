@@ -36,8 +36,8 @@ This module adds customization as per BDU Media
 
 
     """,
-    'author'  : 'Eurogroup Consulting - Willem Hulshof',
-    'website' : 'http://www.eurogroupconsulting.nl',
+    'author'  : 'Magnus - Willem Hulshof',
+    'website' : 'http://www.magnus.nl',
     'depends' : ['account',
 		'sale_advertising_order','purchase'
     ],
