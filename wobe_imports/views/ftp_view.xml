@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_file_transfer_tree" model="ir.ui.view">
+        <field name="name">file.transfer.tree</field>
+        <field name="model">file.transfer</field>
+        <field name="arch" type="xml">
+            <tree string="File Transfer">
+                <field name="url"/>
+                <field name="login"/>
+                <field name="port"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_file_transfer_form" model="ir.ui.view">
+        <field name="name">file.transfer.form</field>
+        <field name="model">file.transfer</field>
+        <field name="arch" type="xml">
+            <form string="File Transfer">
+                <header>
+                    <button string="Test Connection" type="object" name="check_connection" help="Test server connection."/>
+                </header>
+                <div class="alert alert-info" role="alert" style="margin-bottom:0px;padding:10px;" attrs="{'invisible': [('msg','=',False)]}">
+                    <field name="msg" readonly="1"/>
+                </div>
+                <sheet>
+                    <group>
+                        <field name="active"/>
+                        <field name="url" placeholder="IP like 192.168.1.128" required="1"/>
+                        <field name="port" placeholder="default port number is 22" required="1"/>
+                        <field name="login" placeholder="Server's Username" required="1"/>
+                        <field name="password" password="True" placeholder="Server's User Password" required="1"/>
+                        <field name="server_path" placeholder="path like = /home/user/shared/" required="1"/>
+                        <field name="local_path" placeholder="path like = /home/user/download/" required="1"/>
+                        <field name="rsa_key" placeholder="RSA Key of the Server, if exists"/>
+                    </group>
+                    <group>
+                        <field name="note" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_file_transfer" model="ir.actions.act_window">
+        <field name="name">FTP Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">file.transfer</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create server connection.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_file_transfer" parent="menu_wobe" sequence="1"
+              action="action_file_transfer" groups="base.group_system"/>
+
+
+
+
+</odoo>
