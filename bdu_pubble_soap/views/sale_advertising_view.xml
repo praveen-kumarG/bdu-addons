@@ -9,7 +9,8 @@
             <field name="inherit_id" ref="sale_advertising_order.view_order_form_advertising"/>
             <field name="arch" type="xml">
 					<button name="action_approve2" position="replace">
-                            <button name="action_pubble" string="Send to Pubble" type="object"  class="oe_highlight" />
+                        <button name="action_pubble" string="Prepare for Pubble" type="object"  class="oe_highlight" />
+                        <button name="send_pubble" string="Send to Pubble" type="object"  class="oe_highlight" />
                     </button>
             </field>
         </record>

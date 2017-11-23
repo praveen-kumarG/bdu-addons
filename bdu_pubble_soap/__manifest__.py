@@ -121,7 +121,8 @@ To contribute to this module, please visit https://odoo-community.org.
     },
 
     # always loaded
-    'data': ['views/sale_advertising_view.xml'
+    'data': ['views/sale_advertising_view.xml',
+             'data/transmission_sequence.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+    <record model="ir.sequence" id="seq_transmission">
+        <field name="name">Transmission ID</field>
+        <field name="code">pubble.itf</field>
+        <field name="prefix">9</field>
+        <field name="padding">6</field>
+    </record>
+</odoo>
