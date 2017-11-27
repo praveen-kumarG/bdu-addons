@@ -298,12 +298,13 @@ class Job(models.Model):
     def _prepare_order_data(self):
         self.ensure_one()
 
-        aa = self.env['account.analytic.account'].search([('name','=', self.title)])
-        partner = aa and aa.partner_id or False
         prodTem_obj = self.env['product.template']
         product_obj = self.env['product.product']
         sale_obj = self.env['sale.order']
         variant_obj = self.env['product.attribute.value']
+
+        aa = self.env['account.analytic.account'].search([('name','=', self.title)])
+        partner = aa and aa.partner_id or False
 
         if not aa:
             self.message_post(body=_('Analytic Account not found for this NewspaperTitle.'))
@@ -335,13 +336,11 @@ class Job(models.Model):
             elif p.print_category == 'glueing'  : glueing = p.id
             elif p.print_category == 'stitching': stitching = p.id
 
-        pFormat = self.env.ref('wobe_imports.variant_attribute_1', False)
         pPages  = self.env.ref('wobe_imports.variant_attribute_2', False)
         pWeight = self.env.ref('wobe_imports.variant_attribute_3', False)
 
         emsg = ''
-        if not pFormat: emsg += "Paper Format, "
-        if not pPages : emsg += "Paper Pages, "
+        if not pPages : emsg += "Pages, "
         if not pWeight: emsg += "Paper Weight."
         if emsg:
             self.message_post(body=_("Variant Attributes not found for %s"%emsg))
@@ -360,13 +359,15 @@ class Job(models.Model):
             if booklet.glueing: glueCnt += 1
             if booklet.stitching: stitchCnt += 1
 
+            pFormat = 'MP' if booklet.format == 'MAG' else booklet.format
+
             v1 = variant_obj.search([('name','=', booklet.pages), ('attribute_id','=', pPages.id)])
-            v2 = variant_obj.search([('name','=', booklet.format), ('attribute_id','=', pFormat.id)])
-            v3 = variant_obj.search([('name','=', booklet.paper_weight), ('attribute_id','=', pWeight.id)])
+            v2 = variant_obj.search([('name','=', booklet.paper_weight), ('attribute_id','=', pWeight.id)])
 
             product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
                                           ('attribute_value_ids', 'in', v2.ids),
-                                          ('attribute_value_ids', 'in', v3.ids)], order='id desc', limit=1)
+                                          ('print_format_template','=', True),
+                                          ('formats','=', pFormat),], order='id desc', limit=1)
             # Booklet-Product
             if product:
                 lines.append(_get_linevals(product.ids[0]))
