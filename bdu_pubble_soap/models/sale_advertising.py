@@ -167,6 +167,8 @@ class SofromOdootoPubble(models.Model):
 
     def call_wsdl(self):
         self.ensure_one()
+        if self.pubble_response:
+            raise UserError(_('This Sale Order already has been succesfully sent to Pubble.'))
         transmissionID = int(float(self.transmission_id))
         client = Client("https://ws.pubble.nl/Sales.svc?singleWsdl")
         SalesOrder = client.factory.create('ns1:salesOrder')
@@ -198,7 +200,6 @@ class SofromOdootoPubble(models.Model):
             SalesOrder.agency.lastModified = datetime.datetime.strptime(self.salesorder_agency_lastmodified,'%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%dT%H:%M:%S.%f')
             SalesOrder.agency.name = self.salesorder_agency_name
             SalesOrder.agency.postalcode = self.salesorder_agency_postalcode
-	import pdb; pdb.set_trace()
 
         for line in self.pubble_so_line:
             ad += 1
@@ -219,8 +220,8 @@ class SofromOdootoPubble(models.Model):
             ad.status = "active" if line.ad_status else "deleted"
 
             SalesOrder.orderLine_Ads.adPlacement.append(ad)
+
         response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
-#        p = print(response.json())
 
         return self.write({'pubble_response': response})
 

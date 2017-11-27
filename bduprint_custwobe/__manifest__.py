@@ -13,7 +13,8 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml # noqa
     # for the full list
-    'category': 'False',    'summary': 'This module enables a checkbox for BDUprint which shows wether a customer is authorized to order in Wobe portal',
+    'category': 'False',
+    'summary': 'This module enables a checkbox for BDUprint which shows wether a customer is authorized to order in Wobe portal',
     'description': """
 .. image:: https://img.shields.io/badge/licence-AGPL--3-blue.svg
    :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
