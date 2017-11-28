@@ -1,0 +1,9 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_delivery_terms_sector_public","res_delivery_terms group_public","model_delivery_terms","base.group_public",1,0,0,0
+"access_delivery_terms_sector_portal","res_delivery_terms group_portal","model_delivery_terms","base.group_portal",1,0,0,0
+"access_delivery_terms_sector_group_partner_manager","res_delivery_terms group_partner_manager","model_delivery_terms","base.group_partner_manager",1,1,1,1
+"access_delivery_terms_sector_group_user","res_delivery_terms group_user","model_delivery_terms","base.group_user",1,0,0,0
+"access_partner_status_sector_public","res_partner_status group_public","model_partner_status","base.group_public",1,0,0,0
+"access_partner_status_sector_portal","res_partner_status group_portal","model_partner_status","base.group_portal",1,0,0,0
+"access_partner_status_sector_group_partner_manager","res_partner_status model_partner_status","model_delivery_terms","base.group_partner_manager",1,1,1,1
+"access_partner_status_sector_group_user","res_partner_status group_user","model_partner_status","base.group_user",1,0,0,0

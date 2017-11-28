@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partners_form_bdu_account" model="ir.ui.view">
+        <field name="name">Partner BDU Account</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="ref" position="replace"/>
+            <!--<xpath expr="//sheet" position="before">-->
+                <!--<div class="alert alert-info" role="alert" style="margin-bottom:0px;padding:5px;" attrs="{'invisible':['|',('ref','=',False),('parent_id','!=',False)]}">-->
+                    <!--<field name="ref" readonly="1"/>-->
+                <!--</div>-->
+            <!--</xpath>-->
+
+
+            <xpath expr="//field[@name='type']" position="before">
+                <field name="ref" attrs="{'readonly': [('is_company', '=', False), ('parent_id', '!=', False)]}"/>
+            </xpath>
+
+            <field name="street" position="attributes">
+                <attribute name="attrs">{'required':[('is_company','=',True)]}</attribute>
+            </field>
+            <field name="email" position="attributes">
+                <attribute name="attrs">{'required':[('is_company','=',True)]}</attribute>
+            </field>
+            <field name="user_id" position="attributes">
+                <attribute name="attrs">{'required':[('is_company','=',True)]}</attribute>
+            </field>
+            <page name="sales_purchases" position="after">
+                <page string="Additional Information" name="additional_information">
+                    <group name="container_row_2">
+                        <group>
+                            <field name="promille_id"/>
+                            <field name="pubble_id"/>
+                            <field name="zeno_id"/>
+                            <field name="exact_id"/>
+                            <field name="newsletter_opt_out"/>
+                        </group>
+                        <group attrs="{'invisible':[('is_company','=',False)]}">
+                            <field name="facebook" widget="url"/>
+                            <field name="twitter" widget="url"/>
+                            <field name="linkedIn" widget="url"/>
+                            <field name="instagram" widget="url"/>
+                            <field name="date_established"/>
+                            <field name="delievery_terms"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <record id="view_partner_form_sector_bdu_account" model="ir.ui.view">
+        <field name="name">Partner Sector BDU Account</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="partner_sector.view_partner_form_sector"/>
+        <field name="arch" type="xml">
+            <field name="sector_id" position="attributes">
+                <attribute name="attrs">{'required':[('is_company','=',True)]}</attribute>
+            </field>
+        </field>
+    </record>
+
+    <!-- Delivery Terms -->
+    <record id="view_delivery_terms_tree" model="ir.ui.view">
+        <field name="model">delivery.terms</field>
+        <field name="arch" type="xml">
+            <tree string="Terms Of Delivery">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_delivery_terms_form" model="ir.ui.view">
+        <field name="model">delivery.terms</field>
+        <field name="arch" type="xml">
+            <form string="Terms Of Delivery">
+                <sheet>
+                    <group>
+                        <field name="name" required="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_delivery_terms" model="ir.actions.act_window">
+        <field name="name">Terms Of Delivery</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">delivery.terms</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="partner_custom_settings" name="Partner" parent="sales_team.menu_sale_config" sequence="3"/>
+
+    <menuitem id="partner_delivery_terms" action="action_delivery_terms" parent="partner_custom_settings" sequence="1"/>
+
+    <!-- status -->
+    <record id="view_partner_status_tree" model="ir.ui.view">
+        <field name="model">partner.status</field>
+        <field name="arch" type="xml">
+            <tree string="Status">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_partner_status_form" model="ir.ui.view">
+        <field name="model">partner.status</field>
+        <field name="arch" type="xml">
+            <form string="Status">
+                <sheet>
+                    <group>
+                        <field name="name" required="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_partner_status" model="ir.actions.act_window">
+        <field name="name">Status</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">partner.status</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="partner_status" action="action_partner_status" parent="partner_custom_settings" sequence="2"/>
+
+
+</odoo>
