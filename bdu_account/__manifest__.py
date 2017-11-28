@@ -39,17 +39,18 @@ This module adds customization as per BDU Media
     'author'  : 'Magnus - Willem Hulshof',
     'website' : 'http://www.magnus.nl',
     'depends' : ['account',
-		'sale_advertising_order','purchase'
+		'sale_advertising_order','partner_contact_gender','partner_sector','base_partner_sequence',
     ],
     'data' : [
 
+         "security/ir.model.access.csv",
+         "data/partner_sequence.xml",
          "report/report_invoice.xml",
          "report/report_saleorder.xml",
-         "report/purchase_quotation_templates.xml",
-         "report/purchase_order_templates.xml",
-         "report/report_deliveryslip.xml",
          "report/report.xml",
+
          "views/res_company_view.xml",
+         "views/res_partner_view.xml",
     ],
     'demo' : [],
     'installable': True
