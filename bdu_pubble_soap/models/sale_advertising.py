@@ -61,8 +61,8 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         a = self.filtered("advertising")
         for order in a:
-#            order.action_pubble()
-            order.with_delay().action_pubble()
+            order.action_pubble()
+#            order.with_delay().action_pubble()
         super(SaleOrder, self).action_confirm()
         return True
 
