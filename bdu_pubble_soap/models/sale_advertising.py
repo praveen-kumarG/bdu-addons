@@ -47,13 +47,24 @@ class SaleOrder(models.Model):
     publog_id = fields.Many2one('sofrom.odooto.pubble')
 
     @api.multi
+    @job
     def action_pubble(self):
-        # self.with_delay().transfer_order_to_pubble().call_wsdl()
+        self.ensure_one()
+#        self.with_delay().transfer_order_to_pubble().call_wsdl()
         res = self.transfer_order_to_pubble()
-#        self.transfer_order_to_pubble().call_wsdl()
-        return self.write({'state': 'pubble',
-                           'date_sent_pubble': fields.Date.context_today(self),
-                           'publog_id': res.id})
+        self._cr.commit()
+        res.call_wsdl()
+        self.date_sent_pubble = fields.Date.context_today(self)
+        self.publog_id = res.id
+        return True
+
+    @api.multi
+    def action_confirm(self):
+        a = self.filtered("advertising")
+        for order in a:
+            order.with_delay().action_pubble()
+        super(SaleOrder, self).action_confirm()
+        return True
 
     @api.multi
     def send_pubble(self):
@@ -62,7 +73,6 @@ class SaleOrder(models.Model):
         return res
 
     @api.multi
-    @job
     def transfer_order_to_pubble(self):
         # import pdb; pdb.set_trace()
         self.ensure_one()
@@ -129,11 +139,11 @@ class SaleOrderLine(models.Model):
 class SofromOdootoPubble(models.Model):
     _name = 'sofrom.odooto.pubble'
 
-    @api.depends('transmission_id')
-    def send_pubble(self):
+#    @api.depends('transmission_id')
+#    def send_pubble(self):
 #        so_to_pub = self.env['sofrom.odooto.pubble'].search([('id', '=', self.publog_id.id)])
-        res = self.call_wsdl()
-        return res
+#        res = self.call_wsdl()
+#        return res
 
     @api.multi
     def get_next_ref(self, vals=None):

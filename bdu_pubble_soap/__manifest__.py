@@ -13,7 +13,8 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml # noqa
     # for the full list
-    'category': 'integration',    'summary': 'This module transfers advertising orders from Odoo to Pubble via a SOAP interface',
+    'category': 'integration',
+    'summary': 'This module transfers advertising orders from Odoo to Pubble via a SOAP interface',
     'description': """
 .. image:: https://img.shields.io/badge/licence-AGPL--3-blue.svg
    :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
@@ -122,7 +123,8 @@ To contribute to this module, please visit https://odoo-community.org.
 
     # always loaded
     'data': ['views/sale_advertising_view.xml',
-             'data/transmission_sequence.xml'
+             'data/transmission_sequence.xml',
+             'security/ir.model.access.csv'
     ],
     # only loaded in demonstration mode
     'demo': [

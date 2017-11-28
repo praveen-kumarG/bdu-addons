@@ -3,7 +3,7 @@
 	<data>
 
 
-        <record id="view_order_form_advertising_pubble" model="ir.ui.view">
+        <!--record id="view_order_form_advertising_pubble" model="ir.ui.view">
             <field name="name">sale.order.form.advertising.pubble</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale_advertising_order.view_order_form_advertising"/>
@@ -13,7 +13,7 @@
                         <button name="send_pubble" string="Send to Pubble" type="object"  class="oe_highlight" />
                     </button>
             </field>
-        </record>
+        </record-->
 
 
 	</data>
