@@ -80,9 +80,9 @@ class Job(models.Model):
     def read_xml_file(self):
         path = self._context.get('local_path', '')
 
-        dir_toRead = os.path.join(path, 'to_read')
-        dir_Read   = os.path.join(path, 'read')
-        dir_Error  = os.path.join(path, 'error')
+        dir_toRead = os.path.join(path, 'To_read')
+        dir_Read   = os.path.join(path, 'Read')
+        dir_Error  = os.path.join(path, 'Error')
         try:
             os.listdir(dir_toRead) and os.listdir(dir_Read) and os.listdir(dir_Error)
         except Exception, e:
