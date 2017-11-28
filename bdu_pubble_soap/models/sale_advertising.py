@@ -50,7 +50,6 @@ class SaleOrder(models.Model):
     @job
     def action_pubble(self):
         self.ensure_one()
-#        self.with_delay().transfer_order_to_pubble().call_wsdl()
         res = self.transfer_order_to_pubble()
         self._cr.commit()
         res.call_wsdl()
@@ -62,6 +61,7 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         a = self.filtered("advertising")
         for order in a:
+#            order.action_pubble()
             order.with_delay().action_pubble()
         super(SaleOrder, self).action_confirm()
         return True
@@ -186,7 +186,6 @@ class SofromOdootoPubble(models.Model):
         apiKey = "9tituo3t2qo4zk7emvlb"
 
 
-        ad = 0
         SalesOrder.extOrderID = int(float(self.salesorder_extorderid))
         SalesOrder.reference = self.salesorder_reference
         SalesOrder.createdBy = self.salesorder_createdby
@@ -212,7 +211,6 @@ class SofromOdootoPubble(models.Model):
             SalesOrder.agency.postalcode = self.salesorder_agency_postalcode
 
         for line in self.pubble_so_line:
-            ad += 1
             ad = client.factory.create('ns1:adPlacement')
             ad.adSize.adTypeName = line.ad_adsize_adtypename
             ad.adSize.extAdSizeID = int(float(line.ad_adsize_extadsizeid))
