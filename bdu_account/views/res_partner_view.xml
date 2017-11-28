@@ -6,11 +6,17 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <field name="ref" position="replace"/>
-            <xpath expr="//sheet" position="before">
-                <div class="alert alert-info" role="alert" style="margin-bottom:0px;padding:5px;" attrs="{'invisible':['|',('ref','=',False),('parent_id','!=',False)]}">
-                    <field name="ref" readonly="1"/>
-                </div>
+            <!--<xpath expr="//sheet" position="before">-->
+                <!--<div class="alert alert-info" role="alert" style="margin-bottom:0px;padding:5px;" attrs="{'invisible':['|',('ref','=',False),('parent_id','!=',False)]}">-->
+                    <!--<field name="ref" readonly="1"/>-->
+                <!--</div>-->
+            <!--</xpath>-->
+
+
+            <xpath expr="//field[@name='type']" position="before">
+                <field name="ref" attrs="{'readonly': [('is_company', '=', False), ('parent_id', '!=', False)]}"/>
             </xpath>
+
             <field name="street" position="attributes">
                 <attribute name="attrs">{'required':[('is_company','=',True)]}</attribute>
             </field>
