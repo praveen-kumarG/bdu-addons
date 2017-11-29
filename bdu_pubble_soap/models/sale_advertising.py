@@ -101,7 +101,7 @@ class SaleOrder(models.Model):
                 'salesorder_agency_postalcode' : self.advertising_agency.zip
         }
         res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
-#        create_ids = []
+
         for line in self.order_line:
             lvals = {
                     'order_id': res.id,
