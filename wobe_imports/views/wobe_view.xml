@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem id="menu_wobe" parent="sales_team.menu_base_partner" name="Wobe Import/Export"/>
+
+        <record id="view_wobe_job_form" model="ir.ui.view">
+            <field name="name">view_wobe_job_form</field>
+            <field name="model">wobe.job</field>
+            <field name="arch" type="xml">
+                <form string="Job" create="false" edit="false" delete="false" copy="false">
+                    <header>
+                        <button name="action_create_order" type="object" string="Create SaleOrder"
+                                states="new,exception" class="oe_highlight"/>
+                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="new,order_created"/>
+                    </header>
+                    <sheet string="Invoice">
+                        <group>
+                            <group>
+                                <field name="title"/>
+                                <field name="total_pages"/>
+                                <field name="plate_type"/>
+                                <field name="gross_quantity"/>
+                                <field name="production_start"/>
+                            </group>
+                            <group>
+                                <field name="issue_date"/>
+                                <field name="strook"/>
+                                <field name="planned_quantity"/>
+                                <field name="net_quantity"/>
+                                <field name="production_stop"/>
+                            </group>
+                        </group>
+
+                        <notebook colspan="4">
+                            <page string="Booklet Details">
+                                <field name="booklet_ids" nolabel="1" widget="one2many_list" mode="tree">
+                                    <tree string="Booklet Details" editable="bottom">
+                                        <field name="pages"/>
+                                        <field name="format"/>
+                                        <field name="page_weight"/>
+                                        <field name="stitching"/>
+                                        <field name="glueing"/>
+                                        <field name="booklet_ref"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Other/Paper Details">
+                                <group>
+                                    <group string="Paper Mass">
+                                        <field name="paper_mass_1"/>
+                                        <field name="paper_mass_2"/>
+                                        <field name="paper_mass_3"/>
+                                        <field name="paper_mass_4"/>
+                                        <field name="paper_mass_5"/>
+                                        <field name="paper_mass_6"/>
+                                        <field name="paper_mass_7"/>
+                                    </group>
+                                    <group string="Paper Width">
+                                        <field name="paper_width_1"/>
+                                        <field name="paper_width_2"/>
+                                        <field name="paper_width_3"/>
+                                        <field name="paper_width_4"/>
+                                        <field name="paper_width_5"/>
+                                        <field name="paper_width_6"/>
+                                        <field name="paper_width_7"/>
+                                    </group>
+                                    <group string="Waste">
+                                        <field name="waste_start"/>
+                                        <field name="waste_total"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="XML Import Details">
+                                <group string="References" colspan="4">
+                                    <field name="job_ref"/>
+                                    <field name="bduorder_ref"/>
+                                    <field name="order_id"/>
+                                </group>
+                                <group string="Source Document" colspan="4">
+                                    <field name="xmlfile_1" filename="filename1"/>
+                                    <field name="xmlfile_3" filename="filename3"/>
+                                    <field name="xmlfile_4" filename="filename4"/>
+                                    <field name="filename1" invisible="1"/>
+                                    <field name="filename3" invisible="1"/>
+                                    <field name="filename4" invisible="1"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_wobe_job_tree" model="ir.ui.view">
+            <field name="name">view_wobe_job_tree</field>
+            <field name="model">wobe.job</field>
+            <field name="arch" type="xml">
+                <tree string="Job" create="false" edit="false" delete="false" copy="false"
+                        decoration-danger="state == 'exception'" decoration-info="state == 'new'">
+                    <field name="bduorder_ref"/>
+                    <field name="title"/>
+                    <field name="job_ref"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_wobe_job_filter" model="ir.ui.view">
+            <field name="name">view_wobe_job_filter</field>
+            <field name="model">wobe.job</field>
+            <field name="arch" type="xml">
+                <search string="Search Jobs">
+                    <field name="job_ref" />
+                    <field name="bduorder_ref"/>
+                    <filter name="new" string="New" domain="[('state','=','new')]"/>
+                    <filter name="order_created" string="SaleOrder Created" domain="[('state','=','order_created')]"/>
+                    <separator/>
+                    <filter name="exceptions" string="Exceptions" domain="[('state','=','exception')]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="status" string="Status" context="{'group_by':'state'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+
+        <record id="action_wobe_job" model="ir.actions.act_window">
+            <field name="name">Wobe Jobs</field>
+            <field name="res_model">wobe.job</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_wobe_job_filter"/>
+            <field name="context">{'search_default_exceptions':1}</field>
+            <field name="help" type="html">
+              <p>
+                Job Records will be created by the call of Schedular (Cron).
+              </p><p>
+                Do enable the schedular [FTP &amp; Import WOBE Jobs], if not done earlier.
+              </p>
+            </field>
+        </record>
+
+
+        <menuitem name="Jobs Imported"
+            parent="menu_wobe"
+            action="action_wobe_job"
+            id="menu_action_wobe_job"
+            sequence="2"/>
+
+
+
+
+    </data>
+</odoo>

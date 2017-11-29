@@ -27,33 +27,27 @@
 ##############################################################################
 
 {
-    'name' : 'BDU Account',
+    'name' : 'Wobe Imports',
     'version' : '0.9',
-    'category': 'accounts',
+    'category': 'imports',
     'description': """
-This module adds customization as per BDU Media
+This module does importing of XML file of Wobe Portal
 =============================================================================
 
 
     """,
-    'author'  : 'Magnus - Willem Hulshof',
-    'website' : 'http://www.magnus.nl',
-    'depends' : ['account',
-		'sale_advertising_order','partner_contact_gender','partner_sector','base_partner_sequence',
-    ],
+    'author'  : 'Eurogroup Consulting - Willem Hulshof',
+    'website' : 'http://www.eurogroupconsulting.nl',
+    'depends' : ['sale',],
     'data' : [
+            'security/ir.model.access.csv',
+            'data/product_data.xml',
+            'data/product.attribute.value.csv',
+            'data/cron_data.xml',
 
-         "security/ir.model.access.csv",
-         "data/partner_sequence.xml",
-         "report/report_invoice.xml",
-         "report/report_saleorder.xml",
-         "report/purchase_quotation_templates.xml",
-         "report/purchase_order_templates.xml",
-         "report/report_deliveryslip.xml",
-         "report/report.xml",
-
-         "views/res_company_view.xml",
-         "views/res_partner_view.xml",
+            'views/wobe_view.xml',
+            'views/ftp_view.xml',
+            'views/product_view.xml',
     ],
     'demo' : [],
     'installable': True

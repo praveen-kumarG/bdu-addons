@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!--
+            Resource: product.attribute
+        -->
+        <record id="variant_attribute_1" model="product.attribute">
+            <field name="name">Paper Format</field>
+        </record>
+        <record id="variant_attribute_2" model="product.attribute">
+            <field name="name">Paper Pages</field>
+        </record>
+        <record id="variant_attribute_3" model="product.attribute">
+            <field name="name">Paper Weight</field>
+        </record>
+
+
+
+    </data>
+</odoo>

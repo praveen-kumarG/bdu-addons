@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2013 Megis - Willem Hulshof - www.megis.nl
+# Copyright (c) 2009 Veritos - Jan Verlaan - www.veritos.nl
 #
 # WARNING: This program as such is intended to be used by professional
 # programmers who take the whole responsability of assessing all potential
@@ -26,37 +26,6 @@
 #
 ##############################################################################
 
-{
-    'name' : 'BDU Account',
-    'version' : '0.9',
-    'category': 'accounts',
-    'description': """
-This module adds customization as per BDU Media
-=============================================================================
+import models
 
-
-    """,
-    'author'  : 'Magnus - Willem Hulshof',
-    'website' : 'http://www.magnus.nl',
-    'depends' : ['account',
-		'sale_advertising_order','partner_contact_gender','partner_sector','base_partner_sequence',
-    ],
-    'data' : [
-
-         "security/ir.model.access.csv",
-         "data/partner_sequence.xml",
-         "report/report_invoice.xml",
-         "report/report_saleorder.xml",
-         "report/purchase_quotation_templates.xml",
-         "report/purchase_order_templates.xml",
-         "report/report_deliveryslip.xml",
-         "report/report.xml",
-
-         "views/res_company_view.xml",
-         "views/res_partner_view.xml",
-    ],
-    'demo' : [],
-    'installable': True
-}
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-
