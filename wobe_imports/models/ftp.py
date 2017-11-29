@@ -102,12 +102,7 @@ class FileTransfer(models.Model):
                 for sfile in server_files:
                     src_path  = str(connection.server_path + sfile)
                     dest_path = str(connection.local_path+'To_read/'+ sfile)
-                    source = ftp.open(src_path, 'r')  # file-like object
-                    target = ftp.open(dest_path, 'w')  # file-like object
-                    ftp.copyfileobj(source, target)
-                    # ftp.download(src_path, dest_path)# download files from server
-                    source.close()
-                    target.close()
+                    ftp.download(src_path, dest_path)# download files from server
                     ftp.remove(src_path)  # remove server file
                 ftp.close()
         except Exception:
@@ -117,6 +112,5 @@ class FileTransfer(models.Model):
         ctx = self._context.copy()
         ctx.update({'local_path': connection.local_path})
         return Job.with_context(ctx).read_xml_file()
-
 
 
