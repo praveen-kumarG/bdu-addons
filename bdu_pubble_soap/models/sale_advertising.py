@@ -100,7 +100,7 @@ class SaleOrder(models.Model):
                 'salesorder_agency_name' : self.advertising_agency.name,
                 'salesorder_agency_postalcode' : self.advertising_agency.zip
         }
-        res = self.env['sofrom.odooto.pubble'].create(vals)
+        res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
 #        create_ids = []
         for line in self.order_line:
             lvals = {
@@ -120,7 +120,7 @@ class SaleOrder(models.Model):
                     'ad_productiondetail_placementcomments': line.name,
                     'ad_status': True,
             }
-            self.env['soline.from.odooto.pubble'].create(lvals)
+            self.env['soline.from.odooto.pubble'].sudo().create(lvals)
         return res
 
 class SaleOrderLine(models.Model):

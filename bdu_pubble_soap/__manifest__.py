@@ -122,8 +122,7 @@ To contribute to this module, please visit https://odoo-community.org.
     },
 
     # always loaded
-    'data': ['views/sale_advertising_view.xml',
-             'data/transmission_sequence.xml',
+    'data': ['data/transmission_sequence.xml',
              'security/ir.model.access.csv'
     ],
     # only loaded in demonstration mode
