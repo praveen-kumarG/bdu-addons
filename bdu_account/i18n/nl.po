@@ -22,6 +22,21 @@ msgid "&amp;bull;"
 msgstr "&amp;bull;"
 
 #. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<span class=\"pull-left\">Lot/Serial Number</span>"
+msgstr "<span class=\"pull-left\">Batch/serie nummer</span>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<span><strong>Customer Address:</strong></span>"
+msgstr "<span><strong>Klantadres:</strong></span>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<span><strong>Date</strong></span>"
+msgstr "<span><strong>Date</strong></span>"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 msgid ""
 "<span><strong>Invoice Date</strong></span>\n"
@@ -35,6 +50,11 @@ msgstr ""
 "                         <span><strong>Factuurnummer</strong></span>\n"
 "                         <br/>\n"
 "                         <span><strong>Klantnummer</strong></span>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<span><strong>Order (Origin)</strong></span><br/>"
+msgstr "<span><strong>bestellen (oorsprong)</strong></span><br/>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
@@ -52,10 +72,41 @@ msgstr ""
 "                         <span><strong>Klantnummer</strong></span>"
 
 #. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid "<span><strong>Order Date</strong></span><br/>\n"
+"                        <span><strong>Order Number</strong></span><br/>\n"
+"                        <span><strong>Your Ref</strong></span>"
+msgstr "<span><strong>Offerte datum</strong></span><br/>\n"
+"                        <span><strong>Offertenummer</strong></span><br/>\n"
+"                        <span><strong>Jouw Ref</strong></span>"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "<strong>Advertiser</strong>"
 msgstr "<strong>Adverteerder</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "<strong>Date Req.</strong>"
+msgstr "<strong>Datum Nodig</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<strong>Delivered Quantity</strong>"
+msgstr "<strong>Geleverde hoeveelheid</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid "<strong>Description</strong>"
+msgstr "<strong>Omschrijving</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid "<strong>Expected Date</strong>"
+msgstr "<strong>Verwachte datum</strong>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
@@ -69,9 +120,30 @@ msgid "<strong>Gross</strong>"
 msgstr "<strong>Bruto</strong>"
 
 #. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "<strong>Net Price</strong>"
+msgstr "<strong>Nettoprijs</strong>"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "<strong>Opportunity Subject</strong>"
 msgstr "<strong>Opportunity omschrijving</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<strong>Ordered Quantity</strong>"
+msgstr "<strong>Bestelde hoeveelheid</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<strong>Product</strong>"
+msgstr "<strong>Product</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid "<strong>Qty</strong>"
+msgstr "<strong>Hvh</strong>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
@@ -79,10 +151,21 @@ msgid "<strong>Subtotal: </strong>"
 msgstr "<strong>Subtotaal: </strong>"
 
 #. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "<strong>Taxes</strong>"
+msgstr "<strong>BTW</strong>"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "<strong>Total</strong>"
 msgstr "<strong>Totaal</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "<strong>Unit Price</strong>"
+msgstr "<strong>Prijs</strong>"
 
 #. module: bdu_account
 #: model:ir.model.fields,field_description:bdu_account.field_account_invoice_published_customer
@@ -93,6 +176,11 @@ msgstr "Adverteerder"
 #: model:ir.actions.report.xml,name:bdu_account.report_sale_order1
 msgid "Advertising Quotation / Order"
 msgstr "Advertentie offerte"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "All items couldn't be shipped, the remaining ones will be shipped as soon as they become available."
+msgstr "Niet alle item konden worden verzonden, de resterende items worden verzonden zodra deze beschikbaar komen."
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.view_res_company_form_inherits
@@ -209,6 +297,11 @@ msgid "PRO-FORMA"
 msgstr "Pro-forma"
 
 #. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "PURCHASE ORDER CONFIRMATION"
+msgstr "INKOOP BESTELBEVESTIGING"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "Product"
@@ -223,6 +316,12 @@ msgstr "Offerte"
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 msgid "Quantity"
 msgstr "Hoeveelheid"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid "REQUEST FOR QUOTATION"
+msgstr "OFFERTE AANVRAGENN"
 
 #. module: bdu_account
 #: model:ir.model,name:bdu_account.model_sale_order
@@ -261,9 +360,24 @@ msgid "Tax Excluded Price"
 msgstr "Bedrag"
 
 #. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "Taxes"
+msgstr "Belastingen"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "This shipment is a backorder of"
+msgstr "Deze levering is een backorder van"
+
+#. module: bdu_account
 #: model:ir.model.fields,field_description:bdu_account.field_account_invoice_line_sol_title
 msgid "Title"
 msgstr "Titel"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "Total Without Taxes"
+msgstr "Totaal zonder belastingen"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
@@ -277,6 +391,8 @@ msgid "Use BDUprint Layout?"
 msgstr "BDUprint Layout gebruiken?"
 
 #. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "VAT:"
 msgstr "BTW:"

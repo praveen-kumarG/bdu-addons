@@ -2,6 +2,12 @@
 <openerp>
     <data>
 
+    <template id="bdu_account.report_assets_common" name="bdu_account report assets common" inherit_id="report.assets_common">
+        <xpath expr="." position="inside">
+            <link href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;subset=latin-ext" rel="stylesheet"/>
+        </xpath>
+    </template>
+
     <record id="paperformat_bdu_layout" model="report.paperformat">
         <field name="name">European A4 - BDU Layout</field>
         <field name="default" eval="True"/>
@@ -37,6 +43,36 @@
         name="bdu_account.report_saleorder1"
         paperformat="bdu_account.paperformat_bdu_layout"
     />
+    <report
+        string="Purchase Order"
+        id="purchase.action_report_purchase_order"
+        model="purchase.order"
+        report_type="qweb-pdf"
+        name="purchase.report_purchaseorder"
+        file="purchase.report_purchaseorder"
+        paperformat="bdu_account.paperformat_bdu_layout"
+    />
+
+    <report
+        string="Request for Quotation"
+        id="purchase.report_purchase_quotation"
+        model="purchase.order"
+        report_type="qweb-pdf"
+        name="purchase.report_purchasequotation"
+        file="purchase.report_purchasequotation"
+        paperformat="bdu_account.paperformat_bdu_layout"
+    />
+
+    <report
+        string="Delivery Slip"
+        id="stock.action_report_delivery"
+        model="stock.picking"
+        report_type="qweb-pdf"
+        name="stock.report_deliveryslip"
+        file="stock.report_deliveryslip"
+        paperformat="bdu_account.paperformat_bdu_layout"
+    />
+
     <report
         string="Purchase Order"
         id="purchase.action_report_purchase_order"

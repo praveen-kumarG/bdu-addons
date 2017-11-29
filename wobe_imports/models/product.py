@@ -48,6 +48,7 @@ class Product(models.Model):
                                string='Paper Format')
 
 
+
     @api.constrains('print_category')
     def _check_printCategory(self):
         for case in self:

@@ -5,7 +5,7 @@
         <t t-call="report.html_container">
             <t t-call="bdu_account.external_layout_bdu">
                 <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
-                <div class="page">
+                <div class="page" style="font-family: Titillium Web, sans-serif;">
                     <div class="row" name="customer_address" style="padding-left:45px;">
                         <div class="col-xs-5 pull-left" style="padding:0px;">
                             <h2 >

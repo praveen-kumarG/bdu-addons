@@ -12,7 +12,6 @@
                 <!--</div>-->
             <!--</xpath>-->
 
-
             <xpath expr="//field[@name='type']" position="before">
                 <field name="ref" attrs="{'readonly': [('is_company', '=', False), ('parent_id', '!=', False)]}"/>
             </xpath>

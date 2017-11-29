@@ -29,6 +29,7 @@ class Job(models.Model):
     plate_type = fields.Selection([('PA', 'PA'), ('PU', 'PU')], string='Plate Type')
     plate_amount = fields.Integer('Plate Amount')
 
+
     production_start = fields.Char('Production Start', help='Info DateTime Start')
     production_stop = fields.Char('Production End', help='Info DateTime End')
 
@@ -71,6 +72,7 @@ class Job(models.Model):
                              copy=False, required=True, track_visibility='onchange')
 
     order_id = fields.Many2one('sale.order', string='Sale Order', ondelete='restrict', help='Associated Sale Order')
+
 
     @api.model
     def _needaction_domain_get(self):
@@ -151,7 +153,9 @@ class Job(models.Model):
             File4 = os.path.join(dir_toRead, fv['file4'])
 
             try:
+
                 job = Job_obj.search([('bduorder_ref', '=', key[0])])
+
                 if job: continue
 
                 tree1 = ET.parse(File1)
@@ -263,6 +267,7 @@ class Job(models.Model):
                 'format': booklet.find('Format').text,
                 'paper_weight': booklet.find('PaperWeight').text,
 
+
                 'stitching': True if booklet.find('Stitching').text == 'Yes' else False,
                 'glueing'  : True if booklet.find('Glueing').text == 'Yes' else False,
             }
@@ -302,7 +307,6 @@ class Job(models.Model):
         product_obj = self.env['product.product']
         sale_obj = self.env['sale.order']
         variant_obj = self.env['product.attribute.value']
-
         aa = self.env['account.analytic.account'].search([('name','=', self.title)])
         partner = aa and aa.partner_id or False
 
@@ -340,6 +344,7 @@ class Job(models.Model):
         pWeight = self.env.ref('wobe_imports.variant_attribute_3', False)
 
         emsg = ''
+
         if not pPages : emsg += "Pages, "
         if not pWeight: emsg += "Paper Weight."
         if emsg:
