@@ -378,7 +378,7 @@ class Job(models.Model):
                 lines.append(_get_linevals(product.ids[0]))
             else:
                 body = _("Product not found for this variants 'Pages: %s', 'Format: %s', 'Paper Weight: %s'!!"
-                          %(str(booklet.pages), booklet.format, booklet.paper_weight))
+                          %(str(booklet.pages), pFormat, booklet.paper_weight))
                 self.message_post(body=body)
                 return {}
 
