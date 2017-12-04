@@ -76,6 +76,7 @@
                                 <group string="References" colspan="4">
                                     <field name="job_ref"/>
                                     <field name="bduorder_ref"/>
+                                    <field name="company_id"/>
                                     <field name="order_id"/>
                                 </group>
                                 <group string="Source Document" colspan="4">

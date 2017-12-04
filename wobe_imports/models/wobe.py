@@ -72,6 +72,7 @@ class Job(models.Model):
                              copy=False, required=True, track_visibility='onchange')
 
     order_id = fields.Many2one('sale.order', string='Sale Order', ondelete='restrict', help='Associated Sale Order')
+    company_id = fields.Many2one('res.company', 'Company')
 
 
     @api.model
@@ -81,6 +82,7 @@ class Job(models.Model):
     @api.multi
     def read_xml_file(self):
         path = self._context.get('local_path', '')
+        companyID = self._context.get('company_id', '')
 
         dir_toRead = os.path.join(path, 'To_read')
         dir_Read   = os.path.join(path, 'Read')
@@ -170,6 +172,7 @@ class Job(models.Model):
                 data4 = tree4.getroot()
 
                 vals = self._prepare_job_data(data1, data3, data4)
+                vals['company_id'] = companyID or self.env.user.company_id.id
 
                 fn = open(File1, 'r')
                 vals.update({'filename1': fv['file1'], 'xmlfile_1': base64.encodestring(fn.read()),})
@@ -324,6 +327,8 @@ class Job(models.Model):
             'project_id': aa.id,
             'partner_id': partner.id,
             'date_order': self.issue_date or res['date_order'],
+            'company_id': self.company_id.id,
+            'origin': self.bduorder_ref,
                })
 
         def _get_linevals(productID, qty=1):
