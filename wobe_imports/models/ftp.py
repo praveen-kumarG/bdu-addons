@@ -29,6 +29,9 @@ class FileTransfer(models.Model):
                                               "\n2. 'Read'"
                                               "\n3. 'Error'")
 
+    company_id = fields.Many2one('res.company', 'Company', help='Company, to which records needs to be imported',
+                                 default=lambda self: self.env['res.company']._company_default_get('sale.order'))
+
 
     @api.onchange('server_path', 'local_path')
     def onchange_details(self):
@@ -110,7 +113,7 @@ class FileTransfer(models.Model):
         # Execute WobeJob Creation
         Job = self.env['wobe.job']
         ctx = self._context.copy()
-        ctx.update({'local_path': connection.local_path})
+        ctx.update({'local_path': connection.local_path, 'company_id': connection.company_id.id})
         return Job.with_context(ctx).read_xml_file()
 
 

@@ -25,14 +25,20 @@
                 </div>
                 <sheet>
                     <group>
-                        <field name="active"/>
-                        <field name="url" placeholder="IP like 192.168.1.128" required="1"/>
-                        <field name="port" placeholder="default port number is 22" required="1"/>
-                        <field name="login" placeholder="Server's Username" required="1"/>
-                        <field name="password" password="True" placeholder="Server's User Password" required="1"/>
+                        <group>
+                            <field name="url" placeholder="IP like 192.168.1.128" required="1"/>
+                            <field name="port" placeholder="default port number is 22" required="1"/>
+                            <field name="login" placeholder="Server's Username" required="1"/>
+                            <field name="password" password="True" placeholder="Server's User Password" required="1"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                            <field name="company_id" required="1"/>
+                        </group>
+                    </group>
+                    <group>
                         <field name="server_path" placeholder="path like = /home/user/shared/" required="1"/>
                         <field name="local_path" placeholder="path like = /home/user/ftpdir/" required="1"/>
-                        <!--<field name="rsa_key" placeholder="RSA Key of the Server, if exists"/>-->
                     </group>
                     <group>
                         <field name="note" readonly="1" nolabel="1"/>

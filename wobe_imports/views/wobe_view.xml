@@ -20,15 +20,16 @@
                                 <field name="title"/>
                                 <field name="total_pages"/>
                                 <field name="plate_type"/>
-                                <field name="gross_quantity"/>
+                                <field name="plate_amount"/>
                                 <field name="production_start"/>
+                                <field name="production_stop"/>
                             </group>
                             <group>
                                 <field name="issue_date"/>
                                 <field name="strook"/>
                                 <field name="planned_quantity"/>
+                                <field name="gross_quantity"/>
                                 <field name="net_quantity"/>
-                                <field name="production_stop"/>
                             </group>
                         </group>
 
@@ -75,6 +76,7 @@
                                 <group string="References" colspan="4">
                                     <field name="job_ref"/>
                                     <field name="bduorder_ref"/>
+                                    <field name="company_id"/>
                                     <field name="order_id"/>
                                 </group>
                                 <group string="Source Document" colspan="4">
