@@ -36,8 +36,8 @@ This module does importing of XML file of Wobe Portal
 
 
     """,
-    'author'  : 'Eurogroup Consulting - Willem Hulshof',
-    'website' : 'http://www.eurogroupconsulting.nl',
+    'author'  : 'Magnus - Willem Hulshof',
+    'website' : 'http://www.magnus.nl',
     'depends' : ['sale',],
     'data' : [
             'security/ir.model.access.csv',
