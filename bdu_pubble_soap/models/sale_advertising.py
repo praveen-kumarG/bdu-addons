@@ -104,8 +104,7 @@ class SaleOrder(models.Model):
         res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
         counter = 0
         for line in self.order_line:
-            if not [('line.product_id.product_template_id.categ_id','child_of', self.env.ref('sale_advertising_order.online_advertising_category').id),
-                    ('line.product_id.product_template_id.categ_id','child_of', self.env.ref('sale_advertising_order.magazine_advertising_category').id)]:
+            if [('line.product_id.product_tmpl_id.categ_id','child_of', self.env.ref('sale_advertising_order.newspaper_advertising_category'))]:
                 counter += 1
                 lvals = {
                         'order_id': res.id,
