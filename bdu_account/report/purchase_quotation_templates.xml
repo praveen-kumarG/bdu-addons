@@ -6,7 +6,7 @@
         <div class="page" style="font-family: 'Titillium Web', sans-serif;">
             <div class="oe_structure"/>
 
-            <div class="row" style="padding-left:40px;">
+            <div class="row" style="padding-left:95;">
                 <div name="order_title" class="col-xs-7 col-xs-offset-7" style="padding:0px;">
                     <h3>
                         <span>REQUEST FOR QUOTATION</span>
@@ -14,7 +14,7 @@
                 </div>
             </div>
 
-            <div class="row mt32 mb32" style="padding-left:45px;">
+            <div class="row mt32 mb32" style="padding-left:95px;">
                  <div class="col-xs-5" style="padding:0px;">
                      <div class="col-xs-4" style="padding:0px;">
                         <span><strong>Order Date</strong></span><br/>
@@ -48,7 +48,7 @@
                  </div>
             </div>
 
-            <div class="row" style="padding-left:45px;padding-right:15px;">
+            <div class="row" style="padding-left:95px;padding-right:15px;">
                 <table class="table table-condensed table-padding">
                     <thead>
                         <tr>
@@ -74,7 +74,7 @@
                 </table>
             </div>
 
-            <p t-field="o.notes" style="padding-left:35px;padding-right:15px;"/>
+            <p t-field="o.notes" style="padding-left:85px;padding-right:15px;"/>
             <div class="oe_structure"/>
         </div>
     </t>
