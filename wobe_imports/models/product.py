@@ -7,6 +7,8 @@ from odoo.exceptions import ValidationError
 PrintCategory = [('strook', 'Strook'),
                  ('stitching', 'Stitching'),
                  ('glueing', 'Glueing'),
+                 ('plate_change', 'Plate Change'),
+                 ('press_stop', 'Press Stop'),
                 ]
 
 class ProductTemplate(models.Model):
