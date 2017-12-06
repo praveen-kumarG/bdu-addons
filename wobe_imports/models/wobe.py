@@ -397,15 +397,15 @@ class Job(models.Model):
 
         # Glueing:
         if glueCnt:
-            if not stitching:
-                self.message_post(body=_("Product not found for the print-category : 'Stitching'"))
+            if not glueing:
+                self.message_post(body=_("Product not found for the print-category : 'Glueing'"))
                 return {}
             lines.append(_get_linevals(glueing, qty=glueCnt))
 
         # Stitching:
         if stitchCnt:
-            if not glueing:
-                self.message_post(body=_("Product not found for the print-category : 'Glueing'"))
+            if not stitching:
+                self.message_post(body=_("Product not found for the print-category : 'Stitching'"))
                 return {}
             lines.append(_get_linevals(stitching, qty=stitchCnt))
 
