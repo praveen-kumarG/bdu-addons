@@ -57,6 +57,7 @@ class Job(models.Model):
     waste_total = fields.Integer('Waste Total')
 
     booklet_ids = fields.One2many('wobe.booklet', 'job_id', 'Booklets', copy=True)
+    edition_ids = fields.One2many('wobe.edition', 'job_id', 'Editions', copy=True)
 
     xmlfile_1 = fields.Binary('XML File1', help='Imported XML File 1')
     filename1 = fields.Char()
@@ -112,6 +113,7 @@ class Job(models.Model):
                 if header.get('SenderId') == 'WOBEWebportal' and header.get('Type') == 'CreateJob':
                     BDUOrder = root.find('Newspaper').find('BduOrderId').text
                     part1[BDUOrder] = filename
+                    # edCnt = len(root.findall('Edition'))
 
                 elif header.get('SenderId') == 'WOBEWorkflow' and header.get('Type') == 'PlatesUsed':
                     BDUOrder = root.find('Newspaper').find('BduOrderId').text
@@ -149,6 +151,7 @@ class Job(models.Model):
             groupedFiles[key] = {'file1': f1, 'file3': f3, 'file4': f4}
 
 
+        # Extract Data
         for key, fv in groupedFiles.iteritems():
             File1 = os.path.join(dir_toRead, fv['file1'])
             File3 = os.path.join(dir_toRead, fv['file3'])
@@ -331,19 +334,24 @@ class Job(models.Model):
             'origin': self.bduorder_ref,
                })
 
-        def _get_linevals(productID, qty=1):
+        def _get_linevals(productID, qty=1, forceQty=0):
+            Qty = qty * ((self.net_quantity / 1000) or 1)
+
             return {
                 'product_id': productID,
-                'product_uom_qty': qty * ((self.net_quantity / 1000) or 1),
+                'product_uom_qty': forceQty if forceQty else Qty,
             }
 
         lines = []
-        strook = glueing = stitching = False
+        strook = glueing = stitching = plateChange = pressStop = False
         glueCnt = stitchCnt = 0
-        for p in product_obj.search([('print_category','in', ('strook', 'stitching', 'glueing'))]):
+        for p in product_obj.search([('print_category','in', ('strook', 'stitching', 'glueing',
+                                                              'plate_change', 'press_stop'))]):
             if p.print_category   == 'strook'   : strook = p.id
             elif p.print_category == 'glueing'  : glueing = p.id
             elif p.print_category == 'stitching': stitching = p.id
+            elif p.print_category == 'plate_change': plateChange = p.id
+            elif p.print_category == 'press_stop'  : pressStop = p.id
 
         pPages  = self.env.ref('wobe_imports.variant_attribute_2', False)
         pWeight = self.env.ref('wobe_imports.variant_attribute_3', False)
@@ -401,6 +409,19 @@ class Job(models.Model):
                 return {}
             lines.append(_get_linevals(stitching, qty=stitchCnt))
 
+        # Multiple Editions:
+        if True: #len(self.edition_ids) > 1:
+            if not plateChange:
+                self.message_post(body=_("Product not found for the print-category : 'Plate Change'"))
+                return {}
+
+            elif not pressStop:
+                self.message_post(body=_("Product not found for the print-category : 'Press Stop'"))
+                return {}
+            print "len(self.edition_ids.ids)", len(self.edition_ids.ids)-1
+            lines.append(_get_linevals(pressStop, forceQty=len(self.edition_ids.ids)-1))
+            lines.append(_get_linevals(plateChange, forceQty=55))
+
         res['order_line'] = map(lambda x:(0,0,x), lines)
 
         return res
@@ -419,3 +440,15 @@ class Booklet(models.Model):
     paper_weight = fields.Char('Paper Weight')
     stitching = fields.Boolean('Stitching', default=False)
     glueing = fields.Boolean('Glueing', default=False)
+
+
+class Edition(models.Model):
+    _name = "wobe.edition"
+    _description = 'WOBE Edition'
+
+    job_id = fields.Many2one('wobe.job', required=True, ondelete='cascade', index=True, copy=False)
+    edition_ref = fields.Char('Edition Ref', help='Edition reference', required=True, index=True)
+    name = fields.Char('Edition Name', help='Edition Name', required=True)
+
+    plate_amount = fields.Integer('Plate Amount')
+    prints_net   = fields.Integer('Net Qty', help='Prints Net')

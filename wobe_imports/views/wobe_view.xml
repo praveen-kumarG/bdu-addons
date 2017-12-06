@@ -72,6 +72,16 @@
                                     </group>
                                 </group>
                             </page>
+                            <page string="Editions">
+                                <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree">
+                                    <tree string="Edition Details" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="plate_amount"/>
+                                        <field name="prints_net"/>
+                                        <field name="edition_ref"/>
+                                    </tree>
+                                </field>
+                            </page>
                             <page string="References">
                                 <group string="References" colspan="4">
                                     <field name="job_ref"/>
