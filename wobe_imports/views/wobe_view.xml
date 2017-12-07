@@ -77,8 +77,12 @@
                                     <tree string="Edition Details" editable="bottom">
                                         <field name="name"/>
                                         <field name="plate_amount"/>
-                                        <field name="prints_net"/>
-                                        <field name="edition_ref"/>
+                                        <field name="net_quantity"/>
+                                        <field name="gross_quantity"/>
+                                        <field name="production_start"/>
+                                        <field name="production_stop"/>
+                                        <!--<field name="waste_start"/>-->
+                                        <!--<field name="waste_total"/>-->
                                     </tree>
                                 </field>
                             </page>
@@ -88,14 +92,6 @@
                                     <field name="bduorder_ref"/>
                                     <field name="company_id"/>
                                     <field name="order_id"/>
-                                </group>
-                                <group string="Source Document" colspan="4">
-                                    <field name="xmlfile_1" filename="filename1"/>
-                                    <field name="xmlfile_3" filename="filename3"/>
-                                    <field name="xmlfile_4" filename="filename4"/>
-                                    <field name="filename1" invisible="1"/>
-                                    <field name="filename3" invisible="1"/>
-                                    <field name="filename4" invisible="1"/>
                                 </group>
                             </page>
                         </notebook>
