@@ -511,7 +511,7 @@ class Booklet(models.Model):
     calculated_ink = fields.Float(string='Calculated Ink', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
 
-    @api.depends('format', 'pages', 'paper_weight', 'glueing', 'stitching', 'job_id')
+    @api.depends('format', 'pages', 'paper_weight')
     def _compute_all(self):
         for booklet in self:
             #calculated_plates
