@@ -485,9 +485,10 @@ class Job(models.Model):
             'name': action.name,
             'help': action.help,
             'type': action.type,
-            'view_type': action.view_type,
-            'view_mode': action.view_mode,
+            'view_type':  'form' if self.order_id else action.view_type,
+            'view_mode': 'form' if self.order_id else action.view_mode,
             'target': action.target,
+            'res_id': self.order_id.id or False,
             'res_model': action.res_model,
             'domain': [('id', '=', self.order_id.id)],
         }
