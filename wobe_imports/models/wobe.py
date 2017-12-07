@@ -543,7 +543,7 @@ class Booklet(models.Model):
                                           ('print_format_template', '=', True),
                                           ('formats', '=', booklet.format), ], order='id desc', limit=1)
             if product:
-                booklet.calculated_mass = (product.booklet_surface_area * pages) / float(2) * paper_weight / float(1000)
+                booklet.calculated_mass = (product.product_tmpl_id.booklet_surface_area * pages) / float(2) * paper_weight / float(1000)
 
             # Calculated_Ink
             booklet.calculated_ink = booklet.calculated_mass * .04
