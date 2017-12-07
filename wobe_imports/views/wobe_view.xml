@@ -15,6 +15,11 @@
                         <field name="state" widget="statusbar" nolabel="1" statusbar_visible="new,order_created"/>
                     </header>
                     <sheet string="Invoice">
+                        <div class="oe_button_box" name="button_box" position="inside">
+                            <button class="oe_stat_button" name="action_view_sales"
+                                type="object" icon="fa-usd" String="Sale Order">
+                            </button>
+                        </div>
                         <group>
                             <group>
                                 <field name="title"/>
@@ -43,6 +48,10 @@
                                         <field name="stitching"/>
                                         <field name="glueing"/>
                                         <field name="booklet_ref"/>
+                                        <field name="calculated_plates"/>
+                                        <field name="calculated_mass"/>
+                                        <field name="calculated_ink"/>
+                                        <field name="calculated_hours"/>
                                     </tree>
                                 </field>
                             </page>
@@ -91,7 +100,7 @@
                                     <field name="job_ref"/>
                                     <field name="bduorder_ref"/>
                                     <field name="company_id"/>
-                                    <field name="order_id"/>
+                                    <!--<field name="order_id"/>-->
                                 </group>
                             </page>
                         </notebook>
