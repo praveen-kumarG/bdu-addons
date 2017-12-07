@@ -243,7 +243,7 @@ class Job(models.Model):
         res = {}
         edlines, lines = [], []
 
-        editionInfoL = ['plate_amount', 'prints_net', 'gross_quantity', 'net_quantity',
+        editionInfoL = ['plate_amount', 'net_quantity', 'gross_quantity', 'net_quantity',
                         'production_start', 'production_stop', 'waste_start', 'waste_total']
 
         commonInfoL = ['plate_type',
@@ -346,6 +346,7 @@ class Job(models.Model):
             vals = case._prepare_order_data()
             if vals:
                 order = sale_obj.create(vals)
+                order.action_confirm()
                 order.message_post_with_view('mail.message_origin_link',
                     values={'self': order, 'origin': case},
                     subtype_id=self.env.ref('mail.mt_note').id)
@@ -461,7 +462,7 @@ class Job(models.Model):
             lines.append(_get_linevals(stitching, qty=stitchCnt))
 
         # Multiple Editions:
-        if True: #len(self.edition_ids) > 1:
+        if len(self.edition_ids) > 1:
             if not plateChange:
                 self.message_post(body=_("Product not found for the print-category : 'Plate Change'"))
                 return {}
@@ -506,12 +507,13 @@ class Booklet(models.Model):
     paper_weight = fields.Char('Paper Weight')
     stitching = fields.Boolean('Stitching', default=False)
     glueing = fields.Boolean('Glueing', default=False)
+
     calculated_plates = fields.Float(string='Calculated Plates', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
     calculated_mass = fields.Float(string='Calculated Mass', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
     calculated_ink = fields.Float(string='Calculated Ink', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
 
-    @api.depends('format', 'pages', 'paper_weight', 'glueing', 'stitching', 'job_id')
+    @api.depends('format', 'pages', 'paper_weight')
     def _compute_all(self):
         for booklet in self:
             #calculated_plates
