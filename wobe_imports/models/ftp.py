@@ -32,10 +32,8 @@ class FileTransfer(models.Model):
     company_id = fields.Many2one('res.company', 'Company', help='Company, to which records needs to be imported',
                                  default=lambda self: self.env['res.company']._company_default_get('sale.order'))
 
-
     @api.onchange('server_path', 'local_path')
     def onchange_details(self):
-
         if self.server_path and not self.server_path.endswith('/'):
             self.server_path = self.server_path + '/'
 
@@ -50,16 +48,27 @@ class FileTransfer(models.Model):
 
     @api.model
     def create(self, vals):
-        if len(self.search([('active','=',True)])) >= 1 and vals['active'] == True :
-            raise UserError(_("You can't create more than one active connection"))
+        if len(self.search([('active','=',True),('company_id','=',vals.get('company_id'))])) >= 1 and vals['active'] == True :
+            raise UserError(_("You can't create more than one active connection same company"))
 
         return super(FileTransfer, self).create(vals)
 
     @api.multi
     def write(self, vals):
-        if vals.has_key('active') and vals.get('active'):
-            if self.search([('id','not in', self._ids),('active', '=', True)]):
-                raise UserError(_("You can't create more than one active connection"))
+        assert len(self.ids) == 1, "you can open only one session at a time"
+        active = False
+        if vals.has_key('active') or vals.has_key('company_id'):
+            if vals.has_key('active'):
+                active = vals.get('active')
+            else:
+                active = self.active
+            if active:
+                if vals.has_key('company_id') and vals.get('company_id'):
+                    company_id = vals.get('company_id')
+                else:
+                    company_id = self.company_id.id
+                if self.search([('id','not in',self._ids),('active', '=', True),('company_id', '=', company_id)]):
+                    raise UserError(_("You can't create more than one active connection for same company"))
 
         return super(FileTransfer, self).write(vals)
 
