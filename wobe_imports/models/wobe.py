@@ -102,7 +102,7 @@ class Job(models.Model):
         newJobs = self.env['wobe.job']
         Attachment = self.env['ir.attachment']
 
-        groupedFiles = defaultdict(lambda: {'file1': False, file3N4: {}})
+        groupedFiles = defaultdict(lambda: {'file1': False, 'file3N4': {}})
         part1, part3, part4 = {}, {}, {}
 
         # --------------------------
