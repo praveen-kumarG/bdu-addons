@@ -481,13 +481,13 @@
         <record id="13010" model="account.account.template">
             <field name="code">13010</field>
             <field name="name">AFSCHRIJVING DEBITEUREN</field>
-            <field name="user_type_id" ref="account.data_account_type_receivable"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="bducoa_template"/>
         </record>
         <record id="13030" model="account.account.template">
             <field name="code">13030</field>
             <field name="name">VOORZ DUB. DEBITEUREN</field>
-            <field name="user_type_id" ref="account.data_account_type_receivable"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="bducoa_template"/>
         </record>
         <record id="14000" model="account.account.template">
@@ -944,7 +944,7 @@
         <record id="16001" model="account.account.template">
             <field name="code">16001</field>
             <field name="name">KRED/DEB.BET ONDERWEG</field>
-            <field name="user_type_id" ref="account.data_account_type_payable"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="bducoa_template"/>
         </record>
         <record id="16002" model="account.account.template">
