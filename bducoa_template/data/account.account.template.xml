@@ -1381,11 +1381,11 @@
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="bducoa_template"/>
         </record>
-        <record id="23000" model="account.account.template">
+        <!--record id="23000" model="account.account.template">
             <field name="code">23000</field>
             <field name="name">KRUISPOSTEN</field>
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
-            <field name="chart_template_id" ref="bducoa_template"/>
+            <field name="chart_template_id" ref="bducoa_template"/-->
         </record>
         <record id="23010" model="account.account.template">
             <field name="code">23010</field>
