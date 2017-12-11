@@ -83,6 +83,11 @@ msgstr "<span><strong>Offerte datum</strong></span><br/>\n"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Tax"
+msgstr "BTW"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "<strong>Advertiser</strong>"
 msgstr "<strong>Adverteerder</strong>"
@@ -183,6 +188,11 @@ msgid "All items couldn't be shipped, the remaining ones will be shipped as soon
 msgstr "Niet alle item konden worden verzonden, de resterende items worden verzonden zodra deze beschikbaar komen."
 
 #. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Amount"
+msgstr "Bedrag"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.view_res_company_form_inherits
 msgid "Background Image for Invoice"
 msgstr "Achtergrondafbeelding voor factuur"
@@ -196,6 +206,11 @@ msgstr "Achtergrondafbeelding voor de rapportage op volgende pagina's"
 #: model:ir.model.fields,field_description:bdu_account.field_res_company_report_background_image1
 msgid "Background Image for Report Frontpage"
 msgstr "Achtergrondafbeelding voor de voorpagina"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Base"
+msgstr "Grondslag"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1

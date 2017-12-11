@@ -38,7 +38,7 @@
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
 
         <div class="page" style="font-family: 'Titillium Web', sans-serif;">
-            <div class="row" style="padding-left:45px;">
+            <div class="row" style="padding-left:85px;">
                 <div name="invoice_title" class="col-xs-5 col-xs-offset-7" style="padding:0px;">
                     <h3>
                         <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">INVOICE</span>
@@ -52,7 +52,7 @@
                 </div>
             </div>
 
-             <div class="row mt32 mb32" style="padding-left:45px;">
+             <div class="row mt32 mb32" style="padding-left:85px;">
                  <div class="col-xs-7" style="padding:0px;">
                      <div class="col-xs-3" style="padding:0px;">
                          <span><strong>Invoice Date</strong></span>
@@ -104,7 +104,7 @@
             <t t-set="display_Cdiscount" t-value="any([l.sol_computed_discount for l in o.invoice_line_ids])"/>
             <t t-set="tot_Cdiscount" t-value="0"/>
 
-            <div t-if="not o.company_id.use_bduprint" class="row" style="padding-left:45px;padding-right:15px;">
+            <div t-if="not o.company_id.use_bduprint" class="row" style="padding-left:85px;padding-right:15px;">
                 <table class="table table-condensed table-padding">
                     <thead>
                         <tr>
@@ -151,7 +151,7 @@
             </div>
 
 
-            <div t-if="o.company_id.use_bduprint" class="row" style="padding-left:45px;padding-right:15px;">
+            <div t-if="o.company_id.use_bduprint" class="row" style="padding-left:85px;padding-right:15px;">
                 <table class="table table-condensed table-padding">
                     <thead>
                         <tr>
@@ -181,7 +181,7 @@
                 </table>
             </div>
 
-            <div class="row" style="padding-left:45px;">
+            <div class="row" style="padding-left:85px;">
                 <div class="col-xs-4 pull-right">
                     <table class="table table-condensed">
                         <tr class="border-black">
@@ -217,7 +217,7 @@
             </div>
 
             <!--&lt;!&ndash; DO NOT REMOVE THIS TABLE. MANDATORY IN SOME COUNTRIES &ndash;&gt;-->
-            <div class="row" t-if="len(o.tax_line_ids) > 0" style="padding-left:45px;padding-right:15px;">
+            <div class="row" t-if="len(o.tax_line_ids) > 1" style="padding-left:75px;padding-right:15px;">
                 <div class="col-xs-6">
                     <table class="table table-condensed">
                         <thead>
@@ -243,15 +243,15 @@
             </div>
 
             <t t-if="not o.company_id.use_bduprint">
-                <p t-if="o.comment" class='text-center' style="padding-left:70px;padding-right:70px;padding-top:30px;">
+                <p t-if="o.comment" class='text-center' style="padding-left:75px;padding-right:70px;padding-top:30px;">
                     <strong><span t-field="o.comment"/></strong>
                 </p>
             </t>
-            <p t-if="o.payment_term_id" class='text-center' style="padding-left:70px;padding-right:70px;padding-top:30px;">
+            <p t-if="o.payment_term_id" class='text-center' style="padding-left:85px;padding-right:70px;padding-top:30px;">
                 <span t-field="o.payment_term_id.note"/>
             </p>
             <t t-if="o.company_id.use_bduprint">
-                <p t-if="o.comment" class='text-center' style="font-size:8pt;padding-left:70px;padding-right:70px;padding-top:30px;">
+                <p t-if="o.comment" class='text-center' style="font-size:8pt;padding-left:75px;padding-right:70px;padding-top:30px;">
                     <strong><span t-field="o.comment"/></strong>
                 </p>
             </t>
