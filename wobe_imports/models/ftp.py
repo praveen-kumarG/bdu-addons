@@ -155,19 +155,27 @@ class Registry(models.Model):
     company_id = fields.Many2one('res.company', 'Company')
     edition_count = fields.Integer('Edition Count', help='Print Editions')
 
+    xmlfile = fields.Binary('XML File', help='Imported XML File')
+    filename = fields.Char()
+
+
     @api.multi
     def load_xml_file(self):
+        '''
+            Imports the XML file into FileRegistry
+        '''
+
         path = self._context.get('local_path', '')
         companyID = self._context.get('company_id', '')
         dir_toRead = os.path.join(path)
 
-        Attachment = self.env['ir.attachment']
+        Job = self.env['wobe.job']
 
         try:
             os.listdir(dir_toRead)
         except Exception, e:
             _logger.exception("Wobe Import File : %s" % str(e))
-            return False
+            return Job.action_create_job()
 
         for filename in os.listdir(dir_toRead):
             if not filename.endswith('.xml'): continue
@@ -209,14 +217,16 @@ class Registry(models.Model):
                     'company_id': companyID,
                     'run_date': fields.Datetime.now(),
                 })
-                reg = self.create(vals)
                 fn = open(File, 'r')
-                Attachment.sudo().create({
-                        'name': filename, 'datas_fname': filename,
-                        'datas': base64.encodestring(fn.read()),
-                        'res_model': self._name, 'res_id': reg.id})
+                vals.update({'filename': filename,
+                             'xmlfile': base64.encodestring(fn.read()),})
                 fn.close()
+                reg = self.create(vals)
 
 
-            except:
+            except Exception, e:
                 _logger.exception("Wobe Import: File-Registry : %s" % str(e))
+
+
+        # Execute WobeJob Creation
+        return Job.action_create_job()
