@@ -101,7 +101,7 @@ class FileTransfer(models.Model):
 
     @api.model
     def process_file_transfer(self, ids=None):
-        connection = self.search([('active','=',True)])
+        connection = self.search([('active','=',True),('company_id','=',self.env.user.company_id.id)])
         if not connection:
             _logger.exception("FTP Connection does not exist, please configure under 'FTP Settings'.")
             return False

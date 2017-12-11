@@ -432,12 +432,11 @@ class Job(models.Model):
             if booklet.id not in booklet_processed_ids:
                 pFormat = 'MP' if booklet.format == 'MAG' else booklet.format
                 #search for record in booklet with same format & page weight
-                booklet_processed_ids.append(booklet.id)
                 search_format = [booklet.format]
                 if booklet.format == 'MAG':
                     search_format = ['MAG', 'MP']
-                dup_booklet_ids = self.env['wobe.booklet'].search([('id', 'not in', booklet_processed_ids), ('format', 'in', search_format),('paper_weight', '=', booklet.paper_weight)])
-                pages = int(booklet.pages)
+                dup_booklet_ids = (self.booklet_ids.filtered(lambda r: (r.format in search_format and r.paper_weight == booklet.paper_weight)))
+                pages = 0
                 for booklet_obj in dup_booklet_ids:
                     booklet_processed_ids.append(booklet_obj.id)
                     pages += int(booklet_obj.pages)
