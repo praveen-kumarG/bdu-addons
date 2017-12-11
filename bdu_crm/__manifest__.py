@@ -27,26 +27,22 @@
 ##############################################################################
 
 {
-    'name' : 'Wobe Imports',
+    'name' : 'BDU CRM',
     'version' : '0.9',
-    'category': 'imports',
+    'category': 'project',
     'description': """
-This module does importing of XML file of Wobe Portal
+This module adds enhancement to project issue module
 =============================================================================
 
 
     """,
     'author'  : 'Magnus - Willem Hulshof',
     'website' : 'http://www.magnus.nl',
-    'depends' : ['sale', 'document'],
+    'depends' : ['sale_advertising_order','bdu_account','project_issue'
+    ],
     'data' : [
-            'security/ir.model.access.csv',
-            'data/product_data.xml',
-            'data/product.attribute.value.csv',
-            'data/cron_data.xml',
-            'views/wobe_view.xml',
-            'views/ftp_view.xml',
-            'views/product_view.xml',
+         "security/ir.model.access.csv",
+         "views/project_issue_view.xml",
     ],
     'demo' : [],
     'installable': True

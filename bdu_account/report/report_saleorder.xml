@@ -6,8 +6,7 @@
         <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})" />
         <div class="page" style="font-family: 'Titillium Web', sans-serif;">
             <div class="oe_structure"/>
-
-            <div class="row" style="padding-left:45px;">
+            <div class="row" style="padding-left:75px;">
                 <div name="order_title" class="col-xs-5 col-xs-offset-7" style="padding:0px;">
                     <h3>
                         <span t-if="doc.state not in ['draft','sent']">ORDER CONFIRMATION</span>
@@ -16,7 +15,7 @@
                 </div>
             </div>
 
-            <div class="row mt32 mb32" style="padding-left:45px;">
+            <div class="row mt32 mb32" style="padding-left:85px;">
                  <div class="col-xs-7" style="padding:0px;">
                      <div class="col-xs-4" style="padding:0px;">
                          <span><strong>Order Date</strong></span>
@@ -80,7 +79,7 @@
             <t t-set="display_Cdiscount" t-value="any([l.computed_discount for l in doc.order_line])"/>
             <t t-set="tot_Cdiscount" t-value="0"/>
 
-            <div class="row" style="padding-left:45px;padding-right:15px;">
+            <div class="row" style="padding-left:85px;padding-right:15px;">
                 <t t-foreach="doc.order_lines_layouted()" t-as="page">
                     <table class="table table-condensed">
                         <thead>
@@ -199,7 +198,7 @@
             </div>
 
             <strong t-if="not doc.company_id.use_bduprint">
-                <p t-field="doc.note" class='text-center' style="padding-left:70px;padding-right:70px;padding-top:30px;"/>
+                <p t-field="doc.note" class='text-center' style="padding-left:75px;padding-right:70px;padding-top:30px;"/>
             </strong>
 
             <p t-if="doc.payment_term_id.note" class='text-center' style="padding-left:70px;padding-right:70px;padding-top:30px;">
@@ -207,17 +206,16 @@
             </p>
 
             <strong t-if="doc.company_id.use_bduprint">
-                <p t-field="doc.note" class='text-center' style="font-size:8pt;padding-left:70px;padding-right:70px;padding-top:30px;"/>
+                <p t-field="doc.note" class='text-center' style="font-size:8pt;padding-left:75px;padding-right:70px;padding-top:30px;"/>
             </strong>
 
             <p/>
             <p/>
-            <p style="padding-left:45px;padding-right:15px;">
+            <p style="padding-left:75px;padding-right:15px;">
                 We would like to thank you for your request and see your response as soon as possible.
             </p>
             <br/>
-
-            <div class="row" style="padding-left:45px;page-break-inside:avoid;">
+            <div class="row" style="padding-left:75px;page-break-inside:avoid;">
                 <div class="col-xs-5">
                     <strong><p>Sincerely,</p></strong>
                     <span t-field="doc.company_id.name"/>

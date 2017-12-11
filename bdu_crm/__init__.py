@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2013 Megis - Willem Hulshof - www.megis.nl
+# Copyright (c) 2009 Veritos - Jan Verlaan - www.veritos.nl
 #
 # WARNING: This program as such is intended to be used by professional
 # programmers who take the whole responsability of assessing all potential
@@ -26,30 +26,6 @@
 #
 ##############################################################################
 
-{
-    'name' : 'Wobe Imports',
-    'version' : '0.9',
-    'category': 'imports',
-    'description': """
-This module does importing of XML file of Wobe Portal
-=============================================================================
+import models
 
-
-    """,
-    'author'  : 'Magnus - Willem Hulshof',
-    'website' : 'http://www.magnus.nl',
-    'depends' : ['sale', 'document'],
-    'data' : [
-            'security/ir.model.access.csv',
-            'data/product_data.xml',
-            'data/product.attribute.value.csv',
-            'data/cron_data.xml',
-            'views/wobe_view.xml',
-            'views/ftp_view.xml',
-            'views/product_view.xml',
-    ],
-    'demo' : [],
-    'installable': True
-}
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-

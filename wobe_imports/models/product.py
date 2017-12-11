@@ -2,7 +2,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
-
+import odoo.addons.decimal_precision as dp
 
 PrintCategory = [('strook', 'Strook'),
                  ('stitching', 'Stitching'),
@@ -18,7 +18,8 @@ class ProductTemplate(models.Model):
     print_format_template = fields.Boolean('Print Format Template',
                                            help='Set True to assign Print Format to the Products')
     formats = fields.Selection([('MP', 'MP'), ('TB', 'TB'), ('BS', 'BS')], string='Paper Format')
-
+    booklet_surface_area = fields.Float('Booklet Surface Area', help="Page surface booklet (newspaper) format in cm2",
+                                        digits=dp.get_precision('Product Unit of Measure'))
 
     @api.constrains('print_format_template', 'formats')
     def _check_paperFormat(self):
@@ -40,14 +41,12 @@ class Product(models.Model):
     print_category = fields.Selection(PrintCategory, 'Print Category',
                                       related='product_tmpl_id.print_category',
                                       help='Print/Booklet Category')
-
     print_format_template = fields.Boolean('Print Format Template',
-                                           related='product_tmpl_id.print_format_template',
-                                           help='Set True to assign Print Format to the Products')
-
+                                      related='product_tmpl_id.print_format_template',
+                                      help='Set True to assign Print Format to the Products')
     formats = fields.Selection([('MP', 'MP'), ('TB', 'TB'), ('BS', 'BS')],
-                               related='product_tmpl_id.formats',
-                               string='Paper Format')
+                                      related='product_tmpl_id.formats',
+                                      string='Paper Format')
 
 
 

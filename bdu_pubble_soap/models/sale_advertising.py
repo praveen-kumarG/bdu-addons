@@ -46,11 +46,13 @@ class SaleOrder(models.Model):
                                     help="Date on which sales order is sent to Pubble.")
     publog_id = fields.Many2one('sofrom.odooto.pubble')
 
-    @api.multi
+
     @job
     def action_pubble(self):
         self.ensure_one()
         res = self.transfer_order_to_pubble()
+        if not res:
+            return True
         self._cr.commit()
         res.call_wsdl()
         self.date_sent_pubble = fields.Date.context_today(self)
@@ -59,8 +61,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     def action_confirm(self):
-        a = self.filtered("advertising")
-        for order in a:
+        for order in self.filtered("advertising"):
             order.action_pubble()
 #            order.with_delay().action_pubble()
         super(SaleOrder, self).action_confirm()
@@ -101,26 +102,30 @@ class SaleOrder(models.Model):
                 'salesorder_agency_postalcode' : self.advertising_agency.zip
         }
         res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
-
+        counter = 0
         for line in self.order_line:
-            lvals = {
-                    'order_id': res.id,
-                    'ad_adsize_adtypename': line.ad_class.name,
-                    'ad_adsize_extadsizeid': line.product_id.default_code,
-                    'ad_adsize_height': line.product_id.height,
-                    'ad_adsize_name': line.product_id.name,
-                    'ad_adsize_width': line.product_id.width,
-                    'ad_edition_editiondate': line.adv_issue.issue_date,
-                    'ad_edition_extpublicationid': line.title.name,
-                    'ad_extplacementid': line.id,
-                    'ad_price': 0,
-                    'ad_productiondetail_color': True,
-                    'ad_productiondetail_isclassified': False,
-                    'ad_productiondetail_dtpcomments': line.layout_remark,
-                    'ad_productiondetail_placementcomments': line.name,
-                    'ad_status': True,
-            }
-            self.env['soline.from.odooto.pubble'].sudo().create(lvals)
+            if [('line.product_id.product_tmpl_id.categ_id','child_of', self.env.ref('sale_advertising_order.newspaper_advertising_category'))]:
+                counter += 1
+                lvals = {
+                        'order_id': res.id,
+                        'ad_adsize_adtypename': line.ad_class.name,
+                        'ad_adsize_extadsizeid': line.product_id.default_code,
+                        'ad_adsize_height': line.product_id.height,
+                        'ad_adsize_name': line.product_id.name,
+                        'ad_adsize_width': line.product_id.width,
+                        'ad_edition_editiondate': line.adv_issue.issue_date,
+                        'ad_edition_extpublicationid': line.title.name,
+                        'ad_extplacementid': line.id,
+                        'ad_price': 0,
+                        'ad_productiondetail_color': True,
+                        'ad_productiondetail_isclassified': False,
+                        'ad_productiondetail_dtpcomments': line.layout_remark,
+                        'ad_productiondetail_placementcomments': line.name,
+                        'ad_status': True,
+                }
+                self.env['soline.from.odooto.pubble'].sudo().create(lvals)
+        if counter == 0:
+            res = False
         return res
 
 class SaleOrderLine(models.Model):
