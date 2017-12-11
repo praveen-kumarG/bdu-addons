@@ -985,7 +985,7 @@
         </record>
         <record id="18000" model="account.account.template">
             <field name="code">18000</field>
-            <field name="name">BTW VOORBELASTING</field>
+            <field name="name">BTW VOORBELASTING HANDMATIG</field>
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="bducoa_template"/>
         </record>
