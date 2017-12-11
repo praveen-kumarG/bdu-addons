@@ -155,6 +155,10 @@ class Registry(models.Model):
     company_id = fields.Many2one('res.company', 'Company')
     edition_count = fields.Integer('Edition Count', help='Print Editions')
 
+    xmlfile = fields.Binary('XML File', help='Imported XML File')
+    filename = fields.Char()
+
+
     @api.multi
     def load_xml_file(self):
         path = self._context.get('local_path', '')
@@ -209,14 +213,17 @@ class Registry(models.Model):
                     'company_id': companyID,
                     'run_date': fields.Datetime.now(),
                 })
-                reg = self.create(vals)
                 fn = open(File, 'r')
-                Attachment.sudo().create({
-                        'name': filename, 'datas_fname': filename,
-                        'datas': base64.encodestring(fn.read()),
-                        'res_model': self._name, 'res_id': reg.id})
+                vals.update({'filename': filename,
+                             'xmlfile': base64.encodestring(fn.read()),})
+
+                # Attachment.sudo().create({
+                #         'name': filename, 'datas_fname': filename,
+                #         'datas': base64.encodestring(fn.read()),
+                #         'res_model': self._name, 'res_id': reg.id})
                 fn.close()
+                reg = self.create(vals)
 
 
-            except:
+            except Exception, e:
                 _logger.exception("Wobe Import: File-Registry : %s" % str(e))
