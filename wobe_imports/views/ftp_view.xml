@@ -66,6 +66,64 @@
               action="action_file_transfer" groups="base.group_system"/>
 
 
+    <record id="view_file_registry_tree" model="ir.ui.view">
+        <field name="name">file.registry.tree</field>
+        <field name="model">file.registry</field>
+        <field name="arch" type="xml">
+            <tree string="File Registry" create="false" edit="false" delete="false" copy="false"
+                        decoration-muted="state == 'done'">
+                <field name="name"/>
+                <field name="bduorder_ref"/>
+                <field name="job_ref"/>
+                <field name="part"/>
+                <field name="run_date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_file_registry_form" model="ir.ui.view">
+        <field name="name">file.registry.form</field>
+        <field name="model">file.registry</field>
+        <field name="arch" type="xml">
+            <form string="File Registry" create="false" edit="false" delete="false" copy="false">
+                <header>
+                    <field name="state" widget="statusbar" nolabel="1" statusbar_visible="new,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="bduorder_ref"/>
+                            <field name="job_ref"/>
+                            <field name="part"/>
+                            <field name="run_date"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_file_registry" model="ir.actions.act_window">
+        <field name="name">File Registry</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">file.registry</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Wobe XML File Registry
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_file_registry" parent="menu_wobe" sequence="3"
+              action="action_file_registry" groups="base.group_system"/>
+
+
 
 
 </odoo>

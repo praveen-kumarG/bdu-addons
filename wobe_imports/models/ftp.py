@@ -5,6 +5,11 @@ import ftputil
 import ftputil.session
 from odoo.exceptions import UserError
 import logging
+
+import os
+import base64
+import xml.etree.ElementTree as ET
+
 _logger = logging.getLogger(__name__)
 
 
@@ -113,16 +118,105 @@ class FileTransfer(models.Model):
                         server_files.append(i)
                 for sfile in server_files:
                     src_path  = str(connection.server_path + sfile)
-                    dest_path = str(connection.local_path+'To_read/'+ sfile)
+                    dest_path = str(connection.local_path + sfile)
                     ftp.download(src_path, dest_path)# download files from server
                     ftp.remove(src_path)  # remove server file
                 ftp.close()
         except Exception:
             _logger.exception("Failed processing file transfer")
-        # Execute WobeJob Creation
-        Job = self.env['wobe.job']
+
+        Reg = self.env['file.registry']
         ctx = self._context.copy()
         ctx.update({'local_path': connection.local_path, 'company_id': connection.company_id.id})
-        return Job.with_context(ctx).read_xml_file()
+        return Reg.with_context(ctx).load_xml_file()
+
+        # # Execute WobeJob Creation
+        # Job = self.env['wobe.job']
+        # ctx = self._context.copy()
+        # ctx.update({'local_path': connection.local_path, 'company_id': connection.company_id.id})
+        # return Job.with_context(ctx).read_xml_file()
 
 
+
+class Registry(models.Model):
+    _name = 'file.registry'
+    _description = 'XML File Registry'
+
+    name = fields.Char('File Name', required=True, index=True)
+    bduorder_ref = fields.Char('BDUOrder #', help='BDUOrder reference', index=True)
+    job_ref = fields.Char('Job #', help='WobeJob/KBAJob/InfoJob reference', index=True)
+
+    run_date = fields.Datetime('Cron Time', help='Cron run date/time')
+
+    part = fields.Selection([('xml1', 'Xml1'), ('xml3', 'Xml3'), ('xml4', 'Xml4')], 'File Part')
+
+    state = fields.Selection([('new', 'Unpaired'), ('done', 'Done')], string='Status',
+                             default='new', copy=False, required=True)
+    company_id = fields.Many2one('res.company', 'Company')
+    edition_count = fields.Integer('Edition Count', help='Print Editions')
+
+    @api.multi
+    def load_xml_file(self):
+        path = self._context.get('local_path', '')
+        companyID = self._context.get('company_id', '')
+        dir_toRead = os.path.join(path)
+
+        Attachment = self.env['ir.attachment']
+
+        try:
+            os.listdir(dir_toRead)
+        except Exception, e:
+            _logger.exception("Wobe Import File : %s" % str(e))
+            return False
+
+        for filename in os.listdir(dir_toRead):
+            if not filename.endswith('.xml'): continue
+            File = os.path.join(dir_toRead, filename)
+            vals = {}
+
+            try:
+                tree = ET.parse(File)
+                root = tree.getroot()
+                header = root.attrib
+
+                if header.get('SenderId') == 'WOBEWebportal' and header.get('Type') == 'CreateJob':
+                    BDUOrder = root.find('Newspaper').find('BduOrderId').text
+                    edCnt = len(root.find('Newspaper').findall('Edition'))
+                    vals.update({
+                        'part': 'xml1',
+                        'bduorder_ref': BDUOrder,
+                        'edition_count': edCnt,
+                        })
+
+                elif header.get('SenderId') == 'WOBEWorkflow' and header.get('Type') == 'PlatesUsed':
+                    BDUOrder = root.find('Newspaper').find('BduOrderId').text
+                    KBAJobId = root.find('Newspaper').find('WobeJobId').text.split(':')[2]
+                    vals.update({
+                        'part': 'xml3',
+                        'bduorder_ref': BDUOrder,
+                        'job_ref': KBAJobId,
+                        })
+
+                elif header.get('{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation') == 'kba_reportdata.xsd':
+                    KBAJobId = root.find('info_jobid').text
+                    vals.update({
+                        'part': 'xml4',
+                        'job_ref': KBAJobId,
+                        })
+
+                vals.update({
+                    'name': filename,
+                    'company_id': companyID,
+                    'run_date': fields.Datetime.now(),
+                })
+                reg = self.create(vals)
+                fn = open(File, 'r')
+                Attachment.sudo().create({
+                        'name': filename, 'datas_fname': filename,
+                        'datas': base64.encodestring(fn.read()),
+                        'res_model': self._name, 'res_id': reg.id})
+                fn.close()
+
+
+            except:
+                _logger.exception("Wobe Import: File-Registry : %s" % str(e))
