@@ -1046,7 +1046,7 @@
             <field name="chart_template_id" ref="bducoa_template"/>
         </record>
         <record id="vat_refund_l_eu" model="account.account.template">
-            <field name="code">18060</field>
+            <field name="code">18061</field>
             <field name="name">AFDRACHT BTW binnen EU LAAG</field>
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="bducoa_template"/>
