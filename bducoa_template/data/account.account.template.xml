@@ -471,7 +471,7 @@
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="bducoa_template"/>
         </record>
-        <record id="13000" model="account.account.template">
+        <record id="recv" model="account.account.template">
             <field name="code">13000</field>
             <field name="name">DEBITEUREN</field>
             <field name="user_type_id" ref="account.data_account_type_receivable"/>
@@ -934,7 +934,7 @@
             <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="bducoa_template"/>
         </record>
-        <record id="16000" model="account.account.template">
+        <record id="pay" model="account.account.template">
             <field name="code">16000</field>
             <field name="name">KREDITEUREN</field>
             <field eval="True" name="reconcile"/>
