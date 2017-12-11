@@ -10,21 +10,21 @@
             model="account.fiscal.position.account.template">
             <field name="position_id"     ref="fiscal_position_template_eu" />
             <field name="account_src_id"  ref="70010" />
-            <field name="account_dest_id" ref="70010" />
+            <field name="account_dest_id" ref="70011" />
         </record>
         <record
             id="fiscal_position_account_eu_2"
             model="account.fiscal.position.account.template">
             <field name="position_id"     ref="fiscal_position_template_eu" />
-            <field name="account_src_id"  ref="70010" />
-            <field name="account_dest_id" ref="70010" />
+            <field name="account_src_id"  ref="70012" />
+            <field name="account_dest_id" ref="70013" />
         </record>
         <record
             id="fiscal_position_account_eu_3"
             model="account.fiscal.position.account.template">
             <field name="position_id"     ref="fiscal_position_template_eu" />
-            <field name="account_src_id"  ref="70010" />
-            <field name="account_dest_id" ref="70010" />
+            <field name="account_src_id"  ref="70014" />
+            <field name="account_dest_id" ref="70015" />
         </record>
         <record
             id="fiscal_position_account_eu_4"
@@ -37,15 +37,15 @@
             id="fiscal_position_account_eu_5"
             model="account.fiscal.position.account.template">
             <field name="position_id"     ref="fiscal_position_template_eu" />
-            <field name="account_src_id"  ref="87011" />
-            <field name="account_dest_id" ref="87010" />
+            <field name="account_src_id"  ref="87013" />
+            <field name="account_dest_id" ref="87011" />
         </record>
         <record
             id="fiscal_position_account_eu_6"
             model="account.fiscal.position.account.template">
             <field name="position_id"     ref="fiscal_position_template_eu" />
-            <field name="account_src_id"  ref="87010" />
-            <field name="account_dest_id" ref="87010" />
+            <field name="account_src_id"  ref="87015" />
+            <field name="account_dest_id" ref="87014" />
         </record>
 
     </data>
