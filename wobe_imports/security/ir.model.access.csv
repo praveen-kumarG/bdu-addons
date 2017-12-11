@@ -4,3 +4,4 @@ access_wobe_booklet,wobe_booklet,model_wobe_booklet,base.group_user,1,1,1,1
 access_file_transfer,file_transfer,model_file_transfer,base.group_user,1,1,1,1
 access_file_transfer_system,file_transfer_system,model_file_transfer,base.group_system,1,1,1,1
 access_wobe_edition,wobe_edition,model_wobe_edition,base.group_user,1,1,1,1
+access_file_register,file_registry,model_file_registry,base.group_user,1,1,1,1
