@@ -71,7 +71,7 @@ class Job(models.Model):
     booklet_ids = fields.One2many('wobe.booklet', 'job_id', 'Booklets', copy=True)
     edition_ids = fields.One2many('wobe.edition', 'job_id', 'Editions', copy=True)
 
-    state = fields.Selection([('new', 'New'), ('waiting', 'Waiting'),
+    state = fields.Selection([('new','New'),('waiting', 'Waiting'), ('ready', 'Ready'),
                              ('order_created', 'Order Created'),
                              ('exception', 'Exception')], string='Status', default='new',
                              copy=False, required=True, track_visibility='onchange')
@@ -84,218 +84,23 @@ class Job(models.Model):
     def _needaction_domain_get(self):
         return [('state', '=', 'exception')]
 
-    # @api.multi
-    # def read_xml_file(self):
-    #     path = self._context.get('local_path', '')
-    #     companyID = self._context.get('company_id', '')
-    #
-    #     dir_toRead = os.path.join(path, 'To_read')
-    #     dir_Read   = os.path.join(path, 'Read')
-    #     dir_Error  = os.path.join(path, 'Error')
-    #     try:
-    #         os.listdir(dir_toRead) and os.listdir(dir_Read) and os.listdir(dir_Error)
-    #     except Exception, e:
-    #         _logger.exception("Wobe Import File : %s" % str(e))
-    #         return False
-    #
-    #     Job_obj = self.env['wobe.job']
-    #     newJobs = self.env['wobe.job']
-    #     Attachment = self.env['ir.attachment']
-    #
-    #     groupedFiles = defaultdict(lambda: {'file1': False, 'file3N4': {}})
-    #     part1, part3, part4 = {}, {}, {}
-    #
-    #     # --------------------------
-    #     # Files identified
-    #     # --------------------------
-    #     for filename in os.listdir(dir_toRead):
-    #         if not filename.endswith('.xml'): continue
-    #         File = os.path.join(dir_toRead, filename)
-    #
-    #         try:
-    #             tree = ET.parse(File)
-    #             root = tree.getroot()
-    #             header = root.attrib
-    #
-    #             if header.get('SenderId') == 'WOBEWebportal' and header.get('Type') == 'CreateJob':
-    #                 BDUOrder = root.find('Newspaper').find('BduOrderId').text
-    #                 edCnt = len(root.find('Newspaper').findall('Edition'))
-    #                 part1[BDUOrder] = [filename, edCnt]
-    #
-    #             elif header.get('SenderId') == 'WOBEWorkflow' and header.get('Type') == 'PlatesUsed':
-    #                 BDUOrder = root.find('Newspaper').find('BduOrderId').text
-    #                 KBAJobId = root.find('Newspaper').find('WobeJobId').text.split(':')[2]
-    #                 if not BDUOrder in part3:
-    #                     part3[BDUOrder] = {KBAJobId: filename}
-    #                 else:
-    #                     part3[BDUOrder].update({KBAJobId: filename})
-    #
-    #             elif header.get('{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation') == 'kba_reportdata.xsd':
-    #                 KBAJobId = root.find('info_jobid').text
-    #                 part4[KBAJobId] = filename
-    #
-    #         except:
-    #             # Move to 'Error' folder
-    #             tomove = os.path.join(dir_Error, filename)
-    #             os.rename(File, tomove)
-    #
-    #     # -----------------------------
-    #     # Files are linked & grouped:
-    #     # -----------------------------
-    #     for key in set(part1).intersection(set(part3)):
-    #         file1 = part1[key][0]
-    #         editionCnt = part1[key][1]
-    #
-    #         map3N4 = {}
-    #         for y in set(part3[key]).intersection(set(part4)):
-    #             f3, f4 = part3[key][y], part4[y]
-    #             map3N4[f3] = f4
-    #
-    #         # EditionCount check
-    #         if editionCnt == len(map3N4):
-    #             groupedFiles[key] = {'file1': file1, 'file3N4': map3N4}
-    #
-    #
-    #     # --------------------------
-    #     # Extract Data & Create job
-    #     # --------------------------
-    #     for key, fv in groupedFiles.iteritems():
-    #         File1 = os.path.join(dir_toRead, fv['file1'])
-    #
-    #         try:
-    #             job = Job_obj.search([('bduorder_ref', '=', key)])
-    #             if job: continue
-    #
-    #             tree1 = ET.parse(File1)
-    #             root1 = tree1.getroot()
-    #             data1 = root1.find('Newspaper')
-    #
-    #             edData = {}
-    #             for file3, file4 in fv['file3N4'].iteritems():
-    #                 File3 = os.path.join(dir_toRead, file3)
-    #                 File4 = os.path.join(dir_toRead, file4)
-    #
-    #                 tree3 = ET.parse(File3)
-    #                 root3 = tree3.getroot()
-    #                 data3 = root3.find('Newspaper')
-    #
-    #                 tree4 = ET.parse(File4)
-    #                 data4 = tree4.getroot()
-    #
-    #                 edData.update(self._extract_EditionData(edData, data3, data4))
-    #
-    #             vals = self._prepare_job_data(data1, edData)
-    #             vals['company_id'] = companyID or self.env.user.company_id.id
-    #
-    #             job = Job_obj.create(vals)
-    #             newJobs += job
-    #
-    #             # Original Files
-    #             fn = open(File1, 'r')
-    #             Attachment.sudo().create({
-    #                     'name': fv['file1'], 'datas_fname': fv['file1'],
-    #                     'datas': base64.encodestring(fn.read()),
-    #                     'res_model': self._name, 'res_id': job.id})
-    #             fn.close()
-    #
-    #             for fileN in fv['file3N4'].keys() + fv['file3N4'].values():
-    #                 FileN = os.path.join(dir_toRead, fileN)
-    #
-    #                 fn = open(FileN, 'r')
-    #                 Attachment.sudo().create({
-    #                         'name': fileN, 'datas_fname': fileN,
-    #                         'datas': base64.encodestring(fn.read()),
-    #                         'res_model': self._name, 'res_id': job.id})
-    #                 fn.close()
-    #
-    #             # Move to 'Read' folder
-    #             tomove = os.path.join(dir_Read, fv['file1'])
-    #             os.rename(File1, tomove)
-    #
-    #             for file3, file4 in fv['file3N4'].iteritems():
-    #                 File3 = os.path.join(dir_toRead, file3)
-    #                 File4 = os.path.join(dir_toRead, file4)
-    #
-    #                 tomove = os.path.join(dir_Read, file3)
-    #                 os.rename(File3, tomove)
-    #                 tomove = os.path.join(dir_Read, file4)
-    #                 os.rename(File4, tomove)
-    #
-    #         except:
-    #             # Move to 'Error' folder
-    #             tomove = os.path.join(dir_Error, fv['file1'])
-    #             os.rename(File1, tomove)
-    #
-    #             for file3, file4 in fv['file3N4'].iteritems():
-    #                 File3 = os.path.join(dir_toRead, file3)
-    #                 File4 = os.path.join(dir_toRead, file4)
-    #
-    #                 tomove = os.path.join(dir_Error, file3)
-    #                 os.rename(File3, tomove)
-    #                 tomove = os.path.join(dir_Error, file4)
-    #                 os.rename(File4, tomove)
-    #
-    #     return newJobs.action_create_order()
-
 
     @api.multi
-    def read_xml_file(self):
-        # path = self._context.get('local_path', '')
-        # companyID = self._context.get('company_id', '')
-        #
-        # dir_toRead = os.path.join(path, 'To_read')
-        # dir_Read   = os.path.join(path, 'Read')
-        # dir_Error  = os.path.join(path, 'Error')
-        # try:
-        #     os.listdir(dir_toRead) and os.listdir(dir_Read) and os.listdir(dir_Error)
-        # except Exception, e:
-        #     _logger.exception("Wobe Import File : %s" % str(e))
-        #     return False
+    def action_create_job(self):
+        '''
+            Extract data from XML-data stored in File-Registry
+            & Create Job records
+        '''
 
         Job_obj = self.env['wobe.job']
-        newJobs = self.env['wobe.job']
-        Attachment = self.env['ir.attachment']
+        Reg = self.env['file.registry']
 
         groupedFiles = defaultdict(lambda: {'Rfile1': False, 'Rfile3N4': {}})
         part1, part3, part4 = {}, {}, {}
 
-        # # --------------------------
-        # # Files identified
-        # # --------------------------
-        # for filename in os.listdir(dir_toRead):
-        #     if not filename.endswith('.xml'): continue
-        #     File = os.path.join(dir_toRead, filename)
-        #
-        #     try:
-        #         tree = ET.parse(File)
-        #         root = tree.getroot()
-        #         header = root.attrib
-        #
-        #         if header.get('SenderId') == 'WOBEWebportal' and header.get('Type') == 'CreateJob':
-        #             BDUOrder = root.find('Newspaper').find('BduOrderId').text
-        #             edCnt = len(root.find('Newspaper').findall('Edition'))
-        #             part1[BDUOrder] = [filename, edCnt]
-        #
-        #         elif header.get('SenderId') == 'WOBEWorkflow' and header.get('Type') == 'PlatesUsed':
-        #             BDUOrder = root.find('Newspaper').find('BduOrderId').text
-        #             KBAJobId = root.find('Newspaper').find('WobeJobId').text.split(':')[2]
-        #             if not BDUOrder in part3:
-        #                 part3[BDUOrder] = {KBAJobId: filename}
-        #             else:
-        #                 part3[BDUOrder].update({KBAJobId: filename})
-        #
-        #         elif header.get('{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation') == 'kba_reportdata.xsd':
-        #             KBAJobId = root.find('info_jobid').text
-        #             part4[KBAJobId] = filename
-        #
-        #     except:
-        #         # Move to 'Error' folder
-        #         tomove = os.path.join(dir_Error, filename)
-        #         os.rename(File, tomove)
-
-
-
-        Reg = self.env['file.registry']
+        # ----------------------------
+        # Registry Files
+        # ----------------------------
         for x1 in Reg.search([('state','=','new'), ('part','=', 'xml1')]):
             part1[x1.bduorder_ref] = [x1, x1.edition_count]
 
@@ -307,15 +112,8 @@ class Job(models.Model):
             else:
                 part3[BDUOrder].update({KBAJobId: x3})
 
-
         for x4 in Reg.search([('state','=','new'), ('part','=', 'xml4')]):
             part4[x4.job_ref] = x4
-
-
-        print "part1", part1
-        print "part3", part3
-        print "part4", part4
-
 
         # -----------------------------
         # Files are linked & grouped:
@@ -334,8 +132,6 @@ class Job(models.Model):
                 groupedFiles[key] = {'Rfile1': Rfile1, 'Rfile3N4': map3N4}
 
 
-        print "groupedFiles", groupedFiles
-
         # --------------------------
         # Extract Data & Create job
         # --------------------------
@@ -344,21 +140,15 @@ class Job(models.Model):
 
             File1 = base64.decodestring(Reg1.xmlfile)
 
-            if True: # try:
-                # job = Job_obj.search([('bduorder_ref', '=', key)])
-                # if job: continue
+            try:
+                job = Job_obj.search([('bduorder_ref', '=', key)])
+                if job: continue
 
                 tree1 = ET.fromstring(File1)
                 data1 = tree1.find('Newspaper')
 
-                print "data1 ", data1
-
                 edData = {}
                 for Reg3, Reg4 in fv['Rfile3N4'].iteritems():
-
-                    # File3 = os.path.join(dir_toRead, file3)
-                    # File4 = os.path.join(dir_toRead, file4)
-
                     File3 = base64.decodestring(Reg3.xmlfile)
                     File4 = base64.decodestring(Reg4.xmlfile)
 
@@ -371,60 +161,18 @@ class Job(models.Model):
 
                 vals = self._prepare_job_data(data1, edData)
                 vals['company_id'] = Reg1.company_id.id or self.env.user.company_id.id
-                vals['name'] = 'x1 %s'%(str(Reg1.id))
-
 
                 job = Job_obj.create(vals)
-                newJobs += job
 
+                # Registry: Mark as 'Done'
+                Reg1.write({'state': 'done', 'job_id': job.id})
+                for rf in fv['Rfile3N4'].keys() + fv['Rfile3N4'].values():
+                    rf.write({'state': 'done', 'job_id': job.id})
 
+            except:
+                pass
 
-                # # Original Files
-                # fn = open(File1, 'r')
-                # Attachment.sudo().create({
-                #         'name': fv['file1'], 'datas_fname': fv['file1'],
-                #         'datas': base64.encodestring(fn.read()),
-                #         'res_model': self._name, 'res_id': job.id})
-                # fn.close()
-                #
-                # for fileN in fv['file3N4'].keys() + fv['file3N4'].values():
-                #     FileN = os.path.join(dir_toRead, fileN)
-                #
-                #     fn = open(FileN, 'r')
-                #     Attachment.sudo().create({
-                #             'name': fileN, 'datas_fname': fileN,
-                #             'datas': base64.encodestring(fn.read()),
-                #             'res_model': self._name, 'res_id': job.id})
-                #     fn.close()
-                #
-                # # Move to 'Read' folder
-                # tomove = os.path.join(dir_Read, fv['file1'])
-                # os.rename(File1, tomove)
-                #
-                # for file3, file4 in fv['file3N4'].iteritems():
-                #     File3 = os.path.join(dir_toRead, file3)
-                #     File4 = os.path.join(dir_toRead, file4)
-                #
-                #     tomove = os.path.join(dir_Read, file3)
-                #     os.rename(File3, tomove)
-                #     tomove = os.path.join(dir_Read, file4)
-                #     os.rename(File4, tomove)
-
-            # except:
-            #     # Move to 'Error' folder
-            #     tomove = os.path.join(dir_Error, fv['file1'])
-            #     os.rename(File1, tomove)
-            #
-            #     for file3, file4 in fv['file3N4'].iteritems():
-            #         File3 = os.path.join(dir_toRead, file3)
-            #         File4 = os.path.join(dir_toRead, file4)
-            #
-            #         tomove = os.path.join(dir_Error, file3)
-            #         os.rename(File3, tomove)
-            #         tomove = os.path.join(dir_Error, file4)
-            #         os.rename(File4, tomove)
-
-        return newJobs.action_create_order()
+        return self.action_create_order()
 
 
     @api.multi
@@ -529,8 +277,9 @@ class Job(models.Model):
     def action_create_order(self):
         sale_obj = self.env['sale.order']
 
-        for case in self:
-            if case.order_id: continue
+        Jobs = self.search([('state','=', 'ready'), ('order_id','=',False)])
+
+        for case in Jobs:
 
             vals = case._prepare_order_data()
             if vals:
@@ -768,3 +517,9 @@ class Edition(models.Model):
 
     production_start = fields.Char('Production Start', help='Info DateTime Start')
     production_stop = fields.Char('Production End', help='Info DateTime End')
+
+
+class Registry1(models.Model):
+    _inherit = "file.registry"
+
+    job_id = fields.Many2one('wobe.job', ondelete='set null', index=True, copy=False)

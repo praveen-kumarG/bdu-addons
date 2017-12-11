@@ -11,8 +11,8 @@
                 <form string="Job" create="false" edit="false" delete="false" copy="false">
                     <header>
                         <button name="action_create_order" type="object" string="Create SaleOrder"
-                                states="new,exception" class="oe_highlight"/>
-                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="new,order_created"/>
+                                states="ready,exception" class="oe_highlight"/>
+                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="ready,order_created"/>
                     </header>
                     <sheet string="Job">
                         <div class="oe_button_box" name="button_box" position="inside">
@@ -51,7 +51,6 @@
                                         <field name="paper_weight"/>
                                         <field name="stitching"/>
                                         <field name="glueing"/>
-                                        <!--<field name="booklet_ref"/>-->
                                         <field name="calculated_plates"/>
                                         <field name="calculated_mass"/>
                                         <field name="calculated_ink"/>
@@ -94,8 +93,6 @@
                                         <field name="gross_quantity"/>
                                         <field name="production_start"/>
                                         <field name="production_stop"/>
-                                        <!--<field name="waste_start"/>-->
-                                        <!--<field name="waste_total"/>-->
                                     </tree>
                                 </field>
                             </page>
@@ -121,7 +118,7 @@
             <field name="model">wobe.job</field>
             <field name="arch" type="xml">
                 <tree string="Job" create="false" edit="false" delete="false" copy="false"
-                        decoration-danger="state == 'exception'" decoration-info="state == 'new'">
+                        decoration-danger="state == 'exception'" decoration-info="state == 'ready'">
                     <field name="bduorder_ref"/>
                     <field name="title"/>
                     <field name="create_date" string="Creation Date"/>
@@ -139,7 +136,7 @@
                 <search string="Search Jobs">
                     <field name="job_ref" />
                     <field name="bduorder_ref"/>
-                    <filter name="new" string="New" domain="[('state','=','new')]"/>
+                    <filter name="ready" string="Ready to Order" domain="[('state','=','ready')]"/>
                     <filter name="order_created" string="SaleOrder Created" domain="[('state','=','order_created')]"/>
                     <separator/>
                     <filter name="exceptions" string="Exceptions" domain="[('state','=','exception')]"/>
