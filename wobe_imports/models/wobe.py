@@ -71,7 +71,7 @@ class Job(models.Model):
     booklet_ids = fields.One2many('wobe.booklet', 'job_id', 'Booklets', copy=True)
     edition_ids = fields.One2many('wobe.edition', 'job_id', 'Editions', copy=True)
 
-    state = fields.Selection([('new', 'New'),
+    state = fields.Selection([('new', 'New'), ('waiting', 'Waiting'),
                              ('order_created', 'Order Created'),
                              ('exception', 'Exception')], string='Status', default='new',
                              copy=False, required=True, track_visibility='onchange')
