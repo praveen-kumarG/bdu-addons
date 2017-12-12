@@ -75,6 +75,7 @@
                 <field name="run_date"/>
                 <field name="part"/>
                 <field name="bduorder_ref"/>
+                <field name="job_id" string="WobeJob #"/>
                 <field name="name"/>
                 <field name="job_ref"/>
                 <field name="state"/>
@@ -91,6 +92,11 @@
                     <field name="state" widget="statusbar" nolabel="1" statusbar_visible="new,done"/>
                 </header>
                 <sheet>
+                    <field name="job_id" invisible="1"/>
+                    <div class="oe_button_box" name="button_box" position="inside">
+                        <button class="oe_stat_button" name="action_view_job" type="object" icon="fa-building-o" String="WobeJob" attrs="{'invisible':[('job_id','=',False)]}">
+                        </button>
+                    </div>
                     <group>
                         <group>
                             <field name="run_date"/>
