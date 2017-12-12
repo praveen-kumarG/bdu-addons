@@ -440,6 +440,20 @@ class Job(models.Model):
             'domain': [('id', '=', self.order_id.id)],
         }
 
+    @api.multi
+    def action_view_file_registry(self):
+        self.ensure_one()
+        action = self.env.ref('wobe_imports.action_file_registry').read()[0]
+        file_registry = self.env['file.registry'].search([('job_id', 'in', self._ids)])
+        if len(file_registry) > 1:
+            action['domain'] = [('id', 'in', file_registry.ids)]
+        elif file_registry:
+            action['views'] = [(self.env.ref('wobe_imports.view_file_registry_form').id, 'form')]
+            action['res_id'] = file_registry.id
+        else:
+            action['domain'] = [('id', 'in', file_registry.ids)]
+        return action
+
 
 class Booklet(models.Model):
     _name = "wobe.booklet"
@@ -522,3 +536,19 @@ class Registry1(models.Model):
     _inherit = "file.registry"
 
     job_id = fields.Many2one('wobe.job', ondelete='set null', index=True, copy=False)
+
+    @api.multi
+    def action_view_job(self):
+        self.ensure_one()
+        action = self.env.ref('wobe_imports.action_wobe_job')
+        return {
+            'name': action.name,
+            'help': action.help,
+            'type': action.type,
+            'view_type': 'form' if self.job_id else action.view_type,
+            'view_mode': 'form' if self.job_id else action.view_mode,
+            'target': action.target,
+            'res_id': self.job_id.id or False,
+            'res_model': action.res_model,
+            'domain': [('id', '=', self.job_id.id)],
+        }
