@@ -19,6 +19,9 @@
                             <button class="oe_stat_button" name="action_view_sales"
                                 type="object" icon="fa-usd" String="Sale Order">
                             </button>
+                            <button class="oe_stat_button" name="action_view_file_registry"
+                                type="object" icon="fa-files-o" String="File Groups">
+                            </button>
                         </div>
                         <h1 class="mt0">
                             <label string="BDU Order :"/>
@@ -136,6 +139,8 @@
                 <search string="Search Jobs">
                     <field name="job_ref" />
                     <field name="bduorder_ref"/>
+                    <filter name="waiting" string="Waiting" domain="[('state','=','waiting')]"/>
+                    <separator/>
                     <filter name="ready" string="Ready to Order" domain="[('state','=','ready')]"/>
                     <filter name="order_created" string="SaleOrder Created" domain="[('state','=','order_created')]"/>
                     <separator/>
@@ -143,6 +148,7 @@
                     <separator/>
                     <group expand="0" string="Group By">
                         <filter name="status" string="Status" context="{'group_by':'state'}"/>
+                        <filter name="company_id" string="Company" context="{'group_by':'company_id'}"/>
                     </group>
                </search>
             </field>
@@ -170,7 +176,6 @@
             action="action_wobe_job"
             id="menu_action_wobe_job"
             sequence="2"/>
-
 
     </data>
 </odoo>

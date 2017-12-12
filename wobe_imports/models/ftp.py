@@ -28,11 +28,11 @@ class FileTransfer(models.Model):
     msg = fields.Char(string="Connection Message", copy=False)
     active = fields.Boolean(string='Active', default=True)
 
-    note = fields.Text(string='Note', default="Note:"
-                                              "\nIn the Destination path: Please maintain the 3 directory structure as follows:"
-                                              "\n1. 'To_read'"
-                                              "\n2. 'Read'"
-                                              "\n3. 'Error'")
+    # note = fields.Text(string='Note', default="Note:"
+    #                                           "\nIn the Destination path: Please maintain the 3 directory structure as follows:"
+    #                                           "\n1. 'To_read'"
+    #                                           "\n2. 'Read'"
+    #                                           "\n3. 'Error'")
 
     company_id = fields.Many2one('res.company', 'Company', help='Company, to which records needs to be imported',
                                  default=lambda self: self.env['res.company']._company_default_get('sale.order'))
@@ -215,6 +215,7 @@ class Registry(models.Model):
                 vals.update({'filename': filename,
                              'xmlfile': base64.encodestring(fn.read()),})
                 fn.close()
+                os.remove(File)#remove file from local system
                 reg = self.create(vals)
 
             except Exception, e:
