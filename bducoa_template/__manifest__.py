@@ -8,7 +8,7 @@
     'version': '3.0',
     'category': 'Localization',
     'author': 'Magnus',
-    'website': 'http://www.magnus.eu',
+    'website': 'http://magnus.nl',
     'depends': [
         'account',
         'base_vat',
