@@ -70,7 +70,7 @@
         <field name="name">file.registry.tree</field>
         <field name="model">file.registry</field>
         <field name="arch" type="xml">
-            <tree string="File Registry" create="false" edit="false" delete="false" copy="false"
+            <tree string="File Registry" create="false" edit="false" delete="true" copy="false"
                         decoration-muted="state == 'done'">
                 <field name="run_date"/>
                 <field name="part"/>

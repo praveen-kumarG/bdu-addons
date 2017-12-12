@@ -120,7 +120,7 @@
             <field name="name">view_wobe_job_tree</field>
             <field name="model">wobe.job</field>
             <field name="arch" type="xml">
-                <tree string="Job" create="false" edit="false" delete="false" copy="false"
+                <tree string="Job" create="false" edit="false" delete="true" copy="false"
                         decoration-danger="state == 'exception'" decoration-info="state == 'ready'">
                     <field name="bduorder_ref"/>
                     <field name="title"/>
