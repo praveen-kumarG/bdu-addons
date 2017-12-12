@@ -177,31 +177,5 @@
             id="menu_action_wobe_job"
             sequence="2"/>
 
-        <record id="view_file_registry_tree_wobe" model="ir.ui.view">
-            <field name="name">file.registry.tree</field>
-            <field name="model">file.registry</field>
-            <field name="inherit_id" ref="wobe_imports.view_file_registry_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='bduorder_ref']" position="after">
-                    <field name="job_id" string="WobeJob #"/>
-                </xpath>
-            </field>
-        </record>
-
-        <record id="view_file_registry_form_wobe" model="ir.ui.view">
-		   <field name="name">file.registry.form</field>
-		   <field name="model">file.registry</field>
-		   <field name="inherit_id" ref="wobe_imports.view_file_registry_form"/>
-		   <field name="arch" type="xml">
-			  <xpath  expr="//group" position="before">
-                  <field name="job_id" invisible="1"/>
-                  <div class="oe_button_box" name="button_box" position="inside">
-                      <button class="oe_stat_button" name="action_view_job" type="object" icon="fa-building-o" String="WobeJob" attrs="{'invisible':[('job_id','=',False)]}">
-                    </button>
-                  </div>
-			  </xpath>
-		   </field>
-        </record>
-
     </data>
 </odoo>

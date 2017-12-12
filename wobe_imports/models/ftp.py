@@ -125,17 +125,11 @@ class FileTransfer(models.Model):
         except Exception:
             _logger.exception("Failed processing file transfer")
 
+        # Registry Creation
         Reg = self.env['file.registry']
         ctx = self._context.copy()
         ctx.update({'local_path': connection.local_path, 'company_id': connection.company_id.id})
         return Reg.with_context(ctx).load_xml_file()
-
-        # # Execute WobeJob Creation
-        # Job = self.env['wobe.job']
-        # ctx = self._context.copy()
-        # ctx.update({'local_path': connection.local_path, 'company_id': connection.company_id.id})
-        # return Job.with_context(ctx).read_xml_file()
-
 
 
 class Registry(models.Model):
@@ -150,7 +144,7 @@ class Registry(models.Model):
 
     part = fields.Selection([('xml1', 'Xml1'), ('xml3', 'Xml3'), ('xml4', 'Xml4')], 'File Part')
 
-    state = fields.Selection([('new', 'Unpaired'), ('done', 'Done')], string='Status',
+    state = fields.Selection([('new', 'New/ Unpaired'), ('pending', 'Partially Done'), ('done', 'Done')], string='Status',
                              default='new', copy=False, required=True)
     company_id = fields.Many2one('res.company', 'Company')
     edition_count = fields.Integer('Edition Count', help='Print Editions')
@@ -224,10 +218,8 @@ class Registry(models.Model):
                 os.remove(File)#remove file from local system
                 reg = self.create(vals)
 
-
             except Exception, e:
                 _logger.exception("Wobe Import: File-Registry : %s" % str(e))
-
 
         # Execute WobeJob Creation
         return Job.action_create_job()
