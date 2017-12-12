@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 # Copyright (C) 2016 Onestein (<http://www.onestein.eu>).
-
+# Copyright (C) 2016 Magnus (<http://www.magnus.nl>).
 {
     'name': 'Netherlands - BDU Accounting',
     'version': '3.0',

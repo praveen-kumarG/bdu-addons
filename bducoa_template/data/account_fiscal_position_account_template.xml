@@ -6,27 +6,6 @@
 
         <!-- EU Countries -->
         <record
-            id="fiscal_position_account_eu_1"
-            model="account.fiscal.position.account.template">
-            <field name="position_id"     ref="fiscal_position_template_eu" />
-            <field name="account_src_id"  ref="60052" />
-            <field name="account_dest_id" ref="60055" />
-        </record>
-        <record
-            id="fiscal_position_account_eu_2"
-            model="account.fiscal.position.account.template">
-            <field name="position_id"     ref="fiscal_position_template_eu" />
-            <field name="account_src_id"  ref="60056" />
-            <field name="account_dest_id" ref="61010" />
-        </record>
-        <record
-            id="fiscal_position_account_eu_3"
-            model="account.fiscal.position.account.template">
-            <field name="position_id"     ref="fiscal_position_template_eu" />
-            <field name="account_src_id"  ref="61015" />
-            <field name="account_dest_id" ref="61020" />
-        </record>
-        <record
             id="fiscal_position_account_eu_4"
             model="account.fiscal.position.account.template">
             <field name="position_id"     ref="fiscal_position_template_eu" />

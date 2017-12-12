@@ -3201,7 +3201,7 @@
         </record>
         <record id="87010" model="account.account.template">
             <field name="code">87010</field>
-            <field name="name">OMZET EXTERN KRANTEN 0</field>
+            <field name="name">OMZET EXTERN KRANTEN ONBELAST</field>
             <field name="user_type_id" ref="account.data_account_type_revenue"/>
             <field name="chart_template_id" ref="bducoa_template"/>
             <field name="tag_ids" eval="[(6,0,[ref('account_tag_11')])]"/>
@@ -3229,28 +3229,28 @@
         </record>
         <record id="87300" model="account.account.template">
             <field name="code">87300</field>
-            <field name="name">BDU MEDIA KRANTEN  0</field>
+            <field name="name">BDU MEDIA KRANTEN ONBELAST</field>
             <field name="user_type_id" ref="account.data_account_type_revenue"/>
             <field name="chart_template_id" ref="bducoa_template"/>
             <field name="tag_ids" eval="[(6,0,[ref('account_tag_11')])]"/>
         </record>
         <record id="87301" model="account.account.template">
             <field name="code">87301</field>
-            <field name="name">BDU MEDIA KRANTEN  LAAG</field>
+            <field name="name">BDU MEDIA KRANTEN LAAG</field>
             <field name="user_type_id" ref="account.data_account_type_revenue"/>
             <field name="chart_template_id" ref="bducoa_template"/>
             <field name="tag_ids" eval="[(6,0,[ref('account_tag_11')])]"/>
         </record>
         <record id="87302" model="account.account.template">
             <field name="code">87302</field>
-            <field name="name">BDU MEDIA KRANTEN  HOOG</field>
+            <field name="name">BDU MEDIA KRANTEN HOOG</field>
             <field name="user_type_id" ref="account.data_account_type_revenue"/>
             <field name="chart_template_id" ref="bducoa_template"/>
             <field name="tag_ids" eval="[(6,0,[ref('account_tag_11')])]"/>
         </record>
         <record id="89200" model="account.account.template">
             <field name="code">89200</field>
-            <field name="name">DOORBEREKENDE PORTO 0</field>
+            <field name="name">DOORBEREKENDE PORTO ONBELAST</field>
             <field name="user_type_id" ref="account.data_account_type_revenue"/>
             <field name="chart_template_id" ref="bducoa_template"/>
             <field name="tag_ids" eval="[(6,0,[ref('account_tag_11')])]"/>
@@ -3271,7 +3271,7 @@
         </record>
         <record id="89300" model="account.account.template">
             <field name="code">89300</field>
-            <field name="name">VRACHT/PORTOKOSTEN 0</field>
+            <field name="name">VRACHT/PORTOKOSTEN ONBELAST</field>
             <field name="user_type_id" ref="account.data_account_type_revenue"/>
             <field name="chart_template_id" ref="bducoa_template"/>
             <field name="tag_ids" eval="[(6,0,[ref('account_tag_11')])]"/>
