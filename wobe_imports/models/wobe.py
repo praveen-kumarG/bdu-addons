@@ -33,7 +33,6 @@ class Job(models.Model):
         self.production_start = prodStart
         self.production_stop = prodEnd
 
-
     job_ref = fields.Char('WOBE Job #', help='XML reference', required=True, index=True)
     bduorder_ref = fields.Char('BDUOrder #', help='BDUOrder reference', required=True, index=True)
     name = fields.Char('Name', help='BDUOrder reference', required=True, index=True)
@@ -101,7 +100,7 @@ class Job(models.Model):
         part1, part3, part4 = {}, {}, {}
 
         # ----------------------------
-        # Registry Files:
+        # Registry Files: Search
         # ----------------------------
         for x1 in Reg.search([('state','<>','done'), ('part','=', 'xml1')]):
             part1[x1.bduorder_ref] = [x1, x1.edition_count]
@@ -128,14 +127,12 @@ class Job(models.Model):
         # Files are linked & grouped: <Xml1> => <Xml3> => [<Xml4>]
         # ---------------------------------------------------------------
         for key in set(part1).intersection(set(part3)):
-            # editionCnt = part1[key][1]
             groupedFiles[key].update({'Rfile3': part3[key].values()})
 
             map3N4, unmap3 = {}, []
             for y in set(part3[key]).intersection(set(part4)):
                 f3, f4 = part3[key][y], part4[y]
                 map3N4[f3] = f4
-
 
             for z in set(part3[key]) - set(part3[key]).intersection(set(part4)):
                 regF3 = part3[key][z]
@@ -152,8 +149,7 @@ class Job(models.Model):
 
             File1 = base64.decodestring(Reg1.xmlfile)
 
-            if True: #try:
-
+            try:
                 tree1 = ET.fromstring(File1)
                 data1 = tree1.find('Newspaper')
 
@@ -187,6 +183,8 @@ class Job(models.Model):
                 elif job.state == 'waiting':
                     vals = self._prepare_job_data(data1, edData, Job=job)
                     job.write(vals)
+                else:
+                    continue
 
                 # --------------------------------------------
                 # Regitry: Update
@@ -204,12 +202,12 @@ class Job(models.Model):
 
                 for rf in fv['Rfile3']:
                     rf.write(rPending)
-            #
-            # except:
-            #     pass
 
-        return self.action_create_order()
+            except:
+                pass
 
+        self._reset_Job_status()
+        return True
 
 
     @api.multi
@@ -508,6 +506,30 @@ class Job(models.Model):
         return res
 
     @api.multi
+    def _reset_Job_status(self):
+        # Waiting:
+        for job in self.search([('state','=', 'waiting')]):
+            if job.net_quantity >= job.planned_quantity:
+                job.write({'state': 'ready'})
+
+        # Exceptions:
+        for job in self.search([('state','=', 'exception')]):
+            if job.net_quantity >= job.planned_quantity:
+                job.write({'state': 'ready'})
+            else:
+                job.write({'state': 'waiting'})
+
+
+    @api.multi
+    def action_reset(self):
+        self._reset_Job_status()
+
+    @api.multi
+    def action_force_ready(self):
+        self.message_post(body=_("Force assign to 'Ready' status."))
+        self.write({'state':'ready'})
+
+    @api.multi
     def action_view_sales(self):
         self.ensure_one()
         action = self.env.ref('sale.action_orders')
@@ -515,7 +537,7 @@ class Job(models.Model):
             'name': action.name,
             'help': action.help,
             'type': action.type,
-            'view_type':  'form' if self.order_id else action.view_type,
+            'view_type': 'form' if self.order_id else action.view_type,
             'view_mode': 'form' if self.order_id else action.view_mode,
             'target': action.target,
             'res_id': self.order_id.id or False,

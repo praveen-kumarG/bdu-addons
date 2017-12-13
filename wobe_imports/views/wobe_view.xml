@@ -11,7 +11,11 @@
                 <form string="Job" create="false" edit="false" delete="false" copy="false">
                     <header>
                         <button name="action_create_order" type="object" string="Create SaleOrder"
-                                states="ready,exception" class="oe_highlight"/>
+                                states="ready" class="oe_highlight"/>
+                        <button name="action_force_ready" type="object" string="Force Ready"
+                                states="waiting" class="oe_highlight"/>
+                        <button name="action_reset" type="object" string="Reset Status"
+                                states="waiting,exception" class="oe_highlight"/>
                         <field name="state" widget="statusbar" nolabel="1" statusbar_visible="ready,order_created"/>
                     </header>
                     <sheet string="Job">
