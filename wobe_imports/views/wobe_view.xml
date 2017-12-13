@@ -19,12 +19,14 @@
                         <field name="state" widget="statusbar" nolabel="1" statusbar_visible="ready,order_created"/>
                     </header>
                     <sheet string="Job">
-                        <div class="oe_button_box" name="button_box" position="inside">
+                        <div class="oe_button_box" name="button_box">
+                            <field name="order_id" invisible="1"/>
                             <button class="oe_stat_button" name="action_view_sales"
-                                type="object" icon="fa-usd" String="Sale Order">
+                                type="object" icon="fa-usd" String="Sale Order" attrs="{'invisible': [('order_id','=',False)]}">
                             </button>
                             <button class="oe_stat_button" name="action_view_file_registry"
-                                type="object" icon="fa-files-o" String="File Groups">
+                                type="object" icon="fa-bars" attrs="{'invisible': [('file_count','=',0)]}">
+                                <field string="RegistryFiles" name="file_count" widget="statinfo" attrs="{'invisible': [('file_count','=',0)]}"/>
                             </button>
                         </div>
                         <h1 class="mt0">

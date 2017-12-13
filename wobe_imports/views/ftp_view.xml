@@ -71,14 +71,15 @@
         <field name="model">file.registry</field>
         <field name="arch" type="xml">
             <tree string="File Registry" create="false" edit="false" delete="true" copy="false"
-                        decoration-muted="state == 'done'">
+                        decoration-danger="is_duplicate == True" decoration-muted="state == 'done'">
                 <field name="run_date"/>
                 <field name="part"/>
                 <field name="bduorder_ref"/>
-                <field name="job_id" string="WobeJob #"/>
+                <field name="job_ref" string="WobeJob #"/>
                 <field name="name"/>
-                <field name="job_ref"/>
+                <field name="job_id" string="OdooJob #"/>
                 <field name="state"/>
+                <field name="is_duplicate" invisible="1"/>
             </tree>
         </field>
     </record>
@@ -91,10 +92,14 @@
                 <header>
                     <field name="state" widget="statusbar" nolabel="1" statusbar_visible="new,done"/>
                 </header>
+                <div class="alert alert-info" role="alert" style="margin-bottom:0px;padding:10px;background-color: #ffcccc;color:#660000;" attrs="{'invisible': [('is_duplicate','=',False)]}">
+                    Record is duplicated, please refer the origin record <bold><a class="alert-link" href="#" role="button"><field name="duplicate_ref"/></a></bold>.
+                    <field name="is_duplicate" invisible="1"/>
+                </div>
                 <sheet>
                     <field name="job_id" invisible="1"/>
                     <div class="oe_button_box" name="button_box" position="inside">
-                        <button class="oe_stat_button" name="action_view_job" type="object" icon="fa-building-o" String="WobeJob" attrs="{'invisible':[('job_id','=',False)]}">
+                        <button class="oe_stat_button" name="action_view_job" type="object" icon="fa-files-o" String="OdooJob" attrs="{'invisible':[('job_id','=',False)]}">
                         </button>
                     </div>
                     <group>
@@ -106,7 +111,7 @@
                         </group>
                         <group>
                             <field name="bduorder_ref"/>
-                            <field name="job_ref"/>
+                            <field name="job_ref" string="WobeJob #"/>
                             <field name="company_id"/>
                         </group>
                     </group>
@@ -125,8 +130,10 @@
                 <filter name="done" string="Job Created" domain="[('state','=','done')]"/>
                 <separator/>
                 <filter name="new" string="Unpaired" domain="[('state','=','new')]"/>
+                <filter name="is_duplicate" string="Duplicate" domain="[('is_duplicate','=',True)]"/>
                 <separator/>
                 <group expand="0" string="Group By">
+                    <filter name="part" string="File Type" context="{'group_by':'part'}"/>
                     <filter name="job_id" string="Jobs" context="{'group_by':'job_id'}"/>
                     <filter name="status" string="Status" context="{'group_by':'state'}"/>
                     <filter name="company_id" string="Company" context="{'group_by':'company_id'}"/>

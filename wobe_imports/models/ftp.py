@@ -166,6 +166,24 @@ class Registry(models.Model):
 
     xmlfile = fields.Binary('XML File', help='Imported XML File')
     filename = fields.Char()
+    is_duplicate = fields.Boolean('Duplicate Record')
+    duplicate_ref = fields.Many2one('file.registry','Duplicate Ref#')
+
+    @api.model
+    def create(self, vals):
+        condition = False
+        if vals.get('part') == 'xml1':
+            condition = [('part', '=', 'xml1'), ('bduorder_ref', '=', vals['bduorder_ref']),('edition_count', '=', vals['edition_count'])]
+        elif vals.get('part') == 'xml3':
+            condition = [('part', '=', 'xml3'), ('bduorder_ref', '=', vals['bduorder_ref']),('job_ref', '=', vals['job_ref'])]
+        elif vals.get('part') == 'xml4':
+            condition = [('part', '=', 'xml4'), ('job_ref', '=', vals['job_ref'])]
+        if condition:
+            reg_obj = self.search(condition, limit=1, order='id')
+            if reg_obj:
+                vals['is_duplicate'] = True
+                vals['duplicate_ref'] = reg_obj.id
+        return super(Registry, self).create(vals)
 
 
     @api.multi

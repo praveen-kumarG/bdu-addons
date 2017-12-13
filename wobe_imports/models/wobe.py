@@ -80,7 +80,13 @@ class Job(models.Model):
 
     order_id = fields.Many2one('sale.order', string='Sale Order', ondelete='restrict', help='Associated Sale Order')
     company_id = fields.Many2one('res.company', 'Company')
+    file_count = fields.Integer('Files', compute='_compute_file_count')
 
+    def _compute_file_count(self):
+        file_registry = self.env['file.registry'].read_group([('job_id', 'in', self.ids)], ['job_id'], ['job_id'])
+        res = dict((data['job_id'][0], data['job_id_count']) for data in file_registry)
+        for line in self:
+            line.file_count = res.get(line.id, 0)
 
     @api.model
     def _needaction_domain_get(self):
@@ -102,10 +108,10 @@ class Job(models.Model):
         # ----------------------------
         # Registry Files: Search
         # ----------------------------
-        for x1 in Reg.search([('state','<>','done'), ('part','=', 'xml1')]):
+        for x1 in Reg.search([('state','<>','done'), ('part','=', 'xml1'), ('is_duplicate','=',False)]):
             part1[x1.bduorder_ref] = [x1, x1.edition_count]
 
-        for x3 in Reg.search([('state','<>','done'), ('part','=', 'xml3')]):
+        for x3 in Reg.search([('state','<>','done'), ('part','=', 'xml3'), ('is_duplicate','=',False)]):
             BDUOrder = x3.bduorder_ref
             KBAJobId = x3.job_ref
             if not BDUOrder in part3:
@@ -113,7 +119,7 @@ class Job(models.Model):
             else:
                 part3[BDUOrder].update({KBAJobId: x3})
 
-        for x4 in Reg.search([('state','<>','done'), ('part','=', 'xml4')]):
+        for x4 in Reg.search([('state','<>','done'), ('part','=', 'xml4'), ('is_duplicate','=',False)]):
             part4[x4.job_ref] = x4
 
         # ---------------------------------------
@@ -557,6 +563,7 @@ class Job(models.Model):
             action['res_id'] = file_registry.id
         else:
             action['domain'] = [('id', 'in', file_registry.ids)]
+        action['context'] = {}
         return action
 
 
