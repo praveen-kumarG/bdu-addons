@@ -99,8 +99,8 @@ class FileTransfer(models.Model):
         msg = self.test_connection()
         raise UserError(msg[1])
 
-    @api.model
-    def process_file_transfer(self, ids=None):
+    @api.multi
+    def process_file_transfer(self):
         connection = self.search([('active','=',True),('company_id','=',self.env.user.company_id.id)])
         if not connection:
             _logger.exception("FTP Connection does not exist, please configure under 'FTP Settings'.")
@@ -130,6 +130,21 @@ class FileTransfer(models.Model):
         ctx = self._context.copy()
         ctx.update({'local_path': connection.local_path, 'company_id': connection.company_id.id})
         return Reg.with_context(ctx).load_xml_file()
+
+
+    @api.model
+    def run_wobejob_process(self, ids=None):
+        Job = self.env['wobe.job']
+
+        # Call: FTP & Registry Creation
+        self.process_file_transfer()
+        self._cr.commit()
+
+        # Call: WobeJob Creation
+        Job.action_create_job()
+
+        # Call: Sale Order Creation
+        Job.action_create_order()
 
 
 class Registry(models.Model):
@@ -163,13 +178,11 @@ class Registry(models.Model):
         companyID = self._context.get('company_id', '')
         dir_toRead = os.path.join(path)
 
-        Job = self.env['wobe.job']
-
         try:
             os.listdir(dir_toRead)
         except Exception, e:
             _logger.exception("Wobe Import File : %s" % str(e))
-            return Job.action_create_job()
+            return True
 
         for filename in os.listdir(dir_toRead):
             if not filename.endswith('.xml'): continue
@@ -221,5 +234,4 @@ class Registry(models.Model):
             except Exception, e:
                 _logger.exception("Wobe Import: File-Registry : %s" % str(e))
 
-        # Execute WobeJob Creation
-        return Job.action_create_job()
+        return True
