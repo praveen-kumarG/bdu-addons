@@ -133,7 +133,6 @@ class Job(models.Model):
         # Files are linked & grouped: <Xml1> => <Xml3> => [<Xml4>]
         # ---------------------------------------------------------------
         for key in set(part1).intersection(set(part3)):
-            groupedFiles[key].update({'Rfile3': part3[key].values()})
 
             map3N4, unmap3 = {}, []
             for y in set(part3[key]).intersection(set(part4)):
