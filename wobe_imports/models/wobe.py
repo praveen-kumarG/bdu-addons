@@ -315,7 +315,7 @@ class Job(models.Model):
 
         if RegFile4:
             evals.update({
-                'infojob_ref' : RegFile3.job_ref,
+                'infojob_ref' : RegFile4.job_ref,
                 'info_product': data4.find('info_product').text,
 
                 'production_start' : data4.find('info_datetime_start').text,
