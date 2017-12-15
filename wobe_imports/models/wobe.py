@@ -109,10 +109,12 @@ class Job(models.Model):
         # ----------------------------
         # Registry Files: Search
         # ----------------------------
-        for x1 in Reg.search([('state','<>','done'), ('part','=', 'xml1')]):
+        for x1 in Reg.search([('state','<>','done'), ('part','=', 'xml1')]
+                , order='run_date, file_create_date, is_duplicate'):
             part1[x1.bduorder_ref] = [x1, x1.edition_count]
 
-        for x3 in Reg.search([('state','<>','done'), ('part','=', 'xml3')]):
+        for x3 in Reg.search([('state','<>','done'), ('part','=', 'xml3')]
+                , order='run_date, file_create_date, is_duplicate'):
             BDUOrder = x3.bduorder_ref
             KBAJobId = x3.job_ref
             if not BDUOrder in part3:
@@ -120,7 +122,8 @@ class Job(models.Model):
             else:
                 part3[BDUOrder].update({KBAJobId: x3})
 
-        for x4 in Reg.search([('state','<>','done'), ('part','=', 'xml4')]):
+        for x4 in Reg.search([('state','<>','done'), ('part','=', 'xml4')]
+                , order='run_date, file_create_date, is_duplicate'):
             part4[x4.job_ref] = x4
 
         # ---------------------------------------
@@ -193,24 +196,29 @@ class Job(models.Model):
                     continue
 
                 # --------------------------------------------
-                # Regitry: Update
+                # Regitry: Update Status
                 # --------------------------------------------
                 rDone = {'job_id': job.id, 'state':'done'}
                 rPending = {'job_id': job.id, 'state':'pending'}
+
+                def _update_RegStatus(RgFile, Rvals):
+                    RgFile.write(Rvals)
+                    if RgFile.duplicate_ref:
+                        _update_RegStatus(RgFile.duplicate_ref, Rvals)
 
                 QtyCheck = job.net_quantity >= job.planned_quantity
                 EditionCheck = len(job.edition_ids) == job.edition_count and all(l.net_quantity for l in job.edition_ids)
 
                 if QtyCheck or EditionCheck:
-                    Reg1.write(rDone)
+                    _update_RegStatus(Reg1, rDone)
                 else:
-                    Reg1.write(rPending)
+                    _update_RegStatus(Reg1, rPending)
 
                 for rf in fv['Rfile3N4'].keys() + fv['Rfile3N4'].values():
-                    rf.write(rDone)
+                    _update_RegStatus(rf, rDone)
 
                 for rf in fv['Rfile3']:
-                    rf.write(rPending)
+                    _update_RegStatus(rf, rPending)
 
             except:
                 pass
