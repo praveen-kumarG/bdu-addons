@@ -150,6 +150,7 @@ class FileTransfer(models.Model):
 class Registry(models.Model):
     _name = 'file.registry'
     _description = 'XML File Registry'
+    _order = 'run_date desc, file_create_date'
 
     name = fields.Char('File Name', required=True, index=True)
     bduorder_ref = fields.Char('BDUOrder #', help='BDUOrder reference', index=True)
@@ -168,6 +169,7 @@ class Registry(models.Model):
     filename = fields.Char()
     is_duplicate = fields.Boolean('Duplicate Record')
     duplicate_ref = fields.Many2one('file.registry','Duplicate Ref#')
+    file_create_date = fields.Float('File Create Date')
 
     @api.model
     def create(self, vals):
@@ -179,7 +181,7 @@ class Registry(models.Model):
         elif vals.get('part') == 'xml4':
             condition = [('part', '=', 'xml4'), ('job_ref', '=', vals['job_ref'])]
         if condition:
-            reg_obj = self.search(condition, limit=1, order='id')
+            reg_obj = self.search(condition, limit=1)
             if reg_obj:
                 vals['is_duplicate'] = True
                 vals['duplicate_ref'] = reg_obj.id
@@ -201,10 +203,19 @@ class Registry(models.Model):
         except Exception, e:
             _logger.exception("Wobe Import File : %s" % str(e))
             return True
+        # sort local path files based on creation date
+        os.chdir(dir_toRead)
+        fileLists = filter(os.path.isfile, os.listdir(dir_toRead))
+        fileLists.sort(key=lambda x: os.path.getctime(x))
 
-        for filename in os.listdir(dir_toRead):
+        if not fileLists:
+            fileLists = os.listdir(dir_toRead)
+
+        for filename in fileLists:
             if not filename.endswith('.xml'): continue
             File = os.path.join(dir_toRead, filename)
+            fileStat = os.stat(File)
+            file_create_date = fileStat.st_ctime
             vals = {}
 
             try:
@@ -244,7 +255,7 @@ class Registry(models.Model):
                 })
                 fn = open(File, 'r')
                 vals.update({'filename': filename,
-                             'xmlfile': base64.encodestring(fn.read()),})
+                             'xmlfile': base64.encodestring(fn.read()),'file_create_date':file_create_date,})
                 fn.close()
                 os.remove(File)#remove file from local system
                 reg = self.create(vals)

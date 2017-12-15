@@ -98,7 +98,7 @@
                 </div>
                 <sheet>
                     <field name="job_id" invisible="1"/>
-                    <div class="oe_button_box" name="button_box" position="inside">
+                    <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" name="action_view_job" type="object" icon="fa-files-o" String="OdooJob" attrs="{'invisible':[('job_id','=',False)]}">
                         </button>
                     </div>
