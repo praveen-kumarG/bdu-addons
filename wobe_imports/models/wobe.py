@@ -81,6 +81,7 @@ class Job(models.Model):
     order_id = fields.Many2one('sale.order', string='Sale Order', ondelete='restrict', help='Associated Sale Order')
     company_id = fields.Many2one('res.company', 'Company')
     file_count = fields.Integer('Files', compute='_compute_file_count')
+    edition_count = fields.Integer('Edition Count')
 
     def _compute_file_count(self):
         file_registry = self.env['file.registry'].read_group([('job_id', 'in', self.ids)], ['job_id'], ['job_id'])
@@ -108,10 +109,10 @@ class Job(models.Model):
         # ----------------------------
         # Registry Files: Search
         # ----------------------------
-        for x1 in Reg.search([('state','<>','done'), ('part','=', 'xml1'), ('is_duplicate','=',False)]):
+        for x1 in Reg.search([('state','<>','done'), ('part','=', 'xml1')]):
             part1[x1.bduorder_ref] = [x1, x1.edition_count]
 
-        for x3 in Reg.search([('state','<>','done'), ('part','=', 'xml3'), ('is_duplicate','=',False)]):
+        for x3 in Reg.search([('state','<>','done'), ('part','=', 'xml3')]):
             BDUOrder = x3.bduorder_ref
             KBAJobId = x3.job_ref
             if not BDUOrder in part3:
@@ -119,7 +120,7 @@ class Job(models.Model):
             else:
                 part3[BDUOrder].update({KBAJobId: x3})
 
-        for x4 in Reg.search([('state','<>','done'), ('part','=', 'xml4'), ('is_duplicate','=',False)]):
+        for x4 in Reg.search([('state','<>','done'), ('part','=', 'xml4')]):
             part4[x4.job_ref] = x4
 
         # ---------------------------------------
@@ -185,7 +186,7 @@ class Job(models.Model):
                     vals['company_id'] = Reg1.company_id.id or self.env.user.company_id.id
                     job = Job_obj.create(vals)
 
-                elif job.state == 'waiting':
+                elif job.state in ('waiting', 'ready', 'exception'):
                     vals = self._prepare_job_data(data1, edData, Job=job)
                     job.write(vals)
                 else:
@@ -197,7 +198,10 @@ class Job(models.Model):
                 rDone = {'job_id': job.id, 'state':'done'}
                 rPending = {'job_id': job.id, 'state':'pending'}
 
-                if job.net_quantity >= job.planned_quantity:
+                QtyCheck = job.net_quantity >= job.planned_quantity
+                EditionCheck = len(job.edition_ids) == job.edition_count and all(l.net_quantity for l in job.edition_ids)
+
+                if QtyCheck or EditionCheck:
                     Reg1.write(rDone)
                 else:
                     Reg1.write(rPending)
@@ -235,9 +239,9 @@ class Job(models.Model):
             name = key
             found = False
 
-            if Job and key.isalpha():
+            if Job:
                 found = Job.edition_ids.filtered(lambda x: x.name == key)
-                if not found:
+                if not found and key.isalpha():
                     found = Job.edition_ids.filtered(lambda x: x.name == val.get('infojob_ref'))
 
             elnvals = {'name' : name }
@@ -254,20 +258,16 @@ class Job(models.Model):
             else:
                 edlines.append((0,0, elnvals))
 
-        res.update({
-            'edition_ids' : edlines,
-        })
-
-        if Job: return res
-
-        # --------------------------------
-        # Data: for New-Job Record
-        # -------------------------------
-
         # Booklet Lines
         for booklet in data1.iter('Booklet'):
+            ref = booklet.get('id')
+            found = False
+
+            if Job:
+                found = Job.booklet_ids.filtered(lambda x: x.booklet_ref == ref)
+
             lnvals = {
-                'booklet_ref': booklet.get('id'),
+                'booklet_ref': ref,
                 'pages' : booklet.find('Pages').text,
                 'format': booklet.find('Format').text,
                 'paper_weight': booklet.find('PaperWeight').text,
@@ -275,21 +275,34 @@ class Job(models.Model):
                 'stitching': True if booklet.find('Stitching').text == 'Yes' else False,
                 'glueing'  : True if booklet.find('Glueing').text == 'Yes' else False,
             }
-            lines.append(lnvals)
+
+            if found:
+                lines.append((1, found.id, lnvals))
+            else:
+                lines.append((0,0, lnvals))
+
 
         res.update({
-            'job_ref' : data1.find('WobeJobId').text,
-            'bduorder_ref': data1.find('BduOrderId').text,
-            'name'    : data1.find('BduOrderId').text,
             'title'   : data1.find('NewspaperTitle').text,
+            'edition_count': len(data1.findall('Edition')),
 
             'issue_date' : data1.find('IssueDate').text,
             'total_pages': int(data1.find('TotalPages').text or 0),
             'strook': data1.find('Strook').text,
             'planned_quantity': int(data1.find('ProductionAmount').text or 0),
 
-            'booklet_ids' : map(lambda x:(0,0,x), lines),
+            'edition_ids' : edlines,
+            'booklet_ids' : lines,
                })
+
+        if Job: return res
+        # Data: for New-Job Record
+        res.update({
+            'job_ref' : data1.find('WobeJobId').text,
+            'bduorder_ref': data1.find('BduOrderId').text,
+            'name'    : data1.find('BduOrderId').text,
+            })
+
         return res
 
 
@@ -361,6 +374,7 @@ class Job(models.Model):
     @api.multi
     def action_create_order(self):
         sale_obj = self.env['sale.order']
+        Registry = self.env['file.registry']
 
         Jobs = self.search([('state','=', 'ready'), ('order_id','=',False)])
 
@@ -375,6 +389,8 @@ class Job(models.Model):
                     subtype_id=self.env.ref('mail.mt_note').id)
 
                 case.write({'state': 'order_created', 'order_id': order.id})
+                Registry.search([('job_id','=', case.id), ('state', '<>', 'done')]).write({'state': 'done'})
+
             else:
                 case.write({'state': 'exception'})
 
@@ -512,16 +528,16 @@ class Job(models.Model):
 
     @api.multi
     def _reset_Job_status(self):
-        # Waiting:
-        for job in self.search([('state','=', 'waiting')]):
-            if job.net_quantity >= job.planned_quantity:
+
+        # Exceptions/Waiting:
+        for job in self.search([('state','in', ('exception','waiting'))]):
+            QtyCheck = job.net_quantity >= job.planned_quantity
+            EditionCheck = len(job.edition_ids) == job.edition_count and all(l.net_quantity for l in job.edition_ids)
+
+            if QtyCheck or EditionCheck:
                 job.write({'state': 'ready'})
 
-        # Exceptions:
-        for job in self.search([('state','=', 'exception')]):
-            if job.net_quantity >= job.planned_quantity:
-                job.write({'state': 'ready'})
-            else:
+            elif job.state == 'exception':
                 job.write({'state': 'waiting'})
 
 
