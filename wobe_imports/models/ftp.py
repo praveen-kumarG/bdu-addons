@@ -150,7 +150,7 @@ class FileTransfer(models.Model):
 class Registry(models.Model):
     _name = 'file.registry'
     _description = 'XML File Registry'
-    _order = 'run_date desc, file_create_date'
+    _order = 'run_date desc, file_create_date desc'
 
     name = fields.Char('File Name', required=True, index=True)
     bduorder_ref = fields.Char('BDUOrder #', help='BDUOrder reference', index=True)
