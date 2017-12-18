@@ -165,7 +165,12 @@
                         <tr t-foreach="o.invoice_line_ids" t-as="l">
                             <td><span t-field="l.so_number"/></td>
                             <td class="text-right">
-                                <span t-field="l.quantity"/>
+                                <t t-if="l.uom_id.qty_rounding">
+                                    <span t-esc="int(round(l.quantity,0))"/>
+                                </t>
+                                <t t-if="not l.uom_id.qty_rounding">
+                                    <span t-field="l.quantity"/>
+                                </t>
                                 <span t-field="l.uom_id"  groups="product.group_uom"/>
                             </td>
                             <td>

@@ -35,12 +35,12 @@
         paperformat="bdu_account.paperformat_bdu_layout"
     />
     <report
-        id="report_sale_order1"
-        string="Advertising Quotation / Order"
+        id="sale.report_sale_order"
+        string="Quotation / Order / Advertising"
         model="sale.order"
         report_type="qweb-pdf"
-        file="bdu_account.report_saleorder1"
-        name="bdu_account.report_saleorder1"
+        file="sale.report_saleorder"
+        name="sale.report_saleorder"
         paperformat="bdu_account.paperformat_bdu_layout"
     />
 

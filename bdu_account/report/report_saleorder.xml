@@ -238,10 +238,20 @@
 </template>
 
 
-<template id="report_saleorder1">
+<template id="sale.report_saleorder">
     <t t-call="report.html_container">
         <t t-foreach="docs" t-as="doc">
-            <t t-call="bdu_account.report_saleorder_document1" t-lang="doc.partner_id.lang"/>
+            <t t-if="doc.advertising">
+                <t t-call="bdu_account.report_saleorder_document1" t-lang="doc.partner_id.lang"/>
+            </t>
+            <t t-if="not doc.advertising">
+                <t t-if="doc.company_id.use_bduprint">
+                     <t t-call="bdu_account.report_saleorder_document1" t-lang="doc.partner_id.lang"/>
+                </t>
+                <t t-if="not doc.company_id.use_bduprint">
+                    <t t-call="sale.report_saleorder_document" t-lang="doc.partner_id.lang"/>
+                </t>
+            </t>
         </t>
     </t>
 </template>
