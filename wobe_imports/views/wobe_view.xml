@@ -8,7 +8,7 @@
             <field name="name">view_wobe_job_form</field>
             <field name="model">wobe.job</field>
             <field name="arch" type="xml">
-                <form string="Job" create="false" edit="false" delete="false" copy="false">
+                <form string="Job" create="false" edit="true" delete="false" copy="false">
                     <header>
                         <button name="action_create_order" type="object" string="Create SaleOrder"
                                 states="ready" class="oe_highlight"/>
