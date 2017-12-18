@@ -5,11 +5,8 @@
         <!--
             Resource: product.attribute
         -->
-        <record id="variant_attribute_1" model="product.attribute">
-            <field name="name">Paper Format</field>
-        </record>
         <record id="variant_attribute_2" model="product.attribute">
-            <field name="name">Paper Pages</field>
+            <field name="name">Pages</field>
         </record>
         <record id="variant_attribute_3" model="product.attribute">
             <field name="name">Paper Weight</field>

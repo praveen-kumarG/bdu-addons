@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Fiscal Position Account Templates -->
+
+        <!-- EU Countries -->
+        <record
+            id="fiscal_position_account_eu_4"
+            model="account.fiscal.position.account.template">
+            <field name="position_id"     ref="fiscal_position_template_eu" />
+            <field name="account_src_id"  ref="80010" />
+            <field name="account_dest_id" ref="80055" />
+        </record>
+        <record
+            id="fiscal_position_account_eu_5"
+            model="account.fiscal.position.account.template">
+            <field name="position_id"     ref="fiscal_position_template_eu" />
+            <field name="account_src_id"  ref="80110" />
+            <field name="account_dest_id" ref="80113" />
+        </record>
+        <record
+            id="fiscal_position_account_eu_6"
+            model="account.fiscal.position.account.template">
+            <field name="position_id"     ref="fiscal_position_template_eu" />
+            <field name="account_src_id"  ref="80120" />
+            <field name="account_dest_id" ref="80121" />
+        </record>
+
+    </data>
+</openerp>

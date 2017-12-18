@@ -5,10 +5,15 @@
         <field name="name">product_normal_form_view_inherit</field>
         <field name="model">product.product</field>
         <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="priority" eval="7" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='default_code']" position="after">
-            <field name="print_category"/>
-        </xpath>
+                <field name="print_category"/>
+                <field name="print_format_template" attrs="{'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+                <field name="formats" attrs="{'invisible': [('print_format_template', '!=', True)],
+                                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+
+            </xpath>
         </field>
     </record>
 
@@ -20,9 +25,23 @@
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='default_code']" position="after">
-                <field name="print_category" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+                <field name="print_category" />
+                <field name="print_format_template" />
+                <field name="formats" attrs="{'invisible': [('print_format_template', '!=', True)],
+                                               'required': [('print_format_template', '=', True)]}"/>
             </xpath>
         </field>
+    </record>
+
+    <record id="product_template_form_view_wobe" model="ir.ui.view">
+		   <field name="name">product.template.common.form</field>
+		   <field name="model">product.template</field>
+		   <field name="inherit_id" ref="product.product_template_form_view"/>
+		   <field name="arch" type="xml">
+			  <field name="categ_id" position="after">
+				 <field name="booklet_surface_area"/>
+			  </field>
+		   </field>
     </record>
 
 </odoo>

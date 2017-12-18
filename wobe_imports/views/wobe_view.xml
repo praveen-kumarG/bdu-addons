@@ -11,24 +11,43 @@
                 <form string="Job" create="false" edit="false" delete="false" copy="false">
                     <header>
                         <button name="action_create_order" type="object" string="Create SaleOrder"
-                                states="new,exception" class="oe_highlight"/>
-                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="new,order_created"/>
+                                states="ready" class="oe_highlight"/>
+                        <button name="action_force_ready" type="object" string="Force Ready"
+                                states="waiting" class="oe_highlight"/>
+                        <button name="action_reset" type="object" string="Reset Status"
+                                states="waiting,exception" class="oe_highlight"/>
+                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="ready,order_created"/>
                     </header>
-                    <sheet string="Invoice">
+                    <sheet string="Job">
+                        <div class="oe_button_box" name="button_box">
+                            <field name="order_id" invisible="1"/>
+                            <button class="oe_stat_button" name="action_view_sales"
+                                type="object" icon="fa-usd" String="Sale Order" attrs="{'invisible': [('order_id','=',False)]}">
+                            </button>
+                            <button class="oe_stat_button" name="action_view_file_registry"
+                                type="object" icon="fa-bars" attrs="{'invisible': [('file_count','=',0)]}">
+                                <field string="RegistryFiles" name="file_count" widget="statinfo" attrs="{'invisible': [('file_count','=',0)]}"/>
+                            </button>
+                        </div>
+                        <h1 class="mt0">
+                            <label string="BDU Order :"/>
+                            <field name="name"/>
+                        </h1>
                         <group>
                             <group>
                                 <field name="title"/>
                                 <field name="total_pages"/>
                                 <field name="plate_type"/>
-                                <field name="gross_quantity"/>
+                                <field name="plate_amount"/>
                                 <field name="production_start"/>
+                                <field name="production_stop"/>
                             </group>
                             <group>
                                 <field name="issue_date"/>
                                 <field name="strook"/>
                                 <field name="planned_quantity"/>
+                                <field name="gross_quantity"/>
                                 <field name="net_quantity"/>
-                                <field name="production_stop"/>
                             </group>
                         </group>
 
@@ -36,12 +55,15 @@
                             <page string="Booklet Details">
                                 <field name="booklet_ids" nolabel="1" widget="one2many_list" mode="tree">
                                     <tree string="Booklet Details" editable="bottom">
-                                        <field name="pages"/>
                                         <field name="format"/>
-                                        <field name="page_weight"/>
+                                        <field name="pages"/>
+                                        <field name="paper_weight"/>
                                         <field name="stitching"/>
                                         <field name="glueing"/>
-                                        <field name="booklet_ref"/>
+                                        <field name="calculated_plates"/>
+                                        <field name="calculated_mass"/>
+                                        <field name="calculated_ink"/>
+                                        <field name="calculated_hours"/>
                                     </tree>
                                 </field>
                             </page>
@@ -71,19 +93,23 @@
                                     </group>
                                 </group>
                             </page>
-                            <page string="XML Import Details">
+                            <page string="Editions">
+                                <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree">
+                                    <tree string="Edition Details" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="plate_amount"/>
+                                        <field name="net_quantity"/>
+                                        <field name="gross_quantity"/>
+                                        <field name="production_start"/>
+                                        <field name="production_stop"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="References">
                                 <group string="References" colspan="4">
                                     <field name="job_ref"/>
                                     <field name="bduorder_ref"/>
-                                    <field name="order_id"/>
-                                </group>
-                                <group string="Source Document" colspan="4">
-                                    <field name="xmlfile_1" filename="filename1"/>
-                                    <field name="xmlfile_3" filename="filename3"/>
-                                    <field name="xmlfile_4" filename="filename4"/>
-                                    <field name="filename1" invisible="1"/>
-                                    <field name="filename3" invisible="1"/>
-                                    <field name="filename4" invisible="1"/>
+                                    <field name="company_id"/>
                                 </group>
                             </page>
                         </notebook>
@@ -100,11 +126,12 @@
             <field name="name">view_wobe_job_tree</field>
             <field name="model">wobe.job</field>
             <field name="arch" type="xml">
-                <tree string="Job" create="false" edit="false" delete="false" copy="false"
-                        decoration-danger="state == 'exception'" decoration-info="state == 'new'">
+                <tree string="Job" create="false" edit="false" delete="true" copy="false"
+                        decoration-danger="state == 'exception'" decoration-info="state == 'ready'">
                     <field name="bduorder_ref"/>
                     <field name="title"/>
-                    <field name="job_ref"/>
+                    <field name="create_date" string="Creation Date"/>
+                    <field name="issue_date"/>
                     <field name="state"/>
                 </tree>
             </field>
@@ -118,13 +145,16 @@
                 <search string="Search Jobs">
                     <field name="job_ref" />
                     <field name="bduorder_ref"/>
-                    <filter name="new" string="New" domain="[('state','=','new')]"/>
+                    <filter name="waiting" string="Waiting" domain="[('state','=','waiting')]"/>
+                    <separator/>
+                    <filter name="ready" string="Ready to Order" domain="[('state','=','ready')]"/>
                     <filter name="order_created" string="SaleOrder Created" domain="[('state','=','order_created')]"/>
                     <separator/>
                     <filter name="exceptions" string="Exceptions" domain="[('state','=','exception')]"/>
                     <separator/>
                     <group expand="0" string="Group By">
                         <filter name="status" string="Status" context="{'group_by':'state'}"/>
+                        <filter name="company_id" string="Company" context="{'group_by':'company_id'}"/>
                     </group>
                </search>
             </field>
@@ -141,7 +171,7 @@
               <p>
                 Job Records will be created by the call of Schedular (Cron).
               </p><p>
-                Do enable the schedular [FTP &amp; Import WOBE Jobs], if not done earlier.
+                Enable the schedular "FTP &amp; Import WOBE Jobs", to create records.
               </p>
             </field>
         </record>
@@ -152,9 +182,6 @@
             action="action_wobe_job"
             id="menu_action_wobe_job"
             sequence="2"/>
-
-
-
 
     </data>
 </odoo>
