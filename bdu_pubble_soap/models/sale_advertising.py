@@ -157,7 +157,7 @@ class SofromOdootoPubble(models.Model):
     transmission_id = fields.Char(string='Transmission ID', store=True, size=16, readonly=True)
     pubble_so_line = fields.One2many('soline.from.odooto.pubble', 'order_id', string='Order Lines', copy=True)
     pubble_response = fields.Text('Pubble Response')
-    salesorder_extorderid = fields.Char(string='Sale Order Name')
+    salesorder_extorderid = fields.Char(string='Sale Order ID')
     salesorder_reference = fields.Char(string='Opportunity Subject', size=64)
     salesorder_createdby = fields.Char(string='User Name', size=32)
     salesorder_debtor_extaccountingid = fields.Char(string='Advertiser Number')

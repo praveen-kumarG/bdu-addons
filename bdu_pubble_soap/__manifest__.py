@@ -20,9 +20,9 @@
    :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
    :alt: License: AGPL-3
 
-==============
+===========================
 Odoo-Pubble SOAP Interface
-==============
+===========================
 
 This module transfers advertising orders from Odoo to Pubble via a SOAP interface
 
@@ -123,7 +123,8 @@ To contribute to this module, please visit https://odoo-community.org.
 
     # always loaded
     'data': ['data/transmission_sequence.xml',
-             'security/ir.model.access.csv'
+             'security/ir.model.access.csv',
+             'views/sale_advertising_order.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
