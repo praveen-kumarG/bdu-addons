@@ -9,6 +9,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='default_code']" position="after">
                 <field name="print_category"/>
+                <field name="applicable_to_regioman"/>
                 <field name="print_format_template" attrs="{'readonly': [('product_variant_count', '&gt;', 1)]}"/>
                 <field name="formats" attrs="{'invisible': [('print_format_template', '!=', True)],
                                                'readonly': [('product_variant_count', '&gt;', 1)]}"/>
@@ -26,6 +27,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='default_code']" position="after">
                 <field name="print_category" />
+                <field name="applicable_to_regioman"/>
                 <field name="print_format_template" />
                 <field name="formats" attrs="{'invisible': [('print_format_template', '!=', True)],
                                                'required': [('print_format_template', '=', True)]}"/>

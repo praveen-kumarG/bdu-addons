@@ -73,24 +73,24 @@
                             </page>
                             <page string="Other/Paper Details">
                                 <group>
-                                    <group string="Paper Mass">
-                                        <field name="paper_mass_1"/>
-                                        <field name="paper_mass_2"/>
-                                        <field name="paper_mass_3"/>
-                                        <field name="paper_mass_4"/>
-                                        <field name="paper_mass_5"/>
-                                        <field name="paper_mass_6"/>
-                                        <field name="paper_mass_7"/>
-                                    </group>
-                                    <group string="Paper Width">
-                                        <field name="paper_width_1"/>
-                                        <field name="paper_width_2"/>
-                                        <field name="paper_width_3"/>
-                                        <field name="paper_width_4"/>
-                                        <field name="paper_width_5"/>
-                                        <field name="paper_width_6"/>
-                                        <field name="paper_width_7"/>
-                                    </group>
+                                    <!--<group string="Paper Mass">-->
+                                        <!--<field name="paper_mass_1"/>-->
+                                        <!--<field name="paper_mass_2"/>-->
+                                        <!--<field name="paper_mass_3"/>-->
+                                        <!--<field name="paper_mass_4"/>-->
+                                        <!--<field name="paper_mass_5"/>-->
+                                        <!--<field name="paper_mass_6"/>-->
+                                        <!--<field name="paper_mass_7"/>-->
+                                    <!--</group>-->
+                                    <!--<group string="Paper Width">-->
+                                        <!--<field name="paper_width_1"/>-->
+                                        <!--<field name="paper_width_2"/>-->
+                                        <!--<field name="paper_width_3"/>-->
+                                        <!--<field name="paper_width_4"/>-->
+                                        <!--<field name="paper_width_5"/>-->
+                                        <!--<field name="paper_width_6"/>-->
+                                        <!--<field name="paper_width_7"/>-->
+                                    <!--</group>-->
 
                                 </group>
                             </page>
