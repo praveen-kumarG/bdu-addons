@@ -657,19 +657,28 @@ class Edition(models.Model):
     name = fields.Char('Edition', help='Edition Name', required=True, copy=False)
 
     plate_amount = fields.Integer('Plate Amount')
-    net_quantity   = fields.Integer('Net Qty', help='Prints Net')
+    net_quantity = fields.Integer('Net Qty', help='Prints Net')
 
     gross_quantity = fields.Integer('Gross Qty', help='Prints Gross')
     waste_start = fields.Integer('Waste Start')
     waste_total = fields.Integer('Waste Total')
 
-    production_start = fields.Char('Production Start', help='Info DateTime Start')
-    production_stop = fields.Char('Production End', help='Info DateTime End')
+    production_start = fields.Datetime('Production Start', help='Info DateTime Start')
+    production_stop = fields.Datetime('Production End', help='Info DateTime End')
 
     kbajob_ref  = fields.Char('KBA Job #', help='KBA Job (XML3)', copy=False)
     infojob_ref = fields.Char('Info Job #', help='Info Job (XML4)', copy=False)
     info_product = fields.Char('Info Product', help='Info product / Edition Name', copy=False)
 
+    @api.onchange('name')
+    def edition_create(self):
+        self.name = self.job_id.title
+        self.plate_amount = sum(line.calculated_plates if int(line.pages) >= 48 else line.calculated_plates / 2 for line in self.job_id.booklet_ids)
+        self.net_quantity = self.job_id.planned_quantity
+
+    @api.onchange('gross_quantity')
+    def waste_compute(self):
+        self.waste_total = self.gross_quantity - self.net_quantity
 
 class Registry1(models.Model):
     _inherit = "file.registry"
