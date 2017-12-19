@@ -9,6 +9,12 @@ PrintCategory = [('strook', 'Strook'),
                  ('glueing', 'Glueing'),
                  ('plate_change', 'Plate Change'),
                  ('press_stop', 'Press Stop'),
+                 ('paper_kba','Paper KBA'),
+                 ('ink_kba','Ink KBA'),
+                 ('plates_kba','Plates KBA'),
+                 ('paper_regioman','Paper Regioman'),
+                 ('ink_regioman','Ink Regioman'),
+                 ('plates_regioman','Plates Regioman'),
                 ]
 
 class ProductTemplate(models.Model):
@@ -20,6 +26,7 @@ class ProductTemplate(models.Model):
     formats = fields.Selection([('MP', 'MP'), ('TB', 'TB'), ('BS', 'BS')], string='Paper Format')
     booklet_surface_area = fields.Float('Booklet Surface Area', help="Page surface booklet (newspaper) format in cm2",
                                         digits=dp.get_precision('Product Unit of Measure'))
+    applicable_to_regioman = fields.Boolean('Applicable To Regioman')
 
     @api.constrains('print_format_template', 'formats')
     def _check_paperFormat(self):
