@@ -163,19 +163,19 @@
                     </thead>
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l">
-                            <td><span t-field="l.so_number"/></td>
+                            <td><span t-field="l.sale_line_ids.order_id.name"/>
+                            </td>
                             <td class="text-right">
-                                <t t-if="l.uom_id.qty_rounding">
-                                    <span t-esc="int(round(l.quantity,0))"/>
+                                <t t-if="l.uom_id.uom_type == 'bigger'">
+                                    <span t-esc="int(l.quantity * l.uom_id.factor_inv)"/>
                                 </t>
-                                <t t-if="not l.uom_id.qty_rounding">
-                                    <span t-field="l.quantity"/>
+                                <t t-if="l.uom_id.uom_type == 'reference'">
+                                    <span t-esc="int(l.quantity)"/>
                                 </t>
-                                <span t-field="l.uom_id"  groups="product.group_uom"/>
                             </td>
                             <td>
                                 <span t-if="l.account_analytic_id" t-field="l.account_analytic_id.code"/>,
-                                <span t-if="l.product_id" t-field="l.product_id.name"/>
+                                <span t-if="l.product_id" t-field="l.product_id"/>
                             </td>
                             <td class="text-right">
                                 <span t-field="l.price_unit"
