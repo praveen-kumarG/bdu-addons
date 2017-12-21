@@ -616,6 +616,71 @@ class Job(models.Model):
         action['context'] = {}
         return action
 
+    @api.model
+    def create(self, vals):
+        res = super(Job, self).create(vals)
+        res._fetch_paperProducts()
+        return res
+
+    @api.multi
+    def _fetch_paperProducts(self):
+        self.ensure_one()
+        lines = []
+        product_obj = self.env['product.product']
+        prodTemp_obj = self.env['product.template']
+        variant_obj = self.env['product.attribute.value']
+
+        domain = [('print_category','=', 'paper_regioman')]
+
+        MassX, WidthX = set(), set()
+        for idx in range(1, 8):
+            m = self['paper_mass_' + str(idx)]
+            if m: MassX.add(m)
+
+            w = self['paper_width_' + str(idx)]
+            if w: WidthX.add(w)
+
+        pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
+        pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
+        msg, stockOk = '', True
+
+        # Products: Paper Regioman
+        if not MassX or self.job_type == 'regioman':
+            prods = product_obj.search(domain)
+            for p in prods:
+                lines.append({'product_id': p.id,})
+
+            if not prods:
+                self.message_post(body=_("Product not found for the print-category : 'Paper Regioman'"))
+                stockOk = False
+
+        # Products: Paper KBA
+        for M in MassX:
+            for W in WidthX:
+                m1 = M / 100.0
+                m1 = int(m1) if m1%1 == 0 else m1
+
+                v1 = variant_obj.search([('name','=', str(m1)), ('attribute_id','=', pMass.id)])
+                v2 = variant_obj.search([('name','=', str(W)), ('attribute_id','=', pWidth.id)])
+                product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
+                                              ('attribute_value_ids', 'in', v2.ids),
+                                              ('print_category','=', 'paper_kba')]
+                                             , order='id desc', limit=1)
+
+                if not product:
+                    msg += '(%s, %s); '%(m1, W)
+                    continue
+                lines.append({'product_id': product.id,})
+
+        if msg:
+            self.message_post(body=_("Product not found for the print-category : 'Paper KBA' for these variants - %s"%msg))
+            stockOk = False
+
+        lines = map(lambda x: (0,0, x), lines)
+        self.write({'paper_product_ids': lines, 'stock_ok': stockOk})
+        return True
+
+
 
     @api.model
     def _prepare_picking(self):
