@@ -109,7 +109,7 @@ class SaleOrder(models.Model):
                 lvals = {
                         'order_id': res.id,
                         'ad_adsize_adtypename': line.ad_class.name,
-                        'ad_adsize_extadsizeid': line.product_template_id.default_code,
+                        'ad_adsize_extadsizeid': line.product_id.default_code,
                         'ad_adsize_height': line.product_template_id.height,
                         'ad_adsize_name': line.product_template_id.name,
                         'ad_adsize_width': line.product_template_id.width,
