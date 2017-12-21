@@ -657,10 +657,6 @@ class Job(models.Model):
         res._fetch_paperProducts()
         return res
 
-    def force_fetch_paperProducts(self):
-        res=self.browse(149)
-        res._fetch_paperProducts()
-
     @api.multi
     def _fetch_paperProducts(self):
         self.ensure_one()
