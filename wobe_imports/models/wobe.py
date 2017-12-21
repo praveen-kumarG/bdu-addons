@@ -71,7 +71,9 @@ class Job(models.Model):
     waste_total = fields.Integer(compute=_compute_all, string='Waste Total', store=True)
 
     booklet_ids = fields.One2many('wobe.booklet', 'job_id', 'Booklets', copy=True)
-    edition_ids = fields.One2many('wobe.edition', 'job_id', 'Editions', copy=True)
+    edition_ids = fields.One2many('wobe.edition', 'job_id', 'Editions', copy=False)
+
+    paper_product_ids = fields.One2many('wobe.paper.product', 'job_id', 'Paper Products', copy=False)
 
     state = fields.Selection([('waiting', 'Waiting'), ('ready', 'Ready'),
                              ('order_created', 'Order Created'),
@@ -82,6 +84,11 @@ class Job(models.Model):
     company_id = fields.Many2one('res.company', 'Company')
     file_count = fields.Integer('Files', compute='_compute_file_count')
     edition_count = fields.Integer('Edition Count')
+
+    job_type = fields.Selection([('kba', 'KBA'), ('regioman', 'Regioman')],string='Type', default='kba')
+    stock_ok = fields.Boolean('Ok to create Stock?', default=False)
+
+
 
     def _compute_file_count(self):
         file_registry = self.env['file.registry'].read_group([('job_id', 'in', self.ids)], ['job_id'], ['job_id'])
@@ -589,6 +596,71 @@ class Job(models.Model):
         action['context'] = {}
         return action
 
+    @api.model
+    def create(self, vals):
+        res = super(Job, self).create(vals)
+        res._fetch_paperProducts()
+        return res
+
+    @api.multi
+    def _fetch_paperProducts(self):
+        self.ensure_one()
+        lines = []
+        product_obj = self.env['product.product']
+        prodTemp_obj = self.env['product.template']
+        variant_obj = self.env['product.attribute.value']
+
+        domain = [('print_category','=', 'paper_regioman')]
+
+        MassX, WidthX = set(), set()
+        for idx in range(1, 8):
+            m = self['paper_mass_' + str(idx)]
+            if m: MassX.add(m)
+
+            w = self['paper_width_' + str(idx)]
+            if w: WidthX.add(w)
+
+        pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
+        pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
+        msg, stockOk = '', True
+
+        # Products: Paper Regioman
+        if not MassX or self.job_type == 'regioman':
+            prods = product_obj.search(domain)
+            for p in prods:
+                lines.append({'product_id': p.id,})
+
+            if not prods:
+                self.message_post(body=_("Product not found for the print-category : 'Paper Regioman'"))
+                stockOk = False
+
+        # Products: Paper KBA
+        for M in MassX:
+            for W in WidthX:
+                m1 = M / 100.0
+                m1 = int(m1) if m1%1 == 0 else m1
+
+                v1 = variant_obj.search([('name','=', str(m1)), ('attribute_id','=', pMass.id)])
+                v2 = variant_obj.search([('name','=', str(W)), ('attribute_id','=', pWidth.id)])
+                product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
+                                              ('attribute_value_ids', 'in', v2.ids),
+                                              ('print_category','=', 'paper_kba')]
+                                             , order='id desc', limit=1)
+
+                if not product:
+                    msg += '(%s, %s); '%(m1, W)
+                    continue
+                lines.append({'product_id': product.id,})
+
+        if msg:
+            self.message_post(body=_("Product not found for the print-category : 'Paper KBA' for these variants - %s"%msg))
+            stockOk = False
+
+        lines = map(lambda x: (0,0, x), lines)
+        self.write({'paper_product_ids': lines, 'stock_ok': stockOk})
+        return True
+
+
 
 class Booklet(models.Model):
     _name = "wobe.booklet"
@@ -700,3 +772,13 @@ class Registry1(models.Model):
             'res_model': action.res_model,
             'domain': [('id', '=', self.job_id.id)],
         }
+
+
+class PaperProduct(models.Model):
+    _name = "wobe.paper.product"
+    _description = 'WOBE Paper Product'
+
+    job_id = fields.Many2one('wobe.job', required=True, ondelete='cascade', index=True, copy=False)
+    product_id = fields.Many2one('product.product', 'Product', required=True)
+    name = fields.Char(related='product_id.default_code', string='Internal Reference', store=True)
+

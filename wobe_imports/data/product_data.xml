@@ -11,6 +11,9 @@
         <record id="variant_attribute_3" model="product.attribute">
             <field name="name">Paper Weight</field>
         </record>
+        <record id="variant_attribute_paperWidth" model="product.attribute">
+            <field name="name">Paper Width</field>
+        </record>
 
 
 

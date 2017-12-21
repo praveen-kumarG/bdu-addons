@@ -60,7 +60,8 @@ class Product(models.Model):
     @api.constrains('print_category')
     def _check_printCategory(self):
         for case in self:
-            if case.print_category:
+            UniqueCat = ['strook', 'stitching', 'glueing', 'plate_change', 'press_stop']
+            if case.print_category and case.print_category in UniqueCat:
                 if self.search([('print_category', '=', case.print_category), ('id','<>', case.id)]):
                     raise ValidationError(_('Product for this Print Category already exists'))
         return True
