@@ -16,7 +16,7 @@
                                 states="waiting" class="oe_highlight"/>
                         <button name="action_reset" type="object" string="Reset Status"
                                 states="waiting,exception" class="oe_highlight"/>
-                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="ready,order_created"/>
+                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="ready,order_created,picking_created"/>
                     </header>
                     <sheet string="Job">
                         <div class="oe_button_box" name="button_box">
@@ -26,7 +26,7 @@
                                 type="object" icon="fa-usd" String="Sale Order" attrs="{'invisible': [('order_id','=',False)]}">
                             </button>
                             <button class="oe_stat_button" name="action_view_picking"
-                                type="object" icon="fa-truck" String="Picking" attrs="{'invisible': [('picking_id','=',False)]}">
+                                type="object" icon="fa-truck" String="Picking Order" attrs="{'invisible': [('picking_id','=',False)]}">
                             </button>
                             <button class="oe_stat_button" name="action_view_file_registry"
                                 type="object" icon="fa-bars" attrs="{'invisible': [('file_count','=',0)]}">
@@ -76,27 +76,12 @@
                                 </field>
                             </page>
                             <page string="Other/Paper Details">
-                                <group>
-                                    <!--<group string="Paper Mass">-->
-                                        <!--<field name="paper_mass_1"/>-->
-                                        <!--<field name="paper_mass_2"/>-->
-                                        <!--<field name="paper_mass_3"/>-->
-                                        <!--<field name="paper_mass_4"/>-->
-                                        <!--<field name="paper_mass_5"/>-->
-                                        <!--<field name="paper_mass_6"/>-->
-                                        <!--<field name="paper_mass_7"/>-->
-                                    <!--</group>-->
-                                    <!--<group string="Paper Width">-->
-                                        <!--<field name="paper_width_1"/>-->
-                                        <!--<field name="paper_width_2"/>-->
-                                        <!--<field name="paper_width_3"/>-->
-                                        <!--<field name="paper_width_4"/>-->
-                                        <!--<field name="paper_width_5"/>-->
-                                        <!--<field name="paper_width_6"/>-->
-                                        <!--<field name="paper_width_7"/>-->
-                                    <!--</group>-->
-
-                                </group>
+                                <field name="paper_product_ids" nolabel="1" widget="one2many_list" mode="tree">
+                                    <tree string="Paper Products" editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="name" />
+                                    </tree>
+                                </field>
                             </page>
                             <page string="Editions">
                                 <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree">
@@ -116,6 +101,7 @@
                                     <field name="job_ref" readonly="True"/>
                                     <field name="bduorder_ref" readonly="True"/>
                                     <field name="company_id" readonly="True"/>
+                                    <field name="job_type" invisible="1"/>
                                 </group>
                             </page>
                         </notebook>
@@ -149,8 +135,8 @@
             <field name="model">wobe.job</field>
             <field name="arch" type="xml">
                 <search string="Search Jobs">
-                    <field name="job_ref" />
                     <field name="bduorder_ref"/>
+                    <field name="title"/>
                     <filter name="waiting" string="Waiting" domain="[('state','=','waiting')]"/>
                     <separator/>
                     <filter name="ready" string="Ready to Order" domain="[('state','=','ready')]"/>
