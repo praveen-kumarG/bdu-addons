@@ -131,8 +131,8 @@
             <field name="model">wobe.job</field>
             <field name="arch" type="xml">
                 <search string="Search Jobs">
-                    <field name="job_ref" />
                     <field name="bduorder_ref"/>
+                    <field name="title"/>
                     <filter name="waiting" string="Waiting" domain="[('state','=','waiting')]"/>
                     <separator/>
                     <filter name="ready" string="Ready to Order" domain="[('state','=','ready')]"/>
