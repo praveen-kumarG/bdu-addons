@@ -785,7 +785,7 @@ class Job(models.Model):
         else:
             print_category3 = 'plates_regioman'
             print_category4 = 'ink_regioman'
-            name3 = 'Ink'
+            name4 = 'Ink'
 
         product3 = product_obj.search([('print_category', '=', print_category3)])
         product4 = product_obj.search([('print_category', '=', print_category4)])
