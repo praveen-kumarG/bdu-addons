@@ -5,7 +5,7 @@ from odoo import api, fields, models, _
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    job_id = fields.Many2one('Job Ref #')
+    job_id = fields.Many2one('wobe.job','Job Ref #',ondelete='set null', index=True)
 
     @api.multi
     def action_confirm(self):

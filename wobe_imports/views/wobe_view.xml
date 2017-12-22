@@ -12,6 +12,8 @@
                     <header>
                         <button name="action_create_order" type="object" string="Create SaleOrder"
                                 states="ready" class="oe_highlight"/>
+                        <button name="action_create_picking" type="object" string="Create Picking"
+                                states="order_created" class="oe_highlight"/>
                         <button name="action_force_ready" type="object" string="Force Ready"
                                 states="waiting" class="oe_highlight"/>
                         <button name="action_reset" type="object" string="Reset Status"
@@ -30,7 +32,7 @@
                                 type="object" icon="fa-usd" String="Sale Order" attrs="{'invisible': [('order_id','=',False)]}">
                             </button>
                             <button class="oe_stat_button" name="action_view_picking"
-                                type="object" icon="fa-truck" String="Picking Order" attrs="{'invisible': [('picking_id','=',False)]}">
+                                type="object" icon="fa-truck" String="Picking" attrs="{'invisible': [('picking_id','=',False)]}">
                             </button>
                             <button class="oe_stat_button" name="action_view_file_registry"
                                 type="object" icon="fa-bars" attrs="{'invisible': [('file_count','=',0)]}">
