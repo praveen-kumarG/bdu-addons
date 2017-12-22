@@ -412,6 +412,7 @@ class Job(models.Model):
         Jobs = self.search([('state','=', 'ready'), ('order_id','=',False)])
 
         for case in Jobs:
+            case.button_recompute()
 
             vals = case._prepare_order_data()
             if vals:
@@ -831,11 +832,11 @@ class Job(models.Model):
     @api.model
     def create(self, vals):
         res = super(Job, self).create(vals)
-        res._fetch_paperProducts()
+        res.fetch_paperProducts()
         return res
 
     @api.multi
-    def _fetch_paperProducts(self):
+    def fetch_paperProducts(self):
         self.ensure_one()
         lines = []
         product_obj = self.env['product.product']
@@ -891,6 +892,15 @@ class Job(models.Model):
         self.write({'paper_product_ids': lines, 'stock_ok': stockOk})
         return True
 
+    @api.multi
+    def button_recompute(self):
+        ' Recompute Booklet Values'
+
+        for job in self:
+            for bk in job.booklet_ids:
+                # Trigger the Calculation
+                bk.write({'product_id':bk.product_id.id})
+
 
 
 class Booklet(models.Model):
@@ -911,15 +921,18 @@ class Booklet(models.Model):
     calculated_mass = fields.Float(string='Calculated Mass', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
     calculated_ink = fields.Float(string='Calculated Ink', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
+    product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
 
-    @api.depends('format', 'pages', 'paper_weight')
+    @api.depends('format', 'pages', 'paper_weight', 'product_id')
     def _compute_all(self):
+
         for booklet in self:
             #calculated_plates
             plates = 0.0
             pages = float(booklet.pages)
             paper_weight = float(booklet.paper_weight)
             format = 'MP' if booklet.format == 'MAG' else booklet.format
+
             if pages <= 48.0:
                 plates = pages * 4
             elif pages > 48.0:
@@ -931,8 +944,6 @@ class Booklet(models.Model):
                     plates = pages
             booklet.calculated_plates = plates
 
-            #calculated_mass
-            booklet.calculated_mass = 0.0
             product_obj = self.env['product.product']
             variant_obj = self.env['product.attribute.value']
             pPages = self.env.ref('wobe_imports.variant_attribute_2', False)
@@ -946,8 +957,13 @@ class Booklet(models.Model):
                                           ('attribute_value_ids', 'in', v2.ids),
                                           ('print_format_template', '=', True),
                                           ('formats', '=', format), ], order='id desc', limit=1)
+
+            #calculated_mass
             if product:
+                booklet.product_id = product.id
                 booklet.calculated_mass = (product.product_tmpl_id.booklet_surface_area * pages) / float(2) * paper_weight / float(1000)
+            else:
+                booklet.calculated_mass, booklet.product_id = 0.0, False
 
             # Calculated_Ink
             booklet.calculated_ink = booklet.calculated_mass * .04
