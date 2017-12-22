@@ -4,7 +4,7 @@ from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError, ValidationError
 import logging
-
+from datetime import datetime
 import os
 import base64
 import xml.etree.ElementTree as ET
@@ -77,11 +77,12 @@ class Job(models.Model):
     paper_product_ids = fields.One2many('wobe.paper.product', 'job_id', 'Paper Products', copy=False)
 
     state = fields.Selection([('waiting', 'Waiting'), ('ready', 'Ready'),
-                             ('order_created', 'Order Created'),
+                             ('order_created', 'Order Created'),('picking_created', 'Picking Created'),
                              ('exception', 'Exception')], string='Status', default='waiting',
                              copy=False, required=True, track_visibility='onchange')
 
     order_id = fields.Many2one('sale.order', string='Sale Order', ondelete='restrict', help='Associated Sale Order')
+    picking_id = fields.Many2one('stock.picking', string='Picking', ondelete='restrict', help='Associated Stock Picking')
     company_id = fields.Many2one('res.company', 'Company')
     file_count = fields.Integer('Files', compute='_compute_file_count')
     edition_count = fields.Integer('Edition Count')
@@ -414,7 +415,9 @@ class Job(models.Model):
             vals = case._prepare_order_data()
             if vals:
                 order = sale_obj.create(vals)
+                order_id = order.id # action confirm inherited and super returns false for job SO
                 order.action_confirm()
+                order = self.env['sale.order'].browse(order_id)
                 order.message_post_with_view('mail.message_origin_link',
                     values={'self': order, 'origin': case},
                     subtype_id=self.env.ref('mail.mt_note').id)
@@ -455,6 +458,7 @@ class Job(models.Model):
             'date_order': self.issue_date or res['date_order'],
             'company_id': self.company_id.id,
             'origin': self.bduorder_ref,
+            'job_id': self.id,
                })
 
         def _get_linevals(productID, qty=1, forceQty=0):
@@ -600,6 +604,22 @@ class Job(models.Model):
         }
 
     @api.multi
+    def action_view_picking(self):
+        self.ensure_one()
+        action = self.env.ref('stock.action_picking_tree_all')
+        return {
+            'name': action.name,
+            'help': action.help,
+            'type': action.type,
+            'view_type': 'form' if self.picking_id else action.view_type,
+            'view_mode': 'form' if self.picking_id else action.view_mode,
+            'target': action.target,
+            'res_id': self.picking_id.id or False,
+            'res_model': action.res_model,
+            'domain': [('id', '=', self.picking_id.id)],
+        }
+
+    @api.multi
     def action_view_file_registry(self):
         self.ensure_one()
         action = self.env.ref('wobe_imports.action_file_registry').read()[0]
@@ -695,6 +715,105 @@ class Job(models.Model):
         else: self.convert_ok = False
 
 
+    @api.model
+    def _prepare_picking(self):
+        picking_type = self.env['stock.picking.type'].search([('code','=','outgoing'),('warehouse_id.company_id','=',self.company_id.id)])
+        aa = self.env['account.analytic.account'].search([('name', '=', self.title)])
+        partner = aa and aa.partner_id or False
+
+        return  {
+            'picking_type_id': picking_type.id,
+            'partner_id': partner.id,
+            'min_date': self.issue_date+' '+datetime.now().strftime("%H:%M:%S"),
+            'origin': self.name,
+            'location_dest_id': partner.property_stock_customer.id,
+            'location_id': picking_type.default_location_src_id.id,
+            'company_id': self.company_id.id,
+        }
+
+    @api.multi
+    def action_create_picking(self):
+        StockPicking = self.env['stock.picking']
+        Jobs = self.search([('state','=','order_created'),('picking_id','=',False),('stock_ok','=',True)])
+        for case in Jobs:
+            res = case._prepare_picking()
+            picking = StockPicking.create(res)
+            picking.message_post_with_view('mail.message_origin_link',
+                                           values={'self': picking, 'origin': case},
+                                           subtype_id=self.env.ref('mail.mt_note').id)
+            if not picking.group_id:
+                picking.group_id = picking.group_id.create({
+                    'name': case.name,
+                    'partner_id': picking.partner_id.id
+                })
+            case.write({'picking_id':picking.id,'state':'picking_created'})
+        return True
+
+    @api.model
+    def create(self, vals):
+        res = super(Job, self).create(vals)
+        res._fetch_paperProducts()
+        return res
+
+    @api.multi
+    def _fetch_paperProducts(self):
+        self.ensure_one()
+        lines = []
+        product_obj = self.env['product.product']
+        prodTemp_obj = self.env['product.template']
+        variant_obj = self.env['product.attribute.value']
+
+        domain = [('print_category','=', 'paper_regioman')]
+
+        MassX, WidthX = set(), set()
+        for idx in range(1, 8):
+            m = self['paper_mass_' + str(idx)]
+            if m: MassX.add(m)
+
+            w = self['paper_width_' + str(idx)]
+            if w: WidthX.add(w)
+
+        pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
+        pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
+        msg, stockOk = '', True
+
+        # Products: Paper Regioman
+        if not MassX or self.job_type == 'regioman':
+            prods = product_obj.search(domain)
+            for p in prods:
+                lines.append({'product_id': p.id,})
+
+            if not prods:
+                self.message_post(body=_("Product not found for the print-category : 'Paper Regioman'"))
+                stockOk = False
+
+        # Products: Paper KBA
+        for M in MassX:
+            for W in WidthX:
+                m1 = M / 100.0
+                m1 = int(m1) if m1%1 == 0 else m1
+
+                v1 = variant_obj.search([('name','=', str(m1)), ('attribute_id','=', pMass.id)])
+                v2 = variant_obj.search([('name','=', str(W)), ('attribute_id','=', pWidth.id)])
+                product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
+                                              ('attribute_value_ids', 'in', v2.ids),
+                                              ('print_category','=', 'paper_kba')]
+                                             , order='id desc', limit=1)
+                if not product:
+                    msg += '(%s, %s); '%(m1, W)
+                    continue
+                lines.append({'product_id': product.id,})
+
+        if msg:
+            self.message_post(body=_("Product not found for the print-category : 'Paper KBA' for these variants - %s"%msg))
+            stockOk = False
+
+        lines = map(lambda x: (0,0, x), lines)
+        self.write({'paper_product_ids': lines, 'stock_ok': stockOk})
+        return True
+
+
+
 class Booklet(models.Model):
     _name = "wobe.booklet"
     _description = 'WOBE Booklet'
@@ -721,14 +840,15 @@ class Booklet(models.Model):
             booklet.calculated_plates = 0.0
             pages = float(booklet.pages)
             paper_weight = float(booklet.paper_weight)
+            format = 'MP' if booklet.format == 'MAG' else booklet.format
             if pages <= 48.0:
                 booklet.calculated_plates = pages * 4
             elif pages > 48.0:
-                if booklet.format == 'BS':
+                if format == 'BS':
                     booklet.calculated_plates = pages * 4
-                elif booklet.format == 'TB':
+                elif format == 'TB':
                     booklet.calculated_plates = pages * 2
-                elif booklet.format == 'MAG':
+                elif format == 'MP':
                     booklet.calculated_plates = pages
 
             #calculated_mass
@@ -743,7 +863,7 @@ class Booklet(models.Model):
             product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
                                           ('attribute_value_ids', 'in', v2.ids),
                                           ('print_format_template', '=', True),
-                                          ('formats', '=', booklet.format), ], order='id desc', limit=1)
+                                          ('formats', '=', format), ], order='id desc', limit=1)
             if product:
                 booklet.calculated_mass = (product.product_tmpl_id.booklet_surface_area * pages) / float(2) * paper_weight / float(1000)
 

@@ -140,6 +140,9 @@ class FileTransfer(models.Model):
         # Call: Sale Order Creation
         Job.action_create_order()
 
+        # Call: Picking Creation
+        Job.action_create_picking()
+
 
 class Registry(models.Model):
     _name = 'file.registry'
