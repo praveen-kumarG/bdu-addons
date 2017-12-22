@@ -771,7 +771,8 @@ class Job(models.Model):
     def _prepare_picking_lines(self, job, picking):
         product_obj = self.env['product.product']
         lines = []
-        print_category3, print_category4, name3, name4 = '', '', '', ''
+        print_category3, print_category4 = '', ''
+        name3, name4 = 'Plates', 'Ink'
         qty3, qty4 = job.plate_amount, int(sum(bookObj.calculated_ink for bookObj in job.booklet_ids))
 
         for paper_line in job.paper_product_ids:
@@ -782,11 +783,9 @@ class Job(models.Model):
         if job.plate_type == 'PA':
             print_category3 = 'plates_kba'
             print_category4 = 'ink_kba'
-            name3 = 'Plates'
         else:
             print_category3 = 'plates_regioman'
             print_category4 = 'ink_regioman'
-            name3 = 'Ink'
 
         product3 = product_obj.search([('print_category', '=', print_category3)])
         product4 = product_obj.search([('print_category', '=', print_category4)])
