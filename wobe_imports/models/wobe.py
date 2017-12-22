@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
+from odoo.exceptions import UserError, ValidationError
 import logging
 from datetime import datetime
 import os
@@ -86,9 +87,10 @@ class Job(models.Model):
     file_count = fields.Integer('Files', compute='_compute_file_count')
     edition_count = fields.Integer('Edition Count')
 
-    job_type = fields.Selection([('kba', 'KBA'), ('regioman', 'Regioman')],string='Type', default='kba')
+    job_type = fields.Selection([('kba', 'KBA'), ('regioman', 'Regioman')],string='Type', default='kba',
+                                track_visibility='onchange')
     stock_ok = fields.Boolean('Ok to create Stock?', default=False)
-
+    convert_ok = fields.Boolean('Allow conversion of Job to Regioman?', default=True, copy=False)
 
 
     def _compute_file_count(self):
@@ -101,6 +103,13 @@ class Job(models.Model):
     def _needaction_domain_get(self):
         return [('state', '=', 'exception')]
 
+
+    @api.multi
+    @api.constrains('edition_ids')
+    def _check_editionRegioman(self):
+        for case in self:
+            if case.job_type == 'regioman' and len(case.edition_ids) > 1:
+                    raise ValidationError(_('Regioman cannot have more than 1 Edition Details'))
 
     @api.multi
     def action_create_job(self):
@@ -165,6 +174,11 @@ class Job(models.Model):
             Reg1 = fv['Rfile1']
 
             File1 = base64.decodestring(Reg1.xmlfile)
+            job = Job_obj.search([('bduorder_ref', '=', key)], limit=1)
+            if job:
+                # Pairing not allowed for Regioman Jobs
+                if job.job_type == 'regioman':
+                    continue
 
             try:
                 tree1 = ET.fromstring(File1)
@@ -191,7 +205,6 @@ class Job(models.Model):
 
                     edData.update(self._extract_EditionData(edData, Reg3, data3))
 
-                job = Job_obj.search([('bduorder_ref', '=', key)])
                 if not job:
                     vals = self._prepare_job_data(data1, edData)
                     vals['company_id'] = Reg1.company_id.id or self.env.user.company_id.id
@@ -282,11 +295,14 @@ class Job(models.Model):
             if Job:
                 found = Job.booklet_ids.filtered(lambda x: x.booklet_ref == ref)
 
+            weight = booklet.find('PaperWeight').text
+            weight = 65 if float(weight) == 70 else weight
+
             lnvals = {
                 'booklet_ref': ref,
                 'pages' : booklet.find('Pages').text,
                 'format': booklet.find('Format').text,
-                'paper_weight': booklet.find('PaperWeight').text,
+                'paper_weight': weight,
 
                 'stitching': True if booklet.find('Stitching').text == 'Yes' else False,
                 'glueing'  : True if booklet.find('Glueing').text == 'Yes' else False,
@@ -559,6 +575,8 @@ class Job(models.Model):
             elif job.state == 'exception':
                 job.write({'state': 'waiting'})
 
+            job._onchange_convert_flag()
+
 
     @api.multi
     def action_reset(self):
@@ -680,6 +698,21 @@ class Job(models.Model):
         self.write({'paper_product_ids': lines, 'stock_ok': stockOk})
         return True
 
+    @api.one
+    def button_convert_regioman(self):
+        "Mark Job as 'Regioman' "
+
+        self.write({
+            'job_type': 'regioman', 'convert_ok': False,
+            'edition_ids': map(lambda x: (2, x), [x.id for x in self.edition_ids])
+            })
+
+    @api.onchange('state', 'job_type')
+    def _onchange_convert_flag(self):
+        if self.state == 'waiting' and self.job_type == 'kba':
+            self.convert_ok = True
+
+        else: self.convert_ok = False
 
 
     @api.model
@@ -871,6 +904,7 @@ class Edition(models.Model):
     @api.onchange('gross_quantity')
     def waste_compute(self):
         self.waste_total = self.gross_quantity - self.net_quantity
+
 
 class Registry1(models.Model):
     _inherit = "file.registry"
