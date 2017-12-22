@@ -18,7 +18,11 @@
                                 states="waiting" class="oe_highlight"/>
                         <button name="action_reset" type="object" string="Reset Status"
                                 states="waiting,exception" class="oe_highlight"/>
+
+                        <button name="button_convert_regioman" type="object" string="Convert as Regioman"
+                                attrs="{'invisible':[('convert_ok','=',False)]}" confirm="Do you really want to proceed?"/>
                         <field name="state" widget="statusbar" nolabel="1" statusbar_visible="ready,order_created,picking_created"/>
+
                     </header>
                     <sheet string="Job">
                         <div class="oe_button_box" name="button_box">
@@ -78,7 +82,8 @@
                                 </field>
                             </page>
                             <page string="Other/Paper Details">
-                                <field name="paper_product_ids" nolabel="1" widget="one2many_list" mode="tree">
+                                <field name="paper_product_ids" nolabel="1" widget="one2many_list" mode="tree"
+                                        attrs="{'readonly': [('job_type','=','kba')]}">
                                     <tree string="Paper Products" editable="bottom">
                                         <field name="product_id"/>
                                         <field name="name" />
@@ -86,15 +91,17 @@
                                 </field>
                             </page>
                             <page string="Editions">
-                                <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree">
+                                <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree"
+                                        attrs="{'readonly': [('job_type','=','kba')]}">
                                     <tree string="Edition Details" editable="bottom">
                                         <field name="name" />
                                         <field name="plate_amount"/>
                                         <field name="net_quantity"/>
                                         <field name="gross_quantity"/>
                                         <field name="waste_total" invisible="True"/>
-                                        <field name="production_start" required="True"/>
-                                        <field name="production_stop" required="True"/>
+                                        <field name="production_start" attrs="{'required':[('kbajob_ref','=',False)]}"/>
+                                        <field name="production_stop" attrs="{'required':[('kbajob_ref','=',False)]}"/>
+                                        <field name="kbajob_ref" invisible="0"/>
                                     </tree>
                                 </field>
                             </page>
@@ -103,7 +110,8 @@
                                     <field name="job_ref" readonly="True"/>
                                     <field name="bduorder_ref" readonly="True"/>
                                     <field name="company_id" readonly="True"/>
-                                    <field name="job_type" invisible="1"/>
+                                    <field name="job_type" invisible="0"/>
+                                    <field name="convert_ok" invisible="0"/>
                                 </group>
                             </page>
                         </notebook>
