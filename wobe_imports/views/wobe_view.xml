@@ -65,6 +65,8 @@
 
                         <notebook colspan="4">
                             <page string="Booklet Details">
+                                <button name="button_recompute" type="object" string="" help="Recompute"
+                                    states="ready,waiting" class="oe_stat_button oe_right" icon="fa-refresh"/>
                                 <field name="booklet_ids" nolabel="1" widget="one2many_list" mode="tree" readonly="True">
                                     <tree string="Booklet Details" >
                                         <field name="format"/>
