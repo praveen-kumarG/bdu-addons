@@ -8,6 +8,7 @@ import os
 import base64
 import xml.etree.ElementTree as ET
 from collections import defaultdict
+from product import PrintCategory
 
 
 _logger = logging.getLogger(__name__)
@@ -501,7 +502,9 @@ class Job(models.Model):
                     pages += int(booklet_obj.pages)
                 ###################
                 v1 = variant_obj.search([('name','=', str(pages)), ('attribute_id','=', pPages.id)])
-                v2 = variant_obj.search([('name','=', booklet.paper_weight), ('attribute_id','=', pWeight.id)])
+                paper_weight = float(booklet.paper_weight)
+                paper_weight = int(paper_weight) if paper_weight % 1 == 0 else paper_weight
+                v2 = variant_obj.search([('name','=', str(paper_weight)), ('attribute_id','=', pWeight.id)])
                 product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
                                               ('attribute_value_ids', 'in', v2.ids),
                                               ('print_format_template','=', True),
@@ -698,6 +701,82 @@ class Job(models.Model):
             'company_id': self.company_id.id,
         }
 
+    def _prepare_stock_moves(self, job, line,  picking):
+        """ Prepare the stock moves data from line. This function returns a list of
+        dictionary ready to be used in stock.move's create()
+        """
+        res = []
+        product_obj = line['productObj']
+        if product_obj.type not in ['product', 'consu']:
+            return res
+        template = {
+            'name': line['name'] or '',
+            'product_id': product_obj.id,
+            'product_uom': product_obj.uom_id.id,
+            'product_uom_qty': line['product_uom_qty'],
+            'date': job.issue_date,
+            'date_expected': picking.min_date,
+            'location_id':picking.location_id.id,
+            'location_dest_id': picking.location_dest_id.id,
+            'picking_id': picking.id,
+            'partner_id': picking.partner_id.id,
+            'move_dest_id': False,
+            'state': 'draft',
+            'company_id': picking.company_id.id,
+            'picking_type_id': picking.picking_type_id.id,
+            'group_id': picking.group_id.id,
+            'procurement_id': False,
+            'origin': picking.origin,
+            'route_ids': picking.picking_type_id.warehouse_id and [
+                (6, 0, [x.id for x in picking.picking_type_id.warehouse_id.route_ids])] or [],
+            'warehouse_id': picking.picking_type_id.warehouse_id.id,
+        }
+        res.append(template)
+        return res
+
+    def _prepare_picking_lines(self, job, picking):
+        product_obj = self.env['product.product']
+        lines = []
+        print_category3, print_category4, name3, name4 = '', '', '', ''
+        qty3, qty4 = job.plate_amount, int(sum(bookObj.calculated_ink for bookObj in job.booklet_ids))
+
+        for paper_line in job.paper_product_ids:
+            # total_mass_per_paper_type = sum(bookObj.calculated_mass for bookObj in job.booklet_ids) * job.net_quantity
+            # total_paper_width = sum(job.paper_width_1+job.paper_width_2+job.paper_width_3+job.paper_width_4+job.paper_width_5+job.paper_width_6)
+            lines.append({'productObj': paper_line.product_id, 'name': paper_line.name, 'product_uom_qty': 1})
+
+        if job.plate_type == 'PA':
+            print_category3 = 'plates_kba'
+            print_category4 = 'ink_kba'
+            name3 = 'Plates'
+        else:
+            print_category3 = 'plates_regioman'
+            print_category4 = 'ink_regioman'
+            name3 = 'Ink'
+
+        product3 = product_obj.search([('print_category', '=', print_category3)])
+        product4 = product_obj.search([('print_category', '=', print_category4)])
+        if not product3:
+            body = _("Product not found for the print-category : '%s'" % (dict(PrintCategory)[print_category3]))
+            picking.message_post(body=body)
+            return {}
+        if not product4:
+            body = _("Product not found for the print-category : '%s'" % (dict(PrintCategory)[print_category4]))
+            picking.message_post(body=body)
+            return []
+        lines.append({'productObj': product3, 'name': name3, 'product_uom_qty': qty3})
+        lines.append({'productObj': product4, 'name': name4, 'product_uom_qty': qty4})
+        return lines
+
+    def _create_stock_moves(self, job, picking):
+        moves = self.env['stock.move']
+        done = self.env['stock.move'].browse()
+        lines = self._prepare_picking_lines(job, picking)
+        for line in lines:
+            for val in self._prepare_stock_moves(job, line, picking):
+                done += moves.create(val)
+        return done
+
     @api.multi
     def action_create_picking(self):
         StockPicking = self.env['stock.picking']
@@ -705,6 +784,7 @@ class Job(models.Model):
         for case in Jobs:
             res = case._prepare_picking()
             picking = StockPicking.create(res)
+            self._create_stock_moves(case, picking)
             picking.message_post_with_view('mail.message_origin_link',
                                            values={'self': picking, 'origin': case},
                                            subtype_id=self.env.ref('mail.mt_note').id)
@@ -804,19 +884,20 @@ class Booklet(models.Model):
     def _compute_all(self):
         for booklet in self:
             #calculated_plates
-            booklet.calculated_plates = 0.0
+            plates = 0.0
             pages = float(booklet.pages)
             paper_weight = float(booklet.paper_weight)
             format = 'MP' if booklet.format == 'MAG' else booklet.format
             if pages <= 48.0:
-                booklet.calculated_plates = pages * 4
+                plates = pages * 4
             elif pages > 48.0:
                 if format == 'BS':
-                    booklet.calculated_plates = pages * 4
+                    plates = pages * 4
                 elif format == 'TB':
-                    booklet.calculated_plates = pages * 2
+                    plates = pages * 2
                 elif format == 'MP':
-                    booklet.calculated_plates = pages
+                    plates = pages
+            booklet.calculated_plates = plates
 
             #calculated_mass
             booklet.calculated_mass = 0.0
@@ -824,8 +905,10 @@ class Booklet(models.Model):
             variant_obj = self.env['product.attribute.value']
             pPages = self.env.ref('wobe_imports.variant_attribute_2', False)
             pWeight = self.env.ref('wobe_imports.variant_attribute_3', False)
+
+            paper_weight = int(paper_weight) if paper_weight % 1 == 0 else paper_weight
             v1 = variant_obj.search([('name', '=', booklet.pages), ('attribute_id', '=', pPages.id)])
-            v2 = variant_obj.search([('name', '=', booklet.paper_weight), ('attribute_id', '=', pWeight.id)])
+            v2 = variant_obj.search([('name', '=', str(paper_weight)), ('attribute_id', '=', pWeight.id)])
 
             product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
                                           ('attribute_value_ids', 'in', v2.ids),
@@ -870,7 +953,9 @@ class Edition(models.Model):
 
     @api.onchange('gross_quantity')
     def waste_compute(self):
-        self.waste_total = self.gross_quantity - self.net_quantity
+        self.waste_total = 0
+        if self.gross_quantity > self.net_quantity:
+            self.waste_total = self.gross_quantity - self.net_quantity
 
 class Registry1(models.Model):
     _inherit = "file.registry"
