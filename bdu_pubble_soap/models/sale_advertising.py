@@ -32,9 +32,34 @@ import datetime
 class SaleOrder(models.Model):
     _inherit = ["sale.order"]
 
+    @api.depends('order_line.line_pubble_allow')
+    @ali.multi
+    def _pubble_allow(self):
+        for line in self.order_line:
+            if line.line_pubble_allow:
+                self.order_pubble_allow = True
+
+    @api.depends('order_line.pubble_sent')
+    @ali.multi
+    def _pubble_sent(self):
+        for line in self.order_line:
+            if line.pubble_sent:
+                self.pubble_sent = True
+
+    state = fields.Selection([
+        ('draft', 'Quotation'),
+        ('submitted', 'Submitted for Approval'),
+        ('approved1', 'Approved by Sales Mgr'),
+        ('pubble', 'Sent to Pubble'),
+        ('sent', 'Quotation Sent'),
+        ('sale', 'Sale Order'),
+        ('done', 'Done'),
+        ('cancel', 'Cancelled'),
+    ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
+    order_pubble_allow = fields.Boolean(compute=_pubble_allow, string='Advertising Category', default=False, store=True)
     date_sent_pubble = fields.Date('Date order sent to Pubble', index=True,
                                     help="Date on which sales order is sent to Pubble.")
-    pubble = fields.Boolean('Order to Pubble')
+    pubble_sent = fields.Boolean(compute=_pubble_sent, string='Order to Pubble', default=False, store=True)
     publog_id = fields.Many2one('sofrom.odooto.pubble')
 
 
@@ -81,6 +106,9 @@ class SaleOrder(models.Model):
     def transfer_order_to_pubble(self):
         # import pdb; pdb.set_trace()
         self.ensure_one()
+        if not self.order_pubble_allow:
+            return False
+
         vals = {
                 'transmission_id': self.env['sofrom.odooto.pubble'].get_next_ref(),
                 'id': self.id,
@@ -107,10 +135,8 @@ class SaleOrder(models.Model):
                 'salesorder_agency_postalcode' : self.advertising_agency.zip
         }
         res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
-        counter = 0
         for line in self.order_line:
-            if [('line.product_id.product_tmpl_id.categ_id','child_of', self.env.ref('sale_advertising_order.newspaper_advertising_category'))]:
-                counter += 1
+            if line.line_pubble_allow:
                 lvals = {
                         'order_id': res.id,
                         'ad_adsize_adtypename': line.ad_class.name,
@@ -129,14 +155,15 @@ class SaleOrder(models.Model):
                         'ad_status': True,
                 }
                 self.env['soline.from.odooto.pubble'].sudo().create(lvals)
-        if counter == 0:
-            res = False
+
         return res
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
-    pubble = fields.Boolean('Order Line sent to Pubble')
+    pubble_sent = fields.Many2one('soline.from.odooto.pubble','Order Line sent to Pubble')
+    line_pubble_allow = fields.Boolean(related='ad_class.pubble', string='Advertising Category')
+
 
     @api.multi
     def unlink(self):
@@ -151,11 +178,6 @@ class SaleOrderLine(models.Model):
 class SofromOdootoPubble(models.Model):
     _name = 'sofrom.odooto.pubble'
 
-#    @api.depends('transmission_id')
-#    def send_pubble(self):
-#        so_to_pub = self.env['sofrom.odooto.pubble'].search([('id', '=', self.publog_id.id)])
-#        res = self.call_wsdl()
-#        return res
 
     @api.multi
     def get_next_ref(self, vals=None):
@@ -251,6 +273,7 @@ class SofromOdootoPubble(models.Model):
 
 class SoLinefromOdootoPubble(models.Model):
     _name = 'soline.from.odooto.pubble'
+
 
     order_id = fields.Many2one('sofrom.odooto.pubble', string='Order Reference', required=True, ondelete='cascade', index=True, copy=False)
     ad_adsize_adtypename = fields.Char(string='Advertising Class Name', size=64)
