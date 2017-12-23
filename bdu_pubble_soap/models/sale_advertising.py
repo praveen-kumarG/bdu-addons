@@ -33,18 +33,22 @@ class SaleOrder(models.Model):
     _inherit = ["sale.order"]
 
     @api.depends('order_line.line_pubble_allow')
-    @ali.multi
+    @api.multi
     def _pubble_allow(self):
-        for line in self.order_line:
-            if line.line_pubble_allow:
-                self.order_pubble_allow = True
+        for order in self:
+            for line in order.order_line:
+                if line.line_pubble_allow:
+                    order.order_pubble_allow = True
+                    break
 
     @api.depends('order_line.pubble_sent')
-    @ali.multi
+    @api.multi
     def _pubble_sent(self):
-        for line in self.order_line:
-            if line.pubble_sent:
-                self.pubble_sent = True
+        for order in self:
+            for line in order.order_line:
+                if line.pubble_sent:
+                    order.pubble_sent = True
+                    break
 
     state = fields.Selection([
         ('draft', 'Quotation'),
@@ -85,16 +89,18 @@ class SaleOrder(models.Model):
 
     @api.multi
     def write(self, vals):
-        if self.advertising and self.pubble:
+        self.ensure_one()
+        if self.pubble_sent and self.advertising:
             if ('partner_id' or 'published_customer' or 'advertising_agency' or 'order_line') in vals:
-                self.update_pubble(self, vals)
+                self.update_pubble(vals)
         res = super(SaleOrder, self).write(vals)
         return res
 
     @api.multi
     def update_pubble(self, vals):
         self.transfer_order_to_pubble()
-        if 'order_line' in vals and vals['order_line']
+        if 'order_line' in vals and vals['order_line']:
+            return
 
     @api.multi
     def send_pubble(self):
@@ -111,7 +117,7 @@ class SaleOrder(models.Model):
 
         vals = {
                 'transmission_id': self.env['sofrom.odooto.pubble'].get_next_ref(),
-                'id': self.id,
+                'id': self,
                 'salesorder_extorderid': self.name,
                 'salesorder_reference': self.opportunity_subject,
                 'salesorder_createdby': self.user_id.name,
@@ -169,7 +175,7 @@ class SaleOrderLine(models.Model):
     def unlink(self):
         if self.advertising:
             for order_line in self:
-                if order_line.pubble:
+                if order_line.pubble_sent:
                     self.env['sale.order'].search([('id','=', order_line.order_id.id)]).action_pubble()
                     self.env['soline.from.odooto.pubble'].search([('ad_extplacementid','=', order_line.id),
                                                                   ('order_id','=', order_line.order_id.publog_id.id)]).write({'ad_status': False})
@@ -186,7 +192,7 @@ class SofromOdootoPubble(models.Model):
     transmission_id = fields.Char(string='Transmission ID', store=True, size=16, readonly=True)
     pubble_so_line = fields.One2many('soline.from.odooto.pubble', 'order_id', string='Order Lines', copy=True)
     pubble_response = fields.Text('Pubble Response')
-    id = fields.Integer('Sale Order db Id')
+    sale_order_id = fields.Many2one('sale_order',string='Sale Order')
     salesorder_extorderid = fields.Char(string='Sale Order ID')
     salesorder_reference = fields.Char(string='Opportunity Subject', size=64)
     salesorder_createdby = fields.Char(string='User Name', size=32)
@@ -212,7 +218,7 @@ class SofromOdootoPubble(models.Model):
 
     def call_wsdl(self):
         self.ensure_one()
-        if self.pubble_response:
+        if self.pubble_response and self.pubble_response == True:
             raise UserError(_('This Sale Order already has been succesfully sent to Pubble.'))
         transmissionID = int(float(self.transmission_id))
         client = Client("https://ws.pubble.nl/Sales.svc?singleWsdl")
@@ -265,10 +271,13 @@ class SofromOdootoPubble(models.Model):
             SalesOrder.orderLine_Ads.adPlacement.append(ad)
 
         response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
+        self.write({'pubble_response': response})
         if response == 'True':
-            self.env['sale.order'].search([('id','=',self.id)]).write({'pubble': True})
+            self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).write({'pubble_sent': True, 'date_sent_pubble': datetime.datetime.now()})
+            for line in self.pubble_so_line:
+                self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
 
-        return self.write({'pubble_response': response})
+        return True
 
 
 class SoLinefromOdootoPubble(models.Model):

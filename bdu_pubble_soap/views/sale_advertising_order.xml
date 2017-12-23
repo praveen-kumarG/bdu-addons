@@ -77,7 +77,6 @@
                 </tree>
             </field>
         </record>
-
         <record id="view_sofrom_odooto_pubble_filter" model="ir.ui.view">
             <field name="name">view_sofrom_odooto_pubble_filter</field>
             <field name="model">sofrom.odooto.pubble</field>
@@ -93,7 +92,6 @@
                </search>
             </field>
         </record>
-
         <record id="action_staged_pubble" model="ir.actions.act_window">
             <field name="name">Staged Pubble</field>
             <field name="res_model">sofrom.odooto.pubble</field>
@@ -110,9 +108,31 @@
             </field-->
         </record>
 
-
         <menuitem id="menu_action_staged_pubble" name="Staged Pubble" parent="menu_pubble" action="action_staged_pubble"
                   sequence="2"/>
+
+        <record id="view_order_form_advertising_pubble" model="ir.ui.view">
+            <field name="name">sale.order.form.advertising.pubble</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_advertising_order.view_order_form_advertising"/>
+            <field name="arch" type="xml">
+                <group name="ad_refs" position="after">
+                    <group string="Pubble" name="pubble" >
+                        <field name="order_pubble_allow" readonly="1" />
+                        <field name="pubble_sent" readonly="1"/>
+                        <field name="publog_id" readonly="1"/>
+                    </group>
+                </group>
+                <group name="technical" position="after">
+                    <group string="Pubble" name="pubble" >
+                        <field name="order_pubble_allow" readonly="1" />
+                        <field name="date_sent_pubble" readonly="1"/>
+                        <field name="publog_id" readonly="1"/>
+                    </group>
+                </group>
+            </field>
+        </record>
+
 
     </data>
 </odoo>

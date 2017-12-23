@@ -8,13 +8,5 @@ from odoo.exceptions import UserError
 class productCategory(models.Model):
     _inherit = "product.category"
 
-    complete_name = fields.Char(compute='_name_get_fnc', string='Name')
-    date_type = fields.Selection([
-            ('validity', 'Validity Date Range'),
-            ('date', 'Date of Publication'),
-            ('newsletter', 'Newsletter'),
-            ('online', 'Online'),
-            ('issue_date', 'Issue Date'),
-        ], 'Date Type Advertising products')
-    deadline_offset = fields.Integer('Hours offset from Issue Deadline', default=0)
-    pubble = fields.Boolean('Ads go to Pubble')
+
+    pubble = fields.Boolean('Ads to Pubble', default=False)
