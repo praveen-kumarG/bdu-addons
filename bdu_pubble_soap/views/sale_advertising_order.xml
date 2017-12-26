@@ -13,11 +13,12 @@
                     <sheet string="SO to Pubble">
                         <h1 class="mt0">
                             <label string="Sale Order :"/>
-                            <field name="salesorder_extorderid"/>
+                            <field name="sale_order_id"/>
                         </h1>
                         <group>
                             <group>
                                 <field name="transmission_id"/>
+                                <field name="salesorder_extorderid"/>
                                 <field name="salesorder_reference"/>
                                 <field name="salesorder_createdby"/>
                                 <field name="salesorder_debtor_extdebtorid"/>

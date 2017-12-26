@@ -116,6 +116,7 @@ To contribute to this module, please visit https://odoo-community.org.
 
     # any module necessary for this one to work correctly
     'depends': ['sale_advertising_order',
+                'sale_advertising_operating_unit'
     ],
     'external_dependencies': {
         'python': ['suds'],

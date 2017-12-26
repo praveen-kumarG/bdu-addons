@@ -89,11 +89,10 @@ class SaleOrder(models.Model):
 
     @api.multi
     def write(self, vals):
-        self.ensure_one()
+        res = super(SaleOrder, self).write(vals)
         if self.pubble_sent and self.advertising:
             if ('partner_id' or 'published_customer' or 'advertising_agency' or 'order_line') in vals:
-                self.update_pubble(vals)
-        res = super(SaleOrder, self).write(vals)
+                self.action_pubble()
         return res
 
     @api.multi
@@ -117,7 +116,7 @@ class SaleOrder(models.Model):
 
         vals = {
                 'transmission_id': self.env['sofrom.odooto.pubble'].get_next_ref(),
-                'id': self,
+                'sale_order_id': self.id,
                 'salesorder_extorderid': self.name,
                 'salesorder_reference': self.opportunity_subject,
                 'salesorder_createdby': self.user_id.name,
@@ -145,6 +144,7 @@ class SaleOrder(models.Model):
             if line.line_pubble_allow:
                 lvals = {
                         'order_id': res.id,
+                        'odoo_order_line': line.id,
                         'ad_adsize_adtypename': line.ad_class.name,
                         'ad_adsize_extadsizeid': line.product_id.default_code,
                         'ad_adsize_height': line.product_template_id.height,
@@ -185,13 +185,13 @@ class SofromOdootoPubble(models.Model):
 
 
     @api.multi
-    def get_next_ref(self, vals=None):
+    def get_next_ref(self):
         return self.env['ir.sequence'].next_by_code('pubble.itf')
 
     transmission_id = fields.Char(string='Transmission ID', store=True, size=16, readonly=True)
     pubble_so_line = fields.One2many('soline.from.odooto.pubble', 'order_id', string='Order Lines', copy=True)
     pubble_response = fields.Text('Pubble Response')
-    sale_order_id = fields.Many2one('sale_order',string='Sale Order')
+    sale_order_id = fields.Many2one('sale.order',string='Sale Order')
     salesorder_extorderid = fields.Char(string='Sale Order ID')
     salesorder_reference = fields.Char(string='Opportunity Subject', size=64)
     salesorder_createdby = fields.Char(string='User Name', size=32)
@@ -284,6 +284,7 @@ class SoLinefromOdootoPubble(models.Model):
 
 
     order_id = fields.Many2one('sofrom.odooto.pubble', string='Order Reference', required=True, ondelete='cascade', index=True, copy=False)
+    odoo_order_line = fields.Many2one('sale_order_line', string='Order Line Reference', required=True, index=True, copy=False)
     ad_adsize_adtypename = fields.Char(string='Advertising Class Name', size=64)
     ad_adsize_extadsizeid = fields.Char(string='Product ID')
     ad_adsize_height = fields.Integer(string='Height mm')
