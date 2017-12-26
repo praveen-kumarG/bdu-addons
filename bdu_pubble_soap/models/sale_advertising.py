@@ -60,8 +60,8 @@ class SaleOrder(models.Model):
         ('done', 'Done'),
         ('cancel', 'Cancelled'),
     ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
-    order_pubble_allow = fields.Boolean(compute=_pubble_allow, string='Advertising Category', default=False, store=True)
-    date_sent_pubble = fields.Date('Date order sent to Pubble', index=True,
+    order_pubble_allow = fields.Boolean(compute=_pubble_allow, string='Allow to Pubble', default=False, store=True)
+    date_sent_pubble = fields.Date('Date Sent to Pubble', index=True,
                                     help="Date on which sales order is sent to Pubble.")
     pubble_sent = fields.Boolean(compute=_pubble_sent, string='Order to Pubble', default=False, store=True)
     publog_id = fields.Many2one('sofrom.odooto.pubble')
@@ -171,15 +171,14 @@ class SaleOrderLine(models.Model):
     line_pubble_allow = fields.Boolean(related='ad_class.pubble', string='Advertising Category')
 
 
-    @api.multi
+    '''@api.multi
     def unlink(self):
-        if self.advertising:
-            for order_line in self:
-                if order_line.pubble_sent:
-                    self.env['sale.order'].search([('id','=', order_line.order_id.id)]).action_pubble()
-                    self.env['soline.from.odooto.pubble'].search([('ad_extplacementid','=', order_line.id),
-                                                                  ('order_id','=', order_line.order_id.publog_id.id)]).write({'ad_status': False})
-        return super(SaleOrderLine, self).unlink()
+        for order_line in self.filtered('advertising'):
+            if order_line.pubble_sent:
+                self.env['sale.order'].search([('id','=', order_line.order_id.id)]).action_pubble()
+                self.env['soline.from.odooto.pubble'].search([('ad_extplacementid','=', order_line.id),
+                                                              ('order_id','=', order_line.order_id.publog_id.id)]).write({'ad_status': False})
+        return super(SaleOrderLine, self).unlink()'''
 
 class SofromOdootoPubble(models.Model):
     _name = 'sofrom.odooto.pubble'
