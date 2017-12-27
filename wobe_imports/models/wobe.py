@@ -652,8 +652,10 @@ class Job(models.Model):
 
         self.write({
             'job_type': 'regioman', 'convert_ok': False,
-            'edition_ids': map(lambda x: (2, x), [x.id for x in self.edition_ids])
+            'edition_ids': map(lambda x: (2, x), [x.id for x in self.edition_ids]),
+            'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids]),
             })
+        self.fetch_paperProducts()
 
     @api.onchange('state', 'job_type')
     def _onchange_convert_flag(self):
@@ -879,7 +881,7 @@ class Job(models.Model):
         msg, stockOk = '', True
 
         # Products: Paper Regioman
-        if not MassWidth or self.job_type == 'regioman':
+        if not MassWidth:
             prods = product_obj.search(domain)
             for p in prods:
                 lines.append({'product_id': p.id})
@@ -1062,8 +1064,3 @@ class PaperRollProduct(models.Model):
     job_id = fields.Many2one('wobe.job', required=True, ondelete='cascade', index=True, copy=False)
     product_id = fields.Many2one('product.product', 'Product', required=True)
     name = fields.Char(related='product_id.default_code', string='Internal Reference', store=True)
-
-    mass = fields.Float(string='Mass')
-    width = fields.Float(string='Width')
-
-
