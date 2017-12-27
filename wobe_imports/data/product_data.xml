@@ -16,6 +16,10 @@
         </record>
 
 
+        <record forcecreate="True" id="decimal_paper_mass" model="decimal.precision">
+            <field name="name">Paper Mass</field>
+            <field name="digits" eval="4"/>
+        </record>
 
     </data>
 </odoo>

@@ -409,9 +409,14 @@ class Job(models.Model):
         sale_obj = self.env['sale.order']
         Registry = self.env['file.registry']
 
-        Jobs = self.search([('state','=', 'ready'), ('order_id','=',False)])
+        Jobs = self
+        if not self._ids:
+            Jobs = self.search([('state','=', 'ready'), ('order_id','=',False)])
 
         for case in Jobs:
+            if case.state <> 'ready' or case.order_id:
+                continue
+
             case.button_recompute()
 
             vals = case._prepare_order_data()
@@ -573,11 +578,14 @@ class Job(models.Model):
             QtyCheck = job.net_quantity >= job.planned_quantity
             EditionCheck = len(job.edition_ids) == job.edition_count and all(l.net_quantity for l in job.edition_ids)
 
-            if QtyCheck or EditionCheck:
-                job.write({'state': 'ready'})
+            if job.state == 'exception' and job.order_id:
+                job.write({'state': 'order_created'})
 
-            elif job.state == 'exception':
+            elif job.state == 'exception' and not job.order_id:
                 job.write({'state': 'waiting'})
+
+            elif (QtyCheck or EditionCheck):
+                job.write({'state': 'ready'})
 
             job._onchange_convert_flag()
 
@@ -638,70 +646,6 @@ class Job(models.Model):
         action['context'] = {}
         return action
 
-    @api.model
-    def create(self, vals):
-        res = super(Job, self).create(vals)
-        res._fetch_paperProducts()
-        return res
-
-    @api.multi
-    def _fetch_paperProducts(self):
-        self.ensure_one()
-        lines = []
-        product_obj = self.env['product.product']
-        prodTemp_obj = self.env['product.template']
-        variant_obj = self.env['product.attribute.value']
-
-        domain = [('print_category','=', 'paper_regioman')]
-
-        MassX, WidthX = set(), set()
-        for idx in range(1, 8):
-            m = self['paper_mass_' + str(idx)]
-            if m: MassX.add(m)
-
-            w = self['paper_width_' + str(idx)]
-            if w: WidthX.add(w)
-
-        pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
-        pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
-        msg, stockOk = '', True
-
-        # Products: Paper Regioman
-        if not MassX or self.job_type == 'regioman':
-            prods = product_obj.search(domain)
-            for p in prods:
-                lines.append({'product_id': p.id,})
-
-            if not prods:
-                self.message_post(body=_("Product not found for the print-category : 'Paper Regioman'"))
-                stockOk = False
-
-        # Products: Paper KBA
-        for M in MassX:
-            for W in WidthX:
-                m1 = M / 100.0
-                m1 = int(m1) if m1%1 == 0 else m1
-
-                v1 = variant_obj.search([('name','=', str(m1)), ('attribute_id','=', pMass.id)])
-                v2 = variant_obj.search([('name','=', str(W)), ('attribute_id','=', pWidth.id)])
-                product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
-                                              ('attribute_value_ids', 'in', v2.ids),
-                                              ('print_category','=', 'paper_kba')]
-                                             , order='id desc', limit=1)
-
-                if not product:
-                    msg += '(%s, %s); '%(m1, W)
-                    continue
-                lines.append({'product_id': product.id,})
-
-        if msg:
-            self.message_post(body=_("Product not found for the print-category : 'Paper KBA' for these variants - %s"%msg))
-            stockOk = False
-
-        lines = map(lambda x: (0,0, x), lines)
-        self.write({'paper_product_ids': lines, 'stock_ok': stockOk})
-        return True
-
     @api.one
     def button_convert_regioman(self):
         "Mark Job as 'Regioman' "
@@ -733,9 +677,10 @@ class Job(models.Model):
             'location_dest_id': partner.property_stock_customer.id,
             'location_id': picking_type.default_location_src_id.id,
             'company_id': self.company_id.id,
+            'order_id': self.order_id.id,
         }
 
-    def _prepare_stock_moves(self, job, line,  picking):
+    def _prepare_stock_moves(self, line,  picking):
         """ Prepare the stock moves data from line. This function returns a list of
         dictionary ready to be used in stock.move's create()
         """
@@ -743,6 +688,8 @@ class Job(models.Model):
         product_obj = line['productObj']
         if product_obj.type not in ['product', 'consu']:
             return res
+
+        job = self
         template = {
             'name': line['name'] or '',
             'product_id': product_obj.id,
@@ -768,56 +715,127 @@ class Job(models.Model):
         res.append(template)
         return res
 
-    def _prepare_picking_lines(self, job, picking):
+    def _prepare_PaperRoll_StockMoves(self, job):
+        '''
+            Prepares the list of Moves that needs to created
+            based on Paper Roll
+        '''
         product_obj = self.env['product.product']
         lines = []
-        print_category3, print_category4 = '', ''
-        name3, name4 = 'Plates', 'Ink'
-        qty3, qty4 = job.plate_amount, int(sum(bookObj.calculated_ink for bookObj in job.booklet_ids))
+        print_category3, print_category4 = 'plates_regioman', 'ink_regioman'
+        PlateQty, InkQty = job.plate_amount, sum(bookObj.calculated_ink for bookObj in job.booklet_ids)
 
-        for paper_line in job.paper_product_ids:
-            # total_mass_per_paper_type = sum(bookObj.calculated_mass for bookObj in job.booklet_ids) * job.net_quantity
-            # total_paper_width = sum(job.paper_width_1+job.paper_width_2+job.paper_width_3+job.paper_width_4+job.paper_width_5+job.paper_width_6)
-            lines.append({'productObj': paper_line.product_id, 'name': paper_line.name, 'product_uom_qty': 1})
+        pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
+        pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
+
+        def _get_MassWidth(product_id):
+            m, w = 0.0, 0.0
+            if not product_id: return m, w
+
+            for av in product_id.attribute_value_ids:
+                if av.attribute_id.id == pMass.id : m = float(av.name)
+                if av.attribute_id.id == pWidth.id: w = float(av.name)
+            return m, w
+
+        # Ratio-Width per PaperType
+        RatioWidth, ratioSum = {}, {}
+        for roll in job.paper_product_ids:
+            mass, width = _get_MassWidth(roll.product_id)
+
+            if mass not in ratioSum:
+                ratioSum[mass] = width
+            else:
+                ratioSum[mass] += width
+
+            key = (mass, width)
+            RatioWidth[key] = 0 # Value Summed up below
+
+        # Ratio-Width per PaperType [Consolidated]
+        for key in RatioWidth.keys():
+            RatioWidth[key] = ratioSum.get(key[0], 0)
+
+        # Total Mass per PaperMass
+        MassPerUnit = {}
+        for booklet in job.booklet_ids:
+            key = float(booklet.paper_weight)
+
+            if key not in MassPerUnit:
+                MassPerUnit[key] = booklet.calculated_mass
+            else:
+                MassPerUnit[key] += booklet.calculated_mass
+
+        # Paper Rolls
+        for roll in job.paper_product_ids:
+            mass, width = _get_MassWidth(roll.product_id)
+            key = (mass, width)
+
+            # Net Production: (in Kg)
+            NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
+            Qty = (NetMass / RatioWidth.get(key, 1)) * width
+            lines.append({'productObj': roll.product_id, 'name': 'Net Paper: ' + str(roll.product_id.name),
+                          'product_uom_qty': Qty})
+
+            # Waste Production: (in Kg)
+            WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
+            Qty = (WasteMass / RatioWidth.get(key, 1)) * width
+            lines.append({'productObj': roll.product_id, 'name': 'Waste Paper: ' + str(roll.product_id.name),
+                          'product_uom_qty': Qty})
 
         if job.plate_type == 'PA':
             print_category3 = 'plates_kba'
             print_category4 = 'ink_kba'
-        else:
-            print_category3 = 'plates_regioman'
-            print_category4 = 'ink_regioman'
 
-        product3 = product_obj.search([('print_category', '=', print_category3)])
-        product4 = product_obj.search([('print_category', '=', print_category4)])
-        if not product3:
-            body = _("Product not found for the print-category : '%s'" % (dict(PrintCategory)[print_category3]))
-            picking.message_post(body=body)
-            return {}
-        if not product4:
-            body = _("Product not found for the print-category : '%s'" % (dict(PrintCategory)[print_category4]))
-            picking.message_post(body=body)
+        Plates_prods = product_obj.search([('print_category', '=', print_category3)])
+        Ink_prods = product_obj.search([('print_category', '=', print_category4)])
+        if not Plates_prods:
+            self.write({'state': 'exception'})
+            body = _("Unable to create Picking; Product not found for the print-category : '%s'" % (dict(PrintCategory)[print_category3]))
+            self.message_post(body=body)
             return []
-        lines.append({'productObj': product3, 'name': name3, 'product_uom_qty': qty3})
-        lines.append({'productObj': product4, 'name': name4, 'product_uom_qty': qty4})
+
+        if not Ink_prods:
+            self.write({'state': 'exception'})
+            body = _("Unable to create Picking; Product not found for the print-category : '%s'" % (dict(PrintCategory)[print_category4]))
+            self.message_post(body=body)
+            return []
+
+        # Plates:
+        for p in Plates_prods:
+            lines.append({'productObj': p, 'name': 'Plates : ' + str(p.name), 'product_uom_qty': PlateQty})
+
+        # Ink:
+        for p in Ink_prods:
+            lines.append({'productObj': p, 'name': 'Ink : ' + str(p.name), 'product_uom_qty': InkQty})
         return lines
 
-    def _create_stock_moves(self, job, picking):
+    @api.one
+    def _create_stock_moves(self, picking, lines):
         moves = self.env['stock.move']
         done = self.env['stock.move'].browse()
-        lines = self._prepare_picking_lines(job, picking)
         for line in lines:
-            for val in self._prepare_stock_moves(job, line, picking):
+            for val in self._prepare_stock_moves(line, picking):
                 done += moves.create(val)
         return done
 
     @api.multi
     def action_create_picking(self):
         StockPicking = self.env['stock.picking']
-        Jobs = self.search([('state','=','order_created'),('picking_id','=',False),('stock_ok','=',True)])
+        Jobs = self
+        if not self._ids:
+            Jobs = self.search([('state','=','order_created'),('picking_id','=',False),('stock_ok','=',True)])
+
         for case in Jobs:
+            if case.state <> 'order_created' or case.picking_id \
+                or not case.stock_ok:
+                continue
+
+            lines = self._prepare_PaperRoll_StockMoves(case)
+            if not lines:
+                continue
+
             res = case._prepare_picking()
             picking = StockPicking.create(res)
-            self._create_stock_moves(case, picking)
+            case._create_stock_moves(picking, lines)
             picking.message_post_with_view('mail.message_origin_link',
                                            values={'self': picking, 'origin': case},
                                            subtype_id=self.env.ref('mail.mt_note').id)
@@ -845,44 +863,50 @@ class Job(models.Model):
 
         domain = [('print_category','=', 'paper_regioman')]
 
-        MassX, WidthX = set(), set()
+        MassWidth = []
         for idx in range(1, 8):
-            m = self['paper_mass_' + str(idx)]
-            if m: MassX.add(m)
+            M = self['paper_mass_' + str(idx)]
+            W = self['paper_width_' + str(idx)]
 
-            w = self['paper_width_' + str(idx)]
-            if w: WidthX.add(w)
+            if not M or not W: continue
+
+            key = (M, W)
+            if key not in MassWidth:
+                MassWidth.append(key)
 
         pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
         pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
         msg, stockOk = '', True
 
         # Products: Paper Regioman
-        if not MassX or self.job_type == 'regioman':
+        if not MassWidth or self.job_type == 'regioman':
             prods = product_obj.search(domain)
             for p in prods:
-                lines.append({'product_id': p.id,})
+                lines.append({'product_id': p.id})
 
             if not prods:
                 self.message_post(body=_("Product not found for the print-category : 'Paper Regioman'"))
                 stockOk = False
 
+        RollX = []
         # Products: Paper KBA
-        for M in MassX:
-            for W in WidthX:
-                m1 = M / 100.0
-                m1 = int(m1) if m1%1 == 0 else m1
+        for x in MassWidth:
+            M, W = x[0], x[1]
 
-                v1 = variant_obj.search([('name','=', str(m1)), ('attribute_id','=', pMass.id)])
-                v2 = variant_obj.search([('name','=', str(W)), ('attribute_id','=', pWidth.id)])
-                product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
-                                              ('attribute_value_ids', 'in', v2.ids),
-                                              ('print_category','=', 'paper_kba')]
-                                             , order='id desc', limit=1)
-                if not product:
-                    msg += '(%s, %s); '%(m1, W)
-                    continue
-                lines.append({'product_id': product.id,})
+            m1 = M / 100.0
+            m1 = int(m1) if m1%1 == 0 else m1
+
+            v1 = variant_obj.search([('name','=', str(m1)), ('attribute_id','=', pMass.id)])
+            v2 = variant_obj.search([('name','=', str(W)), ('attribute_id','=', pWidth.id)])
+            product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
+                                          ('attribute_value_ids', 'in', v2.ids),
+                                          ('print_category','=', 'paper_kba')]
+                                         , order='id desc', limit=1)
+            if not product:
+                msg += '(%s, %s); '%(m1, W)
+                continue
+
+            lines.append({'product_id': product.id})
 
         if msg:
             self.message_post(body=_("Product not found for the print-category : 'Paper KBA' for these variants - %s"%msg))
@@ -918,7 +942,7 @@ class Booklet(models.Model):
     glueing = fields.Boolean('Glueing', default=False)
 
     calculated_plates = fields.Float(string='Calculated Plates', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
-    calculated_mass = fields.Float(string='Calculated Mass', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
+    calculated_mass = fields.Float(string='Calculated Mass', store=True, compute='_compute_all', digits=dp.get_precision('Paper Mass'))
     calculated_ink = fields.Float(string='Calculated Ink', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
@@ -961,9 +985,12 @@ class Booklet(models.Model):
             #calculated_mass
             if product:
                 booklet.product_id = product.id
-                booklet.calculated_mass = (product.product_tmpl_id.booklet_surface_area * pages) / float(2) * paper_weight / float(1000)
+                mass = (product.product_tmpl_id.booklet_surface_area * pages) / float(2) * paper_weight / float(1000)
             else:
-                booklet.calculated_mass, booklet.product_id = 0.0, False
+                mass, booklet.product_id = 0.0, False
+
+
+            booklet.calculated_mass = mass
 
             # Calculated_Ink
             booklet.calculated_ink = booklet.calculated_mass * .04
@@ -1028,11 +1055,15 @@ class Registry1(models.Model):
         }
 
 
-class PaperProduct(models.Model):
+class PaperRollProduct(models.Model):
     _name = "wobe.paper.product"
     _description = 'WOBE Paper Product'
 
     job_id = fields.Many2one('wobe.job', required=True, ondelete='cascade', index=True, copy=False)
     product_id = fields.Many2one('product.product', 'Product', required=True)
     name = fields.Char(related='product_id.default_code', string='Internal Reference', store=True)
+
+    mass = fields.Float(string='Mass')
+    width = fields.Float(string='Width')
+
 
