@@ -71,12 +71,11 @@ class SaleOrder(models.Model):
     def action_pubble(self):
         self.ensure_one()
         res = self.transfer_order_to_pubble()
-        if not res:
-            return True
         self._cr.commit()
-        res.call_wsdl()
-        self.date_sent_pubble = fields.Date.context_today(self)
-        self.publog_id = res.id
+        if self.order_pubble_allow:
+            res.call_wsdl()
+            self.date_sent_pubble = fields.Date.context_today(self)
+            self.publog_id = res.id
         return True
 
     @api.multi
@@ -112,55 +111,59 @@ class SaleOrder(models.Model):
         # import pdb; pdb.set_trace()
         self.ensure_one()
         if not self.order_pubble_allow:
-            return False
-
-        vals = {
-                'transmission_id': self.env['sofrom.odooto.pubble'].get_next_ref(),
+            vals = {
                 'sale_order_id': self.id,
-                'salesorder_extorderid': self.name,
-                'salesorder_reference': self.opportunity_subject,
-                'salesorder_createdby': self.user_id.name,
-                'salesorder_debtor_extaccountingid': self.published_customer.ref,
-                'salesorder_debtor_extdebtorid': self.published_customer.ref,
-                'salesorder_debtor_addedby': self.published_customer.create_uid.name,
-                'salesorder_debtor_addeddate': self.published_customer.create_date,
-                'salesorder_debtor_city' : self.published_customer.city,
-                'salesorder_debtor_emailadres' : self.published_customer.email,
-                'salesorder_debtor_lastmodified' : self.published_customer.write_date,
-                'salesorder_debtor_name' : self.published_customer.name,
-                'salesorder_debtor_postalcode' : self.published_customer.zip,
-                'salesorder_agency' : self.advertising_agency,
-                'salesorder_agency_extaccountingid' : self.advertising_agency.ref,
-                'salesorder_agency_extdebtorid' : self.advertising_agency.ref,
-                'salesorder_agency_addeddate' : self.advertising_agency.create_date,
-                'salesorder_agency_city' : self.advertising_agency.city,
-                'salesorder_agency_emailadres' : self.advertising_agency.email,
-                'salesorder_agency_lastmodified' : self.advertising_agency.write_date,
-                'salesorder_agency_name' : self.advertising_agency.name,
-                'salesorder_agency_postalcode' : self.advertising_agency.zip
-        }
-        res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
-        for line in self.order_line:
-            if line.line_pubble_allow:
-                lvals = {
-                        'order_id': res.id,
-                        'odoo_order_line': line.id,
-                        'ad_adsize_adtypename': line.ad_class.name,
-                        'ad_adsize_extadsizeid': line.product_id.default_code,
-                        'ad_adsize_height': line.product_template_id.height,
-                        'ad_adsize_name': line.product_template_id.name,
-                        'ad_adsize_width': line.product_template_id.width,
-                        'ad_edition_editiondate': line.adv_issue.issue_date,
-                        'ad_edition_extpublicationid': line.title.name,
-                        'ad_extplacementid': line.id,
-                        'ad_price': 0,
-                        'ad_productiondetail_color': True,
-                        'ad_productiondetail_isclassified': False,
-                        'ad_productiondetail_dtpcomments': line.layout_remark,
-                        'ad_productiondetail_placementcomments': line.name,
-                        'ad_status': True,
-                }
-                self.env['soline.from.odooto.pubble'].sudo().create(lvals)
+                'salesorder_reference': 'This oerder will not be sent to Pubble',
+            }
+            res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
+        else:
+            vals = {
+                    'transmission_id': self.env['sofrom.odooto.pubble'].get_next_ref(),
+                    'sale_order_id': self.id,
+                    'salesorder_extorderid': self.name,
+                    'salesorder_reference': self.opportunity_subject,
+                    'salesorder_createdby': self.user_id.name,
+                    'salesorder_debtor_extaccountingid': self.published_customer.ref,
+                    'salesorder_debtor_extdebtorid': self.published_customer.ref,
+                    'salesorder_debtor_addedby': self.published_customer.create_uid.name,
+                    'salesorder_debtor_addeddate': self.published_customer.create_date,
+                    'salesorder_debtor_city' : self.published_customer.city,
+                    'salesorder_debtor_emailadres' : self.published_customer.email,
+                    'salesorder_debtor_lastmodified' : self.published_customer.write_date,
+                    'salesorder_debtor_name' : self.published_customer.name,
+                    'salesorder_debtor_postalcode' : self.published_customer.zip,
+                    'salesorder_agency' : self.advertising_agency,
+                    'salesorder_agency_extaccountingid' : self.advertising_agency.ref,
+                    'salesorder_agency_extdebtorid' : self.advertising_agency.ref,
+                    'salesorder_agency_addeddate' : self.advertising_agency.create_date,
+                    'salesorder_agency_city' : self.advertising_agency.city,
+                    'salesorder_agency_emailadres' : self.advertising_agency.email,
+                    'salesorder_agency_lastmodified' : self.advertising_agency.write_date,
+                    'salesorder_agency_name' : self.advertising_agency.name,
+                    'salesorder_agency_postalcode' : self.advertising_agency.zip
+            }
+            res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
+            for line in self.order_line:
+                if line.line_pubble_allow:
+                    lvals = {
+                            'order_id': res.id,
+                            'odoo_order_line': line.id,
+                            'ad_adsize_adtypename': line.ad_class.name,
+                            'ad_adsize_extadsizeid': line.product_id.default_code,
+                            'ad_adsize_height': line.product_template_id.height,
+                            'ad_adsize_name': line.product_template_id.name,
+                            'ad_adsize_width': line.product_template_id.width,
+                            'ad_edition_editiondate': line.adv_issue.issue_date,
+                            'ad_edition_extpublicationid': line.title.name,
+                            'ad_extplacementid': line.id,
+                            'ad_price': 0,
+                            'ad_productiondetail_color': True,
+                            'ad_productiondetail_isclassified': False,
+                            'ad_productiondetail_dtpcomments': line.layout_remark,
+                            'ad_productiondetail_placementcomments': line.name,
+                            'ad_status': True,
+                    }
+                    self.env['soline.from.odooto.pubble'].sudo().create(lvals)
 
         return res
 
