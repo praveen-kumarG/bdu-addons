@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<!-- Product.Category Views -->
+	 <record id="product_category_tree_view_pubble" model="ir.ui.view">
+		<field name="name">product.category.tree.pubble</field>
+		<field name="model">product.category</field>
+		<field name="inherit_id" ref="product.product_category_list_view"/>
+		<field name="groups_id" eval="[(4, ref('sale_advertising_order.group_advertising_sales_user'))]"/>
+		<field name="arch" type="xml">
+			<field name="date_type" position="after">
+				<field name="pubble" />
+			</field>
+		</field>
+	 </record>
+
+	 <record id="product_category_form_view_pubble" model="ir.ui.view">
+		<field name="name">product.category.form.pubble</field>
+		<field name="model">product.category</field>
+		<field name="inherit_id" ref="product.product_category_form_view"/>
+		<field name="groups_id" eval="[(4, ref('sale_advertising_order.group_advertising_sales_user'))]"/>
+		<field name="arch" type="xml">
+			<field name="deadline_offset" position="after">
+				<field name="pubble" />
+			</field>
+		</field>
+	 </record>
+</odoo>

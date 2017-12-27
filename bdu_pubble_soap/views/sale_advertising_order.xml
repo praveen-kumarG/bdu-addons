@@ -10,32 +10,15 @@
             <field name="model">sofrom.odooto.pubble</field>
             <field name="arch" type="xml">
                 <form string="SO to Pubble" create="false" edit="false" delete="false" copy="false">
-                    <!--header>
-                        <button name="action_create_order" type="object" string="Create SaleOrder"
-                                states="ready" class="oe_highlight"/>
-                        <button name="action_force_ready" type="object" string="Force Ready"
-                                states="waiting" class="oe_highlight"/>
-                        <button name="action_reset" type="object" string="Reset Status"
-                                states="waiting,exception" class="oe_highlight"/>
-                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="ready,order_created"/>
-                    </header-->
                     <sheet string="SO to Pubble">
-                        <!--div class="oe_button_box" name="button_box">
-                            <field name="order_id" invisible="1"/>
-                            <button class="oe_stat_button" name="action_view_sales"
-                                type="object" icon="fa-usd" String="Sale Order" attrs="{'invisible': [('order_id','=',False)]}">
-                            </button>
-                            <button class="oe_stat_button" name="action_view_file_registry"
-                                type="object" icon="fa-bars" attrs="{'invisible': [('file_count','=',0)]}">
-                                <field string="RegistryFiles" name="file_count" widget="statinfo" attrs="{'invisible': [('file_count','=',0)]}"/>
-                            </button>
-                        </div-->
                         <h1 class="mt0">
                             <label string="Sale Order :"/>
-                            <field name="salesorder_extorderid"/>
+                            <field name="sale_order_id"/>
                         </h1>
                         <group>
                             <group>
+                                <field name="transmission_id"/>
+                                <field name="salesorder_extorderid"/>
                                 <field name="salesorder_reference"/>
                                 <field name="salesorder_createdby"/>
                                 <field name="salesorder_debtor_extdebtorid"/>
@@ -95,7 +78,6 @@
                 </tree>
             </field>
         </record>
-
         <record id="view_sofrom_odooto_pubble_filter" model="ir.ui.view">
             <field name="name">view_sofrom_odooto_pubble_filter</field>
             <field name="model">sofrom.odooto.pubble</field>
@@ -111,7 +93,6 @@
                </search>
             </field>
         </record>
-
         <record id="action_staged_pubble" model="ir.actions.act_window">
             <field name="name">Staged Pubble</field>
             <field name="res_model">sofrom.odooto.pubble</field>
@@ -128,9 +109,30 @@
             </field-->
         </record>
 
-
         <menuitem id="menu_action_staged_pubble" name="Staged Pubble" parent="menu_pubble" action="action_staged_pubble"
                   sequence="2"/>
+
+        <record id="view_order_form_advertising_pubble" model="ir.ui.view">
+            <field name="name">sale.order.form.advertising.pubble</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_advertising_order.view_order_form_advertising"/>
+            <field name="arch" type="xml">
+                <group name="ad_refs" position="after">
+                    <group string="Pubble" name="pubble" >
+                        <field name="line_pubble_allow" readonly="1" />
+                        <field name="pubble_sent" readonly="1"/>
+                    </group>
+                </group>
+                <group name="technical" position="after">
+                    <group string="Pubble" name="pubble" >
+                        <field name="order_pubble_allow" readonly="1" />
+                        <field name="date_sent_pubble" readonly="1"/>
+                        <field name="publog_id" readonly="1"/>
+                    </group>
+                </group>
+            </field>
+        </record>
+
 
     </data>
 </odoo>
