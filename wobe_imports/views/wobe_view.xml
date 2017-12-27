@@ -112,8 +112,8 @@
                                     <field name="job_ref" readonly="True"/>
                                     <field name="bduorder_ref" readonly="True"/>
                                     <field name="company_id" readonly="True"/>
-                                    <field name="job_type" invisible="0"/>
-                                    <field name="convert_ok" invisible="0"/>
+                                    <field name="job_type" invisible="1"/>
+                                    <field name="convert_ok" invisible="1"/>
                                 </group>
                             </page>
                         </notebook>
@@ -153,6 +153,7 @@
                     <separator/>
                     <filter name="ready" string="Ready to Order" domain="[('state','=','ready')]"/>
                     <filter name="order_created" string="SaleOrder Created" domain="[('state','=','order_created')]"/>
+                    <filter name="picking_created" string="Picking Created" domain="[('state','=','picking_created')]"/>
                     <separator/>
                     <filter name="exceptions" string="Exceptions" domain="[('state','=','exception')]"/>
                     <separator/>
