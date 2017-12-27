@@ -409,9 +409,14 @@ class Job(models.Model):
         sale_obj = self.env['sale.order']
         Registry = self.env['file.registry']
 
-        Jobs = self.search([('state','=', 'ready'), ('order_id','=',False)])
+        Jobs = self
+        if not self._ids:
+            Jobs = self.search([('state','=', 'ready'), ('order_id','=',False)])
 
         for case in Jobs:
+            if case.state <> 'ready' or case.order_id:
+                continue
+
             case.button_recompute()
 
             vals = case._prepare_order_data()
@@ -573,11 +578,14 @@ class Job(models.Model):
             QtyCheck = job.net_quantity >= job.planned_quantity
             EditionCheck = len(job.edition_ids) == job.edition_count and all(l.net_quantity for l in job.edition_ids)
 
-            if QtyCheck or EditionCheck:
-                job.write({'state': 'ready'})
+            if job.state == 'exception' and job.order_id:
+                job.write({'state': 'order_created'})
 
-            elif job.state == 'exception':
+            elif job.state == 'exception' and not job.order_id:
                 job.write({'state': 'waiting'})
+
+            elif (QtyCheck or EditionCheck):
+                job.write({'state': 'ready'})
 
             job._onchange_convert_flag()
 
@@ -669,9 +677,10 @@ class Job(models.Model):
             'location_dest_id': partner.property_stock_customer.id,
             'location_id': picking_type.default_location_src_id.id,
             'company_id': self.company_id.id,
+            'order_id': self.order_id.id,
         }
 
-    def _prepare_stock_moves(self, job, line,  picking):
+    def _prepare_stock_moves(self, line,  picking):
         """ Prepare the stock moves data from line. This function returns a list of
         dictionary ready to be used in stock.move's create()
         """
@@ -679,6 +688,8 @@ class Job(models.Model):
         product_obj = line['productObj']
         if product_obj.type not in ['product', 'consu']:
             return res
+
+        job = self
         template = {
             'name': line['name'] or '',
             'product_id': product_obj.id,
@@ -704,7 +715,11 @@ class Job(models.Model):
         res.append(template)
         return res
 
-    def _prepare_picking_lines(self, job, picking):
+    def _prepare_PaperRoll_StockMoves(self, job):
+        '''
+            Prepares the list of Moves that needs to created
+            based on Paper Roll
+        '''
         product_obj = self.env['product.product']
         lines = []
         print_category3, print_category4 = 'plates_regioman', 'ink_regioman'
@@ -755,13 +770,13 @@ class Job(models.Model):
             key = (mass, width)
 
             # Net Production: (in Kg)
-            NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000
+            NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
             Qty = (NetMass / RatioWidth.get(key, 1)) * width
             lines.append({'productObj': roll.product_id, 'name': 'Net Paper: ' + str(roll.product_id.name),
                           'product_uom_qty': Qty})
 
             # Waste Production: (in Kg)
-            WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000
+            WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
             Qty = (WasteMass / RatioWidth.get(key, 1)) * width
             lines.append({'productObj': roll.product_id, 'name': 'Waste Paper: ' + str(roll.product_id.name),
                           'product_uom_qty': Qty})
@@ -773,13 +788,15 @@ class Job(models.Model):
         Plates_prods = product_obj.search([('print_category', '=', print_category3)])
         Ink_prods = product_obj.search([('print_category', '=', print_category4)])
         if not Plates_prods:
-            body = _("Product not found for the print-category : '%s'" % (dict(PrintCategory)[print_category3]))
-            picking.message_post(body=body)
+            self.write({'state': 'exception'})
+            body = _("Unable to create Picking; Product not found for the print-category : '%s'" % (dict(PrintCategory)[print_category3]))
+            self.message_post(body=body)
             return []
 
         if not Ink_prods:
-            body = _("Product not found for the print-category : '%s'" % (dict(PrintCategory)[print_category4]))
-            picking.message_post(body=body)
+            self.write({'state': 'exception'})
+            body = _("Unable to create Picking; Product not found for the print-category : '%s'" % (dict(PrintCategory)[print_category4]))
+            self.message_post(body=body)
             return []
 
         # Plates:
@@ -791,26 +808,34 @@ class Job(models.Model):
             lines.append({'productObj': p, 'name': 'Ink : ' + str(p.name), 'product_uom_qty': InkQty})
         return lines
 
-    def _create_stock_moves(self, job, picking):
+    @api.one
+    def _create_stock_moves(self, picking, lines):
         moves = self.env['stock.move']
         done = self.env['stock.move'].browse()
-        lines = self._prepare_picking_lines(job, picking)
         for line in lines:
-            for val in self._prepare_stock_moves(job, line, picking):
+            for val in self._prepare_stock_moves(line, picking):
                 done += moves.create(val)
         return done
 
     @api.multi
     def action_create_picking(self):
         StockPicking = self.env['stock.picking']
+        Jobs = self
         if not self._ids:
             Jobs = self.search([('state','=','order_created'),('picking_id','=',False),('stock_ok','=',True)])
-        else: Jobs = self
 
         for case in Jobs:
+            if case.state <> 'order_created' or case.picking_id \
+                or not case.stock_ok:
+                continue
+
+            lines = self._prepare_PaperRoll_StockMoves(case)
+            if not lines:
+                continue
+
             res = case._prepare_picking()
             picking = StockPicking.create(res)
-            self._create_stock_moves(case, picking)
+            case._create_stock_moves(picking, lines)
             picking.message_post_with_view('mail.message_origin_link',
                                            values={'self': picking, 'origin': case},
                                            subtype_id=self.env.ref('mail.mt_note').id)

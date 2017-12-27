@@ -47,6 +47,7 @@ This module does importing of XML file of Wobe Portal
             'views/wobe_view.xml',
             'views/ftp_view.xml',
             'views/product_view.xml',
+            'views/stock_view.xml',
     ],
     'demo' : [],
     'installable': True

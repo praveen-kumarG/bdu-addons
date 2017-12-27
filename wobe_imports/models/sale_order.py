@@ -23,3 +23,4 @@ class SaleOrder(models.Model):
             self.env.cr.commit()
         self._ids = order_ids
         return super(SaleOrder, self).action_confirm()
+
