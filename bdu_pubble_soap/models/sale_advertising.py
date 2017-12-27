@@ -113,7 +113,7 @@ class SaleOrder(models.Model):
         if not self.order_pubble_allow:
             vals = {
                 'sale_order_id': self.id,
-                'salesorder_reference': 'This oerder will not be sent to Pubble',
+                'salesorder_reference': 'This Order will not be sent to Pubble',
             }
             res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
         else:
@@ -171,7 +171,17 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
     pubble_sent = fields.Many2one('soline.from.odooto.pubble','Order Line sent to Pubble')
-    line_pubble_allow = fields.Boolean(related='ad_class.pubble', string='Advertising Category')
+    line_pubble_allow = fields.Boolean(related='ad_class.pubble', string='Pubble Allowed')
+
+    @api.multi
+    def write(self, vals):
+        res = super(SaleOrderLine, self).write(vals)
+        if self.advertising and ('product_template_id' or 'adv_issue' or 'title' or 'layout_remark' or 'name') in vals:
+            for order in self.mapped('order_id'):
+                order.action_pubble()
+        return res
+
+
 
 
     '''@api.multi
