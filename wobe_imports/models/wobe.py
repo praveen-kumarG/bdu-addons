@@ -943,10 +943,10 @@ class Booklet(models.Model):
     stitching = fields.Boolean('Stitching', default=False)
     glueing = fields.Boolean('Glueing', default=False)
 
-    calculated_plates = fields.Float(string='Calculated Plates', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
+    calculated_plates = fields.Integer(string='Calculated Plates', store=True, compute='_compute_all')
     calculated_mass = fields.Float(string='Calculated Mass', store=True, compute='_compute_all', digits=dp.get_precision('Paper Mass'))
     calculated_ink = fields.Float(string='Calculated Ink', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
-    calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
+    calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all')
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
 
     @api.depends('format', 'pages', 'paper_weight', 'product_id')
@@ -968,7 +968,7 @@ class Booklet(models.Model):
                     plates = pages * 2
                 elif format == 'MP':
                     plates = pages
-            booklet.calculated_plates = plates
+            booklet.calculated_plates = round(plates,0)
 
             product_obj = self.env['product.product']
             variant_obj = self.env['product.attribute.value']
@@ -998,7 +998,7 @@ class Booklet(models.Model):
             booklet.calculated_ink = booklet.calculated_mass * .04
 
             #Calculated_hours
-            booklet.calculated_hours = booklet.job_id.planned_quantity / float(60)
+            booklet.calculated_hours = booklet.job_id.planned_quantity / float(60000)
 
 
 class Edition(models.Model):
