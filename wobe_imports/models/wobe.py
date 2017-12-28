@@ -660,7 +660,6 @@ class Job(models.Model):
             for node in doc.xpath("//page[@string='Editions']"):
                 node.set('autofocus', 'autofocus')
             result['arch'] = etree.tostring(doc)
-            print result['arch']
         return result
 
     @api.multi
