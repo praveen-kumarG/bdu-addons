@@ -908,7 +908,7 @@ class Job(models.Model):
         msg, stockOk = '', True
 
         # Products: Paper Regioman
-        if not MassWidth:
+        if not MassWidth or self.job_type == 'regioman':
             prods = product_obj.search(domain)
             for p in prods:
                 lines.append({'product_id': p.id})
@@ -919,23 +919,24 @@ class Job(models.Model):
 
         RollX = []
         # Products: Paper KBA
-        for x in MassWidth:
-            M, W = x[0], x[1]
+        if self.job_type == 'kba':
+            for x in MassWidth:
+                M, W = x[0], x[1]
 
-            m1 = M / 100.0
-            m1 = int(m1) if m1%1 == 0 else m1
+                m1 = M / 100.0
+                m1 = int(m1) if m1%1 == 0 else m1
 
-            v1 = variant_obj.search([('name','=', str(m1)), ('attribute_id','=', pMass.id)])
-            v2 = variant_obj.search([('name','=', str(W)), ('attribute_id','=', pWidth.id)])
-            product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
-                                          ('attribute_value_ids', 'in', v2.ids),
-                                          ('print_category','=', 'paper_kba')]
-                                         , order='id desc', limit=1)
-            if not product:
-                msg += '(%s, %s); '%(m1, W)
-                continue
+                v1 = variant_obj.search([('name','=', str(m1)), ('attribute_id','=', pMass.id)])
+                v2 = variant_obj.search([('name','=', str(W)), ('attribute_id','=', pWidth.id)])
+                product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
+                                              ('attribute_value_ids', 'in', v2.ids),
+                                              ('print_category','=', 'paper_kba')]
+                                             , order='id desc', limit=1)
+                if not product:
+                    msg += '(%s, %s); '%(m1, W)
+                    continue
 
-            lines.append({'product_id': product.id})
+                lines.append({'product_id': product.id})
 
         if msg:
             self.message_post(body=_("Product not found for the print-category : 'Paper KBA' for these variants - %s"%msg))

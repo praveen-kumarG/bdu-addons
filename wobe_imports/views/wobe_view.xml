@@ -87,7 +87,7 @@
                                 <field name="paper_product_ids" nolabel="1" widget="one2many_list" mode="tree"
                                         attrs="{'readonly': [('job_type','=','kba')]}">
                                     <tree string="Paper Products" editable="bottom">
-                                        <field name="product_id"/>
+                                        <field name="product_id" domain="[('print_category','=','paper_regioman')]"/>
                                         <field name="name" />
                                     </tree>
                                 </field>
