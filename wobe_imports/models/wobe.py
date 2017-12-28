@@ -10,6 +10,7 @@ import base64
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from product import PrintCategory
+from lxml import etree
 
 
 _logger = logging.getLogger(__name__)
@@ -646,16 +647,42 @@ class Job(models.Model):
         action['context'] = {}
         return action
 
-    @api.one
+    @api.model
+    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+        result =  super(Job, self).fields_view_get(view_id, view_type, toolbar=toolbar, submenu=submenu)
+        job_id = self.env.context.get('active_id')
+        active_model = self.env.context.get('active_model')
+        auto_focus = self.env.context.get('auto_focus', False)
+        if active_model == 'wobe.job' and job_id and auto_focus:
+            job = self.browse(job_id)
+            doc = etree.XML(result['arch'])
+            if job.job_type == 'regioman':
+                for node in doc.xpath("//page[@string='Editions']"):
+                    node.set('autofocus', 'autofocus')
+            result['arch'] = etree.tostring(doc)
+        return result
+
+    @api.multi
     def button_convert_regioman(self):
         "Mark Job as 'Regioman' "
-
+        self.ensure_one()
         self.write({
             'job_type': 'regioman', 'convert_ok': False,
             'edition_ids': map(lambda x: (2, x), [x.id for x in self.edition_ids]),
             'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids]),
             })
         self.fetch_paperProducts()
+        self.with_context({'active_id':self.id, 'active_model':'wobe.job','auto_focus':True}).fields_view_get(None, 'form')
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'wobe.job',
+            'res_id': self.id,
+            'context': self.env.context,
+            'target': 'main',
+            'flags': {'initial_mode': 'edit'},
+        }
 
     @api.onchange('state', 'job_type')
     def _onchange_convert_flag(self):
