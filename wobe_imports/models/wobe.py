@@ -654,16 +654,13 @@ class Job(models.Model):
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         result =  super(Job, self).fields_view_get(view_id, view_type, toolbar=toolbar, submenu=submenu)
-        job_id = self.env.context.get('active_id')
-        active_model = self.env.context.get('active_model')
-        auto_focus = self.env.context.get('auto_focus', False)
-        if active_model == 'wobe.job' and job_id and auto_focus:
-            job = self.browse(job_id)
+        focusEdition = self.env.context.get('editionFocus', False)
+        if focusEdition and view_type == 'form':
             doc = etree.XML(result['arch'])
-            if job.job_type == 'regioman':
-                for node in doc.xpath("//page[@string='Editions']"):
-                    node.set('autofocus', 'autofocus')
+            for node in doc.xpath("//page[@string='Editions']"):
+                node.set('autofocus', 'autofocus')
             result['arch'] = etree.tostring(doc)
+            print result['arch']
         return result
 
     @api.multi
@@ -676,7 +673,7 @@ class Job(models.Model):
             'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids]),
             })
         self.fetch_paperProducts()
-        self.with_context({'active_id':self.id, 'active_model':'wobe.job','auto_focus':True}).fields_view_get(None, 'form')
+        # self.with_context({'editionFocus':True}).fields_view_get(None, 'form')
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',
@@ -686,6 +683,7 @@ class Job(models.Model):
             'context': self.env.context,
             'target': 'main',
             'flags': {'initial_mode': 'edit'},
+            'context':{'editionFocus':True},
         }
 
     @api.onchange('state', 'job_type')

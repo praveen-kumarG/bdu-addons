@@ -96,7 +96,7 @@
                                     </tree>
                                 </field>
                             </page>
-                            <page string="Editions">
+                            <page string="Editions" autofocus="">
                                 <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree"
                                         attrs="{'readonly': [('job_type','=','kba')]}">
                                     <tree string="Edition Details" editable="bottom">
