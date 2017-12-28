@@ -79,12 +79,16 @@ class Job(models.Model):
     paper_product_ids = fields.One2many('wobe.paper.product', 'job_id', 'Paper Products', copy=False)
 
     state = fields.Selection([('waiting', 'Waiting'), ('ready', 'Ready'),
-                             ('order_created', 'Order Created'),('picking_created', 'Picking Created'),
+                             ('order_created', 'Order Created'),
+                             ('picking_created', 'Picking Created'),
+                             ('cost_created', 'Costing Created'),
                              ('exception', 'Exception')], string='Status', default='waiting',
                              copy=False, required=True, track_visibility='onchange')
 
     order_id = fields.Many2one('sale.order', string='Sale Order', ondelete='restrict', help='Associated Sale Order')
     picking_id = fields.Many2one('stock.picking', string='Picking', ondelete='restrict', help='Associated Stock Picking')
+    analytic_line_id = fields.Many2one('account.analytic.line', string='Analytic', ondelete='restrict', help='Associated Analytic Lines')
+
     company_id = fields.Many2one('res.company', 'Company')
     file_count = fields.Integer('Files', compute='_compute_file_count')
     edition_count = fields.Integer('Edition Count')
@@ -955,6 +959,18 @@ class Job(models.Model):
                 # Trigger the Calculation
                 bk.write({'product_id':bk.product_id.id})
 
+    @api.multi
+    def action_create_costing(self):
+        AnalyticLines = self.env['account.analytic.line']
+        Jobs = self
+        if not self._ids:
+            Jobs = self.search([('state','=','picking_created')])
+
+        for case in Jobs:
+            if case.state <> 'picking_created' or case.analyticline_id:
+                continue
+
+            print "xxxx"
 
 
 class Booklet(models.Model):

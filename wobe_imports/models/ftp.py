@@ -143,6 +143,9 @@ class FileTransfer(models.Model):
         # Call: Picking Creation
         Job.action_create_picking()
 
+        # Call: Costing Creation
+        Job.action_create_costing()
+
 
 class Registry(models.Model):
     _name = 'file.registry'
