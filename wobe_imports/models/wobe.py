@@ -967,7 +967,7 @@ class Job(models.Model):
             Jobs = self.search([('state','=','picking_created')])
 
         for case in Jobs:
-            if case.state <> 'picking_created' or case.analyticline_id:
+            if case.state <> 'picking_created' or case.analytic_line_id:
                 continue
 
             print "xxxx"
