@@ -1083,10 +1083,11 @@ class Job(models.Model):
             lines.append({'name': 'Pre-calculation : Plates', 'amount': platesAmount, 'unit_amount':plateUnitAmt, 'product_uom_id':uomUnits})
 
         # Ink Unit Amount : (in Kg)
-        InkUnitAmt = sum(bookObj.calculated_ink for bookObj in job.booklet_ids)/1000
+        totBookletInk = round(sum(bookObj.calculated_ink for bookObj in job.booklet_ids),4)
+        InkUnitAmt = totBookletInk/1000
         # Ink :
         for p in Ink_prods:
-            InkAmount = sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * p.standard_price
+            InkAmount = totBookletInk * p.standard_price
             lines.append({'name': 'Pre-calculation : Ink', 'amount': InkAmount, 'unit_amount':InkUnitAmt, 'product_uom_id':uomKG})
         return lines
 
