@@ -1048,11 +1048,13 @@ class Job(models.Model):
         paperAmount = paperAmount
 
         # Paper Unit Amount : (in Kg)
-        paperUnitAmt = sum(bookObj.calculated_mass for bookObj in job.booklet_ids) / 1000
+        totBookletMass = round(sum(bookObj.calculated_mass for bookObj in job.booklet_ids),4)
+        paperUnitAmt =  totBookletMass/ 1000
 
-        hoursAmount = sum(bookObj.calculated_hours for bookObj in job.booklet_ids) * 1200
+        totBookletHours = round(sum(bookObj.calculated_hours for bookObj in job.booklet_ids), 4)
+        hoursAmount = totBookletHours * 1200
 
-        hoursUnitAmt = sum(bookObj.calculated_hours for bookObj in job.booklet_ids)
+        hoursUnitAmt = totBookletHours
 
         lines.append({'name': 'Pre-calculation : Paper' , 'amount': paperAmount, 'unit_amount': paperUnitAmt, 'product_uom_id':uomKG})
         lines.append({'name': 'Pre-calculation : Hours' , 'amount': hoursAmount, 'unit_amount': hoursUnitAmt, 'product_uom_id':uomHours})
@@ -1074,9 +1076,10 @@ class Job(models.Model):
             return []
 
         # Plates:
-        plateUnitAmt = sum(bookObj.calculated_plates for bookObj in job.booklet_ids)
+        totBookletPlates = round(sum(bookObj.calculated_plates for bookObj in job.booklet_ids),4)
+        plateUnitAmt = totBookletPlates
         for p in Plates_prods:
-            platesAmount = sum(bookObj.calculated_plates for bookObj in job.booklet_ids) * p.standard_price
+            platesAmount = totBookletPlates * p.standard_price
             lines.append({'name': 'Pre-calculation : Plates', 'amount': platesAmount, 'unit_amount':plateUnitAmt, 'product_uom_id':uomUnits})
 
         # Ink Unit Amount : (in Kg)
@@ -1110,7 +1113,8 @@ class Job(models.Model):
                              'account_id': aa.id,
                              'ref': ref,
                              'job_id': case.id,
-                             'amount': amount_currency
+                             'amount': amount_currency,
+                             'unit_amount':round(line['unit_amount'],4)
                              })
                 AnalyticLines.create(line)
             case.write({'state': 'cost_created'})
@@ -1133,7 +1137,7 @@ class Booklet(models.Model):
 
     calculated_plates = fields.Integer(string='Calculated Plates', store=True, compute='_compute_all')
     calculated_mass = fields.Float(string='Calculated Mass', store=True, compute='_compute_all', digits=dp.get_precision('Paper Mass'))
-    calculated_ink = fields.Float(string='Calculated Ink', store=True, compute='_compute_all', digits=dp.get_precision('Product Unit of Measure'))
+    calculated_ink = fields.Float(string='Calculated Ink', store=True, compute='_compute_all', digits=dp.get_precision('Paper Mass'))
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all')
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
 
