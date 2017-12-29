@@ -90,7 +90,7 @@ class Job(models.Model):
     # analytic_line_id = fields.Many2one('account.analytic.line', string='Analytic', ondelete='restrict', help='Associated Analytic Lines')
     analytic_line_ids = fields.Many2many('account.analytic.line', compute='_compute_analytic_line_ids',  string='Analytic Lines associated to this Job')
     analytic_count = fields.Integer(string='Analytic Count', compute='_compute_analytic_line_ids')
-    analytic_done = fields.Boolean(string='Analytic Created', help='Analytic Lines Created ?', default=False)
+    # analytic_done = fields.Boolean(string='Analytic Created', help='Analytic Lines Created ?', default=False)
 
     company_id = fields.Many2one('res.company', 'Company')
     file_count = fields.Integer('Files', compute='_compute_file_count')
@@ -102,7 +102,7 @@ class Job(models.Model):
     convert_ok = fields.Boolean('Allow conversion of Job to Regioman?', default=True, copy=False)
 
     @api.multi
-    @api.depends('analytic_done')
+    @api.depends('state')
     def _compute_analytic_line_ids(self):
         for case in self:
             case.analytic_line_ids = self.env['account.analytic.line'].search([('job_id', '=', case.id)])
@@ -1002,6 +1002,10 @@ class Job(models.Model):
                 if av.attribute_id.id == pWidth.id: w = float(av.name)
             return m, w
 
+        def _get_conversion(job_obj, price_unit):
+            currency_id = job_obj.company_id.currency_id
+            return currency_id.compute(price_unit, job_obj.company_id.currency_id)
+
         # Ratio-Width per PaperType
         RatioWidth, ratioSum = {}, {}
         for roll in job.paper_product_ids:
@@ -1028,8 +1032,9 @@ class Job(models.Model):
                 MassPerUnit[key] = booklet.calculated_mass
             else:
                 MassPerUnit[key] += booklet.calculated_mass
+
         paperAmount = 0.0
-        hoursAmount = sum(bookObj.calculated_hours for bookObj in job.booklet_ids)/1200
+
         # Paper Rolls
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
@@ -1045,16 +1050,19 @@ class Job(models.Model):
 
             paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price
 
+        #get paper amount conversion
+        paperAmount = _get_conversion(job, paperAmount)
         # Paper Unit Amount : (in Kg)
-        paperUnitAmt = sum(bookObj.calculated_mass for bookObj in job.booklet_ids)/1000
+        paperUnitAmt = _get_conversion(job, (sum(bookObj.calculated_mass for bookObj in job.booklet_ids) / 1000))
 
-        hoursUnitAmt = sum(bookObj.calculated_hours for bookObj in job.booklet_ids)
+        hoursAmount = _get_conversion(job, (sum(bookObj.calculated_hours for bookObj in job.booklet_ids) * 1200))
+
+        hoursUnitAmt = _get_conversion(job,(sum(bookObj.calculated_hours for bookObj in job.booklet_ids)))
 
         lines.append({'name': 'Pre-calculation : Paper' , 'amount': paperAmount, 'unit_amount': paperUnitAmt, 'product_uom_id':uomKG})
         lines.append({'name': 'Pre-calculation : Hours' , 'amount': hoursAmount, 'unit_amount':hoursUnitAmt, 'product_uom_id':uomHours})
 
         Plates_prods = product_obj.search([('print_category', '=', print_category3)], limit=1, order='id')
-        Ink_prods = product_obj.search([('print_category', '=', print_category4)], limit=1, order='id')
         if not Plates_prods:
             self.write({'state': 'exception'})
             body = _("Unable to create Picking; Product not found for the print-category : '%s'" % (
@@ -1062,6 +1070,7 @@ class Job(models.Model):
             self.message_post(body=body)
             return []
 
+        Ink_prods = product_obj.search([('print_category', '=', print_category4)], limit=1, order='id')
         if not Ink_prods:
             self.write({'state': 'exception'})
             body = _("Unable to create Picking; Product not found for the print-category : '%s'" % (
@@ -1070,17 +1079,16 @@ class Job(models.Model):
             return []
 
         # Plates:
-        plateUnitAmt = sum(bookObj.calculated_plates for bookObj in job.booklet_ids)
+        plateUnitAmt = _get_conversion(job, (sum(bookObj.calculated_plates for bookObj in job.booklet_ids)))
         for p in Plates_prods:
-            platesAmount = sum(bookObj.calculated_plates for bookObj in job.booklet_ids) * p.standard_price
+            platesAmount = _get_conversion(job, (sum(bookObj.calculated_plates for bookObj in job.booklet_ids) * p.standard_price))
             lines.append({'name': 'Pre-calculation : Plates', 'amount': platesAmount, 'unit_amount':plateUnitAmt, 'product_uom_id':uomUnits})
 
-
         # Ink Unit Amount : (in Kg)
-        InkUnitAmt = sum(bookObj.calculated_ink for bookObj in job.booklet_ids)/1000
+        InkUnitAmt = _get_conversion(job, (sum(bookObj.calculated_ink for bookObj in job.booklet_ids)/1000))
         # Ink :
         for p in Ink_prods:
-            InkAmount = sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * p.standard_price
+            InkAmount = _get_conversion(job, (sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * p.standard_price))
             lines.append({'name': 'Pre-calculation : Ink', 'amount': InkAmount, 'unit_amount':InkUnitAmt, 'product_uom_id':uomKG})
         return lines
 
@@ -1092,7 +1100,7 @@ class Job(models.Model):
             Jobs = self.search([('state','=','picking_created')])
 
         for case in Jobs:
-            if case.state <> 'picking_created' or case.analytic_done:
+            if case.state <> 'picking_created' or case.analytic_count > 0:
                 continue
             company_id = case.company_id.id
             date = case.issue_date
@@ -1101,7 +1109,7 @@ class Job(models.Model):
             for line in case._prepare_analytic_lines():
                 line.update({'company_id':company_id, 'date':date, 'account_id':aa.id, 'ref':ref,'job_id':case.id})
                 AnalyticLines.create(line)
-            case.write({'analytic_done': True, 'state': 'cost_created'})
+            case.write({'state': 'cost_created'})
 
 
 

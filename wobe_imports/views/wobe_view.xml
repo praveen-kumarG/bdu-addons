@@ -32,7 +32,6 @@
                         <div class="oe_button_box" name="button_box">
                             <field name="order_id" invisible="1"/>
                             <field name="picking_id" invisible="1"/>
-                            <field name="analytic_done" invisible="1"/>
                             <button class="oe_stat_button" name="action_view_sales"
                                 type="object" icon="fa-usd" String="Sale Order" attrs="{'invisible': [('order_id','=',False)]}">
                             </button>
