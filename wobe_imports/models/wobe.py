@@ -87,10 +87,8 @@ class Job(models.Model):
 
     order_id = fields.Many2one('sale.order', string='Sale Order', ondelete='restrict', help='Associated Sale Order')
     picking_id = fields.Many2one('stock.picking', string='Picking', ondelete='restrict', help='Associated Stock Picking')
-    # analytic_line_id = fields.Many2one('account.analytic.line', string='Analytic', ondelete='restrict', help='Associated Analytic Lines')
     analytic_line_ids = fields.Many2many('account.analytic.line', compute='_compute_analytic_line_ids',  string='Analytic Lines associated to this Job')
     analytic_count = fields.Integer(string='Analytic Count', compute='_compute_analytic_line_ids')
-    # analytic_done = fields.Boolean(string='Analytic Created', help='Analytic Lines Created ?', default=False)
 
     company_id = fields.Many2one('res.company', 'Company')
     file_count = fields.Integer('Files', compute='_compute_file_count')
@@ -1038,7 +1036,7 @@ class Job(models.Model):
         # Paper Rolls
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-            # key = (mass, width)
+            key = (mass, width)
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
