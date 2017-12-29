@@ -87,7 +87,10 @@ class Job(models.Model):
 
     order_id = fields.Many2one('sale.order', string='Sale Order', ondelete='restrict', help='Associated Sale Order')
     picking_id = fields.Many2one('stock.picking', string='Picking', ondelete='restrict', help='Associated Stock Picking')
-    analytic_line_id = fields.Many2one('account.analytic.line', string='Analytic', ondelete='restrict', help='Associated Analytic Lines')
+    # analytic_line_id = fields.Many2one('account.analytic.line', string='Analytic', ondelete='restrict', help='Associated Analytic Lines')
+    analytic_line_ids = fields.Many2many('account.analytic.line', compute='_compute_analytic_line_ids',  string='Analytic Lines associated to this Job')
+    analytic_count = fields.Integer(string='Analytic Count', compute='_compute_analytic_line_ids')
+    analytic_done = fields.Boolean(string='Analytic Created', help='Analytic Lines Created ?', default=False)
 
     company_id = fields.Many2one('res.company', 'Company')
     file_count = fields.Integer('Files', compute='_compute_file_count')
@@ -97,6 +100,13 @@ class Job(models.Model):
                                 track_visibility='onchange')
     stock_ok = fields.Boolean('Ok to create Stock?', default=False)
     convert_ok = fields.Boolean('Allow conversion of Job to Regioman?', default=True, copy=False)
+
+    @api.multi
+    @api.depends('analytic_done')
+    def _compute_analytic_line_ids(self):
+        for case in self:
+            case.analytic_line_ids = self.env['account.analytic.line'].search([('job_id', '=', case.id)])
+            case.analytic_count = len(case.analytic_line_ids)
 
 
     def _compute_file_count(self):
@@ -672,7 +682,6 @@ class Job(models.Model):
             'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids]),
             })
         self.fetch_paperProducts()
-        # self.with_context({'editionFocus':True}).fields_view_get(None, 'form')
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',
@@ -956,6 +965,117 @@ class Job(models.Model):
                 # Trigger the Calculation
                 bk.write({'product_id':bk.product_id.id})
 
+    def _prepare_analytic_lines(self):
+        job = self
+        product_obj = self.env['product.product']
+        uom_obj = self.env['product.uom']
+        lines = []
+        if job.job_type == 'kba':
+            print_category3, print_category4 = 'plates_kba', 'ink_kba'
+        else:
+            print_category3, print_category4 = 'plates_regioman', 'ink_regioman'
+        uomKG = uom_obj.search([('name','in',('KG','kg'))]).id
+        uomUnits = uom_obj.search([('name','in',('Unit(s)','Units'))]).id
+        uomHours = uom_obj.search([('name','in',('Hour(s)','Hours'))]).id
+        # company_id = job.company_id.id
+        # date = job.issue_date
+        # aa = self.env['account.analytic.account'].search([('name', '=', job.title)])
+        # ref = job.order_id.id
+
+        pMass = self.env.ref('wobe_imports.variant_attribute_3', False)
+        pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
+
+        def _get_MassWidth(product_id):
+            m, w = 0.0, 0.0
+            if not product_id: return m, w
+
+            for av in product_id.attribute_value_ids:
+                if av.attribute_id.id == pMass.id: m = float(av.name)
+                if av.attribute_id.id == pWidth.id: w = float(av.name)
+            return m, w
+
+        # Ratio-Width per PaperType
+        RatioWidth, ratioSum = {}, {}
+        for roll in job.paper_product_ids:
+            mass, width = _get_MassWidth(roll.product_id)
+
+            if mass not in ratioSum:
+                ratioSum[mass] = width
+            else:
+                ratioSum[mass] += width
+
+            key = (mass, width)
+            RatioWidth[key] = 0  # Value Summed up below
+
+        # Ratio-Width per PaperType [Consolidated]
+        for key in RatioWidth.keys():
+            RatioWidth[key] = ratioSum.get(key[0], 0)
+
+        # Total Mass per PaperMass
+        MassPerUnit = {}
+        for booklet in job.booklet_ids:
+            key = float(booklet.paper_weight)
+
+            if key not in MassPerUnit:
+                MassPerUnit[key] = booklet.calculated_mass
+            else:
+                MassPerUnit[key] += booklet.calculated_mass
+        paperAmount = 0.0
+        hoursAmount = sum(bookObj.calculated_hours for bookObj in job.booklet_ids)/1200
+        # Paper Rolls
+        for roll in job.paper_product_ids:
+            mass, width = _get_MassWidth(roll.product_id)
+            key = (mass, width)
+
+            # Net Production: (in Kg)
+            NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
+            NetQty = (NetMass / RatioWidth.get(key, 1)) * width
+
+            # Waste Production: (in Kg)
+            WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
+            WasteQty = (WasteMass / RatioWidth.get(key, 1)) * width
+
+            paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price
+
+        # Paper Unit Amount : (in Kg)
+        paperUnitAmt = sum(bookObj.calculated_mass for bookObj in job.booklet_ids)/1000
+
+        hoursUnitAmt = sum(bookObj.calculated_hours for bookObj in job.booklet_ids)
+
+        lines.append({'name': 'Pre-calculation Paper' , 'amount': paperAmount, 'unit_amount': paperUnitAmt, 'product_uom_id':uomKG})
+        lines.append({'name': 'Pre-calculation hours' , 'amount': hoursAmount, 'unit_amount':hoursUnitAmt, 'product_uom_id':uomHours})
+
+        Plates_prods = product_obj.search([('print_category', '=', print_category3)], limit=1)
+        Ink_prods = product_obj.search([('print_category', '=', print_category4)], limit=1)
+        if not Plates_prods:
+            self.write({'state': 'exception'})
+            body = _("Unable to create Picking; Product not found for the print-category : '%s'" % (
+            dict(PrintCategory)[print_category3]))
+            self.message_post(body=body)
+            return []
+
+        if not Ink_prods:
+            self.write({'state': 'exception'})
+            body = _("Unable to create Picking; Product not found for the print-category : '%s'" % (
+            dict(PrintCategory)[print_category4]))
+            self.message_post(body=body)
+            return []
+
+        # Plates:
+        plateUnitAmt = sum(bookObj.calculated_plates for bookObj in job.booklet_ids)
+        for p in Plates_prods:
+            platesAmount = sum(bookObj.calculated_plates for bookObj in job.booklet_ids) * p.standard_price
+            lines.append({'name': 'Pre-calculation Plates', 'amount': platesAmount, 'unit_amount':plateUnitAmt, 'product_uom_id':uomUnits})
+
+
+        # Ink Unit Amount : (in Kg)
+        InkUnitAmt = sum(bookObj.calculated_ink for bookObj in job.booklet_ids)/1000
+        # Ink :
+        for p in Ink_prods:
+            InkAmount = sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * p.standard_price
+            lines.append({'name': 'Pre-calculation Ink', 'amount': InkAmount, 'unit_amount':InkUnitAmt, 'product_uom_id':uomKG})
+        return lines
+
     @api.multi
     def action_create_costing(self):
         AnalyticLines = self.env['account.analytic.line']
@@ -964,10 +1084,17 @@ class Job(models.Model):
             Jobs = self.search([('state','=','picking_created')])
 
         for case in Jobs:
-            if case.state <> 'picking_created' or case.analytic_line_id:
+            if case.state <> 'picking_created' or case.analytic_done:
                 continue
+            company_id = case.company_id.id
+            date = case.issue_date
+            aa = self.env['account.analytic.account'].search([('name', '=', case.title)])
+            ref = case.order_id.name
+            for line in case._prepare_analytic_lines():
+                line.update({'company_id':company_id, 'date':date, 'account_id':aa.id, 'ref':ref,'job_id':case.id})
+                AnalyticLines.create(line)
+            case.write({'analytic_done': True, 'state': 'cost_created'})
 
-            print "xxxx"
 
 
 class Booklet(models.Model):
