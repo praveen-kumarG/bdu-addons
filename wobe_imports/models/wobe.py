@@ -1029,11 +1029,13 @@ class Job(models.Model):
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
+            NetQty = (NetMass / RatioWidth.get(key, 1)) * width
 
             # Waste Production: (in Kg)
             WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
+            WasteQty = (WasteMass / RatioWidth.get(key, 1)) * width
 
-            paperAmount += (NetMass + WasteMass) * roll.product_id.standard_price
+            paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price
 
         # Paper Unit Amount : (in Kg)
         paperUnitAmt = sum(bookObj.calculated_mass for bookObj in job.booklet_ids)/1000
