@@ -647,6 +647,17 @@ class Job(models.Model):
         }
 
     @api.multi
+    def action_view_analytic_lines(self):
+        action = self.env.ref('analytic.account_analytic_line_action_entries').read()[0]
+        aa_lines = self.mapped('analytic_line_ids')
+        if len(aa_lines) > 1:
+            action['domain'] = [('id', 'in', aa_lines.ids)]
+        elif aa_lines:
+            action['views'] = [(self.env.ref('analytic.view_account_analytic_line_form').id, 'form')]
+            action['res_id'] = aa_lines.id
+        return action
+
+    @api.multi
     def action_view_file_registry(self):
         self.ensure_one()
         action = self.env.ref('wobe_imports.action_file_registry').read()[0]
@@ -682,16 +693,17 @@ class Job(models.Model):
             'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids]),
             })
         self.fetch_paperProducts()
+        ctx = self.env.context.copy()
+        ctx.update({'editionFocus':True})
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'wobe.job',
             'res_id': self.id,
-            'context': self.env.context,
             'target': 'main',
             'flags': {'initial_mode': 'edit'},
-            'context':{'editionFocus':True},
+            'context':ctx,
         }
 
     @api.onchange('state', 'job_type')
@@ -977,10 +989,6 @@ class Job(models.Model):
         uomKG = uom_obj.search([('name','in',('KG','kg'))]).id
         uomUnits = uom_obj.search([('name','in',('Unit(s)','Units'))]).id
         uomHours = uom_obj.search([('name','in',('Hour(s)','Hours'))]).id
-        # company_id = job.company_id.id
-        # date = job.issue_date
-        # aa = self.env['account.analytic.account'].search([('name', '=', job.title)])
-        # ref = job.order_id.id
 
         pMass = self.env.ref('wobe_imports.variant_attribute_3', False)
         pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
@@ -1025,7 +1033,7 @@ class Job(models.Model):
         # Paper Rolls
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-            key = (mass, width)
+            # key = (mass, width)
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
@@ -1040,11 +1048,11 @@ class Job(models.Model):
 
         hoursUnitAmt = sum(bookObj.calculated_hours for bookObj in job.booklet_ids)
 
-        lines.append({'name': 'Pre-calculation Paper' , 'amount': paperAmount, 'unit_amount': paperUnitAmt, 'product_uom_id':uomKG})
-        lines.append({'name': 'Pre-calculation hours' , 'amount': hoursAmount, 'unit_amount':hoursUnitAmt, 'product_uom_id':uomHours})
+        lines.append({'name': 'Pre-calculation : Paper' , 'amount': paperAmount, 'unit_amount': paperUnitAmt, 'product_uom_id':uomKG})
+        lines.append({'name': 'Pre-calculation : Hours' , 'amount': hoursAmount, 'unit_amount':hoursUnitAmt, 'product_uom_id':uomHours})
 
-        Plates_prods = product_obj.search([('print_category', '=', print_category3)], limit=1)
-        Ink_prods = product_obj.search([('print_category', '=', print_category4)], limit=1)
+        Plates_prods = product_obj.search([('print_category', '=', print_category3)], limit=1, order='id')
+        Ink_prods = product_obj.search([('print_category', '=', print_category4)], limit=1, order='id')
         if not Plates_prods:
             self.write({'state': 'exception'})
             body = _("Unable to create Picking; Product not found for the print-category : '%s'" % (
@@ -1063,7 +1071,7 @@ class Job(models.Model):
         plateUnitAmt = sum(bookObj.calculated_plates for bookObj in job.booklet_ids)
         for p in Plates_prods:
             platesAmount = sum(bookObj.calculated_plates for bookObj in job.booklet_ids) * p.standard_price
-            lines.append({'name': 'Pre-calculation Plates', 'amount': platesAmount, 'unit_amount':plateUnitAmt, 'product_uom_id':uomUnits})
+            lines.append({'name': 'Pre-calculation : Plates', 'amount': platesAmount, 'unit_amount':plateUnitAmt, 'product_uom_id':uomUnits})
 
 
         # Ink Unit Amount : (in Kg)
@@ -1071,7 +1079,7 @@ class Job(models.Model):
         # Ink :
         for p in Ink_prods:
             InkAmount = sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * p.standard_price
-            lines.append({'name': 'Pre-calculation Ink', 'amount': InkAmount, 'unit_amount':InkUnitAmt, 'product_uom_id':uomKG})
+            lines.append({'name': 'Pre-calculation : Ink', 'amount': InkAmount, 'unit_amount':InkUnitAmt, 'product_uom_id':uomKG})
         return lines
 
     @api.multi
