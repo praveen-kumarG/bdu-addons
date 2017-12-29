@@ -1000,10 +1000,6 @@ class Job(models.Model):
                 if av.attribute_id.id == pWidth.id: w = float(av.name)
             return m, w
 
-        def _get_conversion(job_obj, price_unit):
-            currency_id = job_obj.company_id.currency_id
-            return currency_id.compute(price_unit, job_obj.company_id.currency_id)
-
         # Ratio-Width per PaperType
         RatioWidth, ratioSum = {}, {}
         for roll in job.paper_product_ids:
@@ -1049,16 +1045,17 @@ class Job(models.Model):
             paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price
 
         #get paper amount conversion
-        paperAmount = _get_conversion(job, paperAmount)
+        paperAmount = paperAmount
+
         # Paper Unit Amount : (in Kg)
-        paperUnitAmt = _get_conversion(job, (sum(bookObj.calculated_mass for bookObj in job.booklet_ids) / 1000))
+        paperUnitAmt = sum(bookObj.calculated_mass for bookObj in job.booklet_ids) / 1000
 
-        hoursAmount = _get_conversion(job, (sum(bookObj.calculated_hours for bookObj in job.booklet_ids) * 1200))
+        hoursAmount = sum(bookObj.calculated_hours for bookObj in job.booklet_ids) * 1200
 
-        hoursUnitAmt = _get_conversion(job,(sum(bookObj.calculated_hours for bookObj in job.booklet_ids)))
+        hoursUnitAmt = sum(bookObj.calculated_hours for bookObj in job.booklet_ids)
 
         lines.append({'name': 'Pre-calculation : Paper' , 'amount': paperAmount, 'unit_amount': paperUnitAmt, 'product_uom_id':uomKG})
-        lines.append({'name': 'Pre-calculation : Hours' , 'amount': hoursAmount, 'unit_amount':hoursUnitAmt, 'product_uom_id':uomHours})
+        lines.append({'name': 'Pre-calculation : Hours' , 'amount': hoursAmount, 'unit_amount': hoursUnitAmt, 'product_uom_id':uomHours})
 
         Plates_prods = product_obj.search([('print_category', '=', print_category3)], limit=1, order='id')
         if not Plates_prods:
@@ -1077,16 +1074,16 @@ class Job(models.Model):
             return []
 
         # Plates:
-        plateUnitAmt = _get_conversion(job, (sum(bookObj.calculated_plates for bookObj in job.booklet_ids)))
+        plateUnitAmt = sum(bookObj.calculated_plates for bookObj in job.booklet_ids)
         for p in Plates_prods:
-            platesAmount = _get_conversion(job, (sum(bookObj.calculated_plates for bookObj in job.booklet_ids) * p.standard_price))
+            platesAmount = sum(bookObj.calculated_plates for bookObj in job.booklet_ids) * p.standard_price
             lines.append({'name': 'Pre-calculation : Plates', 'amount': platesAmount, 'unit_amount':plateUnitAmt, 'product_uom_id':uomUnits})
 
         # Ink Unit Amount : (in Kg)
-        InkUnitAmt = _get_conversion(job, (sum(bookObj.calculated_ink for bookObj in job.booklet_ids)/1000))
+        InkUnitAmt = sum(bookObj.calculated_ink for bookObj in job.booklet_ids)/1000
         # Ink :
         for p in Ink_prods:
-            InkAmount = _get_conversion(job, (sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * p.standard_price))
+            InkAmount = sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * p.standard_price
             lines.append({'name': 'Pre-calculation : Ink', 'amount': InkAmount, 'unit_amount':InkUnitAmt, 'product_uom_id':uomKG})
         return lines
 
@@ -1100,12 +1097,21 @@ class Job(models.Model):
         for case in Jobs:
             if case.state <> 'picking_created' or case.analytic_count > 0:
                 continue
-            company_id = case.company_id.id
+            company = case.company_id
             date = case.issue_date
             aa = self.env['account.analytic.account'].search([('name', '=', case.title)])
             ref = case.order_id.name
+
             for line in case._prepare_analytic_lines():
-                line.update({'company_id':company_id, 'date':date, 'account_id':aa.id, 'ref':ref,'job_id':case.id})
+
+                amount_currency = company.currency_id.compute(line['amount'], case.company_id.currency_id)
+                line.update({'company_id': company.id,
+                             'date': date,
+                             'account_id': aa.id,
+                             'ref': ref,
+                             'job_id': case.id,
+                             'amount': amount_currency
+                             })
                 AnalyticLines.create(line)
             case.write({'state': 'cost_created'})
 
