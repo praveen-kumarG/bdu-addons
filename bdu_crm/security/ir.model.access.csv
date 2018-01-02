@@ -7,3 +7,7 @@
 "access_project_issue_type_portal","project_issue_type group_portal","model_project_issue_type","base.group_portal",1,0,0,0
 "access_project_issue_type_group_partner_manager","project_issue_type group_partner_manager","model_project_issue_type","base.group_partner_manager",1,1,1,1
 "access_project_issue_type_group_user","project_issue_type group_user","model_project_issue_type","base.group_user",1,0,0,0
+"access_task_type_public","task_type group_public","model_task_type","base.group_public",1,0,0,0
+"access_task_type_portal","task_type group_portal","model_task_type","base.group_portal",1,0,0,0
+"access_task_type_group_partner_manager","task_type group_partner_manager","model_task_type","base.group_partner_manager",1,1,1,1
+"access_task_type_group_user","task_type group_user","model_task_type","base.group_user",1,0,0,0

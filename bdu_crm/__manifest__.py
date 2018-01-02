@@ -43,6 +43,7 @@ This module adds enhancement to project issue module
     'data' : [
          "security/ir.model.access.csv",
          "views/project_issue_view.xml",
+         "views/project_view.xml",
     ],
     'demo' : [],
     'installable': True
