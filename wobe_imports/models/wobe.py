@@ -93,7 +93,7 @@ class Job(models.Model):
     company_id = fields.Many2one('res.company', 'Company')
     file_count = fields.Integer('Files', compute='_compute_file_count')
     edition_count = fields.Integer('Edition Count')
-
+    roll_count = fields.Integer('Roll Count')
     job_type = fields.Selection([('kba', 'KBA'), ('regioman', 'Regioman')],string='Type', default='kba',
                                 track_visibility='onchange')
     stock_ok = fields.Boolean('Ok to create Stock?', default=False)
@@ -913,6 +913,7 @@ class Job(models.Model):
         domain = ['|',('print_category','=', 'paper_regioman'),('applicable_to_regioman','=', True)]
 
         MassWidth = {}
+        total_counter = 0
         for idx in range(1, 8):
             M = self['paper_mass_' + str(idx)]
             W = self['paper_width_' + str(idx)]
@@ -923,7 +924,8 @@ class Job(models.Model):
             if not key in MassWidth:
                 MassWidth[key] = {'counter': 0}
             MassWidth[key]['counter'] += 1
-
+            total_counter += 1
+        self.roll_count = total_counter
         pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
         pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
         msg, stockOk = '', True
