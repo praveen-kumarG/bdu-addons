@@ -17,15 +17,16 @@
                         </h1>
                         <group>
                             <group>
+                                <field name="pubble_response"/>
                                 <field name="transmission_id"/>
                                 <field name="salesorder_extorderid"/>
                                 <field name="salesorder_reference"/>
                                 <field name="salesorder_createdby"/>
                                 <field name="salesorder_debtor_extdebtorid"/>
-                                <field name="salesorder_debtor_addedby"/>
-                                <field name="salesorder_debtor_addeddate"/>
                             </group>
                             <group>
+                                <field name="salesorder_debtor_addedby"/>
+                                <field name="salesorder_debtor_addeddate"/>
                                 <field name="salesorder_debtor_city"/>
                                 <field name="salesorder_debtor_emailadres"/>
                                 <field name="salesorder_debtor_lastmodified"/>

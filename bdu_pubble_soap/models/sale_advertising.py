@@ -108,11 +108,11 @@ class SaleOrder(models.Model):
 
     @api.multi
     def transfer_order_to_pubble(self):
-        # import pdb; pdb.set_trace()
         self.ensure_one()
         if not self.order_pubble_allow:
             vals = {
                 'sale_order_id': self.id,
+                'salesorder_extorderid': self.name,
                 'salesorder_reference': 'This Order will not be sent to Pubble',
             }
             res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
@@ -195,7 +195,7 @@ class SaleOrderLine(models.Model):
 
 class SofromOdootoPubble(models.Model):
     _name = 'sofrom.odooto.pubble'
-
+    _order = 'create_date desc'
 
     @api.multi
     def get_next_ref(self):
