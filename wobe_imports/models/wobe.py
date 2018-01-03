@@ -787,10 +787,10 @@ class Job(models.Model):
             return m, w
 
         # Ratio-Width per PaperType
-        RatioWidth, ratioSum = {}, {}
+        ratioSum = {}
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-            number = roll.number_rolls
+            number = int(roll.number_rolls)
 
             if mass not in ratioSum:
                 ratioSum[mass] = {'number_mass': number}
@@ -798,12 +798,6 @@ class Job(models.Model):
             else:
                 ratioSum[mass]['number_mass'] += number
 
-#            key = (mass, width)
-#            RatioWidth[key] = 0 # Value Summed up below
-
-        # Ratio-Width per PaperType [Consolidated]
-#        for key in RatioWidth.keys():
-#            RatioWidth[key] = ratioSum.get(key[0], 0)
 
         # Total Mass per PaperMass
         MassPerUnit = {}
@@ -829,7 +823,7 @@ class Job(models.Model):
 
             # Waste Production: (in Kg)
             WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
-            Qty = (WasteMass / RatioWidth.get(key, 1)) * width
+            Qty = (WasteMass * num_width / num_mass)
             lines.append({'productObj': roll.product_id, 'name': 'Waste Paper: ' + str(roll.product_id.name),
                           'product_uom_qty': Qty})
 
@@ -1009,21 +1003,17 @@ class Job(models.Model):
             return m, w
 
         # Ratio-Width per PaperType
-        RatioWidth, ratioSum = {}, {}
+        ratioSum = {}
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
+            number = int(roll.number_rolls)
 
             if mass not in ratioSum:
-                ratioSum[mass] = width
+                ratioSum[mass] = {'number_mass': number}
+                ratioSum[mass][width] = {'number_width': number}
             else:
-                ratioSum[mass] += width
+                ratioSum[mass]['number_mass'] += number
 
-            key = (mass, width)
-            RatioWidth[key] = 0  # Value Summed up below
-
-        # Ratio-Width per PaperType [Consolidated]
-        for key in RatioWidth.keys():
-            RatioWidth[key] = ratioSum.get(key[0], 0)
 
         # Total Mass per PaperMass
         MassPerUnit = {}
@@ -1038,17 +1028,20 @@ class Job(models.Model):
         paperAmount = 0.0
 
         # Paper Rolls
+
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-            key = (mass, width)
+            num_mass = ratioSum[mass]['number_mass']
+            num_width = ratioSum[mass][width]['number_width']
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
-            NetQty = (NetMass / RatioWidth.get(key, 1)) * width
+            NetQty = (NetMass * num_width / num_mass)
+
 
             # Waste Production: (in Kg)
             WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
-            WasteQty = (WasteMass / RatioWidth.get(key, 1)) * width
+            WasteQty = (WasteMass * num_width / num_mass)
 
             paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price
 
