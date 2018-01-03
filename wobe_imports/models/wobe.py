@@ -482,7 +482,7 @@ class Job(models.Model):
                })
 
         def _get_linevals(productID, qty=1, forceQty=0):
-            Qty = qty * ((self.net_quantity / 1000) or 1)
+            Qty = qty * ((self.planned_quantity / 1000) or 1)
 
             return {
                 'product_id': productID,
@@ -793,16 +793,17 @@ class Job(models.Model):
             number = roll.number_rolls
 
             if mass not in ratioSum:
-                ratioSum[mass] = width
+                ratioSum[mass] = {'number_mass': number}
+                ratioSum[mass][width] = {'number_width': number}
             else:
-                ratioSum[mass] += width
+                ratioSum[mass]['number_mass'] += number
 
-            key = (mass, width)
-            RatioWidth[key] = 0 # Value Summed up below
+#            key = (mass, width)
+#            RatioWidth[key] = 0 # Value Summed up below
 
         # Ratio-Width per PaperType [Consolidated]
-        for key in RatioWidth.keys():
-            RatioWidth[key] = ratioSum.get(key[0], 0)
+#        for key in RatioWidth.keys():
+#            RatioWidth[key] = ratioSum.get(key[0], 0)
 
         # Total Mass per PaperMass
         MassPerUnit = {}
@@ -817,11 +818,12 @@ class Job(models.Model):
         # Paper Rolls
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-            key = (mass, width)
-
+#            key = (mass, width)
+            num_mass = ratioSum[mass]['number_mass']
+            num_width = ratioSum[mass][width]['number_width']
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
-            Qty = (NetMass / RatioWidth.get(key, 1)) * width
+            Qty = (NetMass * num_width / num_mass)
             lines.append({'productObj': roll.product_id, 'name': 'Net Paper: ' + str(roll.product_id.name),
                           'product_uom_qty': Qty})
 
@@ -925,8 +927,7 @@ class Job(models.Model):
             if not key in MassWidth:
                 MassWidth[key] = {'counter': 0}
             MassWidth[key]['counter'] += 1
-            total_counter += 1
-        self.roll_count = total_counter
+
         pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
         pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
         msg, stockOk = '', True
@@ -960,7 +961,10 @@ class Job(models.Model):
                     msg += '(%s, %s); '%(m1, W)
                     continue
 
-                lines.append({'product_id': product.id})
+                if str(cnt) not in ['1','2','3','4']:
+                    self.message_post(body=_(
+                        "Number of rolls used not possible : must be one of '1','2','3','4'"))
+                lines.append({'product_id': product.id, 'number_rolls': str(cnt)})
 
         if msg:
             self.message_post(body=_("Product not found for the print-category : 'Paper KBA' for these variants - %s"%msg))
