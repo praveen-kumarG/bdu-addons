@@ -96,6 +96,7 @@
                                         attrs="{'readonly': [('job_type','=','kba')]}">
                                     <tree string="Paper Products" editable="bottom">
                                         <field name="product_id" domain="[('print_category','=','paper_regioman')]"/>
+                                        <field name="number_rolls" />
                                         <field name="name" />
                                     </tree>
                                 </field>

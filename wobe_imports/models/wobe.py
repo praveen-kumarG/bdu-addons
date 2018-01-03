@@ -959,7 +959,7 @@ class Job(models.Model):
                     msg += '(%s, %s); '%(m1, W)
                     continue
 
-                lines.append({'product_id': product.id, 'number_rolls': str(int(cnt))})
+                lines.append({'product_id': product.id})
 
         if msg:
             self.message_post(body=_("Product not found for the print-category : 'Paper KBA' for these variants - %s"%msg))
