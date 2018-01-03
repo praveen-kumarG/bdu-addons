@@ -482,7 +482,7 @@ class Job(models.Model):
                })
 
         def _get_linevals(productID, qty=1, forceQty=0):
-            Qty = qty * ((self.planned_quantity / 1000) or 1)
+            Qty = float(qty) * (float((self.planned_quantity) / 1000.0) or 1.000)
 
             return {
                 'product_id': productID,
