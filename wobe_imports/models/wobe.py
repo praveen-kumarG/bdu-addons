@@ -955,10 +955,10 @@ class Job(models.Model):
                     msg += '(%s, %s); '%(m1, W)
                     continue
 
-                if str(cnt) not in ['1','2','3','4']:
+                if str(cnt['counter']) not in ['1','2','3','4']:
                     self.message_post(body=_(
                         "Number of rolls used not possible : must be one of '1','2','3','4'"))
-                lines.append({'product_id': product.id, 'number_rolls': str(cnt)})
+                lines.append({'product_id': product.id, 'number_rolls': str(cnt['counter'])})
 
         if msg:
             self.message_post(body=_("Product not found for the print-category : 'Paper KBA' for these variants - %s"%msg))
