@@ -811,8 +811,8 @@ class Job(models.Model):
         # Paper Rolls
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-            num_mass = ratioSum.get[mass]['number_mass']
-            num_width = ratioSum.get[mass][width]['number_width']
+            num_mass = ratioSum[mass]['number_mass']
+            num_width = ratioSum[mass][width]['number_width']
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
