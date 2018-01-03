@@ -790,6 +790,7 @@ class Job(models.Model):
         RatioWidth, ratioSum = {}, {}
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
+            number = roll.number_rolls
 
             if mass not in ratioSum:
                 ratioSum[mass] = width
