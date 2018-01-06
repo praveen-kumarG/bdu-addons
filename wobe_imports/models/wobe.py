@@ -450,6 +450,9 @@ class Job(models.Model):
 
         return True
 
+    @api.multi
+    def compute_prices(self):
+        self.ensure_one()
 
     @api.multi
     def _prepare_order_data(self):
@@ -479,15 +482,17 @@ class Job(models.Model):
             'company_id': self.company_id.id,
             'origin': self.bduorder_ref,
             'job_id': self.id,
+            'pricelist_id' : res.setdefault('pricelist_id',
+                                                   partner.property_product_pricelist and partner.property_product_pricelist.id)
                })
 
         def _get_linevals(productID, qty=1, forceQty=0):
             Qty = float(qty) * (float((self.planned_quantity) / 1000.0) or 1.000)
-
-            return {
+            vals = {
                 'product_id': productID,
                 'product_uom_qty': forceQty if forceQty else Qty,
             }
+            return vals
 
         lines = []
         strook = glueing = stitching = plateChange = pressStop = False
@@ -543,10 +548,14 @@ class Job(models.Model):
                 product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
                                               ('attribute_value_ids', 'in', v2.ids),
                                               ('print_format_template','=', True),
-                                              ('formats','=', pFormat),], order='id desc', limit=1)
+                                              ('formats','=', pFormat),], order='id desc', limit=2)
                 # Booklet-Product
                 if product:
-                    lines.append(_get_linevals(product.ids[0]))
+                    for p in product:
+                        if p.fixed_cost:
+                            lines.append(_get_linevals(p.id, forceQty=1 ))
+                        else:
+                            lines.append(_get_linevals(p.id))
                 else:
                     body = _("Product not found for this variants 'Pages: %s', 'Format: %s', 'Paper Weight: %s'!!"
                               %(str(pages), pFormat, booklet.paper_weight))

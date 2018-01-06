@@ -13,6 +13,7 @@
                 <field name="print_format_template" attrs="{'readonly': [('product_variant_count', '&gt;', 1)]}"/>
                 <field name="formats" attrs="{'invisible': [('print_format_template', '!=', True)],
                                                'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+                <field name="fixed_cost"/>
 
             </xpath>
         </field>
@@ -31,6 +32,7 @@
                 <field name="print_format_template" />
                 <field name="formats" attrs="{'invisible': [('print_format_template', '!=', True)],
                                                'required': [('print_format_template', '=', True)]}"/>
+                <field name="fixed_cost"/>
             </xpath>
         </field>
     </record>

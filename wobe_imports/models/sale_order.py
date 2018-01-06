@@ -15,6 +15,10 @@ class SaleOrder(models.Model):
             if not self.job_id:
                 order_ids.append(order.id)
                 continue
+            for orderline in order.order_line:
+                if self.pricelist_id and self.partner_id:
+                    orderline.price_unit = self.env['account.tax']._fix_tax_included_price_company(
+                        orderline._get_display_price(orderline.product_id), orderline.product_id.taxes_id, orderline.tax_id, self.company_id)
             order.state = 'sale'
             order.confirmation_date = fields.Datetime.now()
             if self.env.context.get('send_email'):
@@ -24,4 +28,3 @@ class SaleOrder(models.Model):
             self.env.cr.commit()
         self._ids = order_ids
         return super(SaleOrder, self).action_confirm()
-
