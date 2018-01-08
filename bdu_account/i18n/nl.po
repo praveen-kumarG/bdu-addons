@@ -6,20 +6,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:11+0000\n"
-"PO-Revision-Date: 2017-11-15 23:49+0100\n"
+"POT-Creation-Date: 2018-01-08 11:07+0000\n"
+"PO-Revision-Date: 2018-01-08 12:55+0100\n"
 "Last-Translator: Willem Hulshof <w.hulshof@magnus.nl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
 "Language: nl\n"
-"X-Generator: Poedit 2.0.4\n"
+"X-Generator: Poedit 2.0.5\n"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "&amp;bull;"
 msgstr "&amp;bull;"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid ""
+"<br/>\n"
+"                            <strong>Your Ref</strong>"
+msgstr ""
+"<br/>\n"
+"                            <strong>uw referentie</strong>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
@@ -34,7 +45,16 @@ msgstr "<span><strong>Klantadres:</strong></span>"
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
 msgid "<span><strong>Date</strong></span>"
-msgstr "<span><strong>Date</strong></span>"
+msgstr "<span><strong>Datum</strong></span>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid ""
+"<span><strong>Date</strong></span><br/>\n"
+"                                    <span><strong>Order (Origin)</strong></span>"
+msgstr ""
+"<span><strong>Datum</strong></span><br/>\n"
+"                                    <span><strong>Datum (Bron)</strong></span>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
@@ -50,11 +70,6 @@ msgstr ""
 "                         <span><strong>Factuurnummer</strong></span>\n"
 "                         <br/>\n"
 "                         <span><strong>Klantnummer</strong></span>"
-
-#. module: bdu_account
-#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
-msgid "<span><strong>Order (Origin)</strong></span><br/>"
-msgstr "<span><strong>bestellen (oorsprong)</strong></span><br/>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
@@ -74,17 +89,17 @@ msgstr ""
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
-msgid "<span><strong>Order Date</strong></span><br/>\n"
-"                        <span><strong>Order Number</strong></span><br/>\n"
-"                        <span><strong>Your Ref</strong></span>"
-msgstr "<span><strong>Offerte datum</strong></span><br/>\n"
-"                        <span><strong>Offertenummer</strong></span><br/>\n"
-"                        <span><strong>Jouw Ref</strong></span>"
+msgid ""
+"<span><strong>Order Date</strong></span><br/>\n"
+"                        <span><strong>Order Number</strong></span>"
+msgstr ""
+"<span><strong>Order Date</strong></span><br/>\n"
+"                        <span><strong>Ordernummer</strong></span>"
 
 #. module: bdu_account
-#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
-msgid "Tax"
-msgstr "BTW"
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid "<span>REQUEST FOR QUOTATION</span>"
+msgstr "<span>Offerte aanvraag</span>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
@@ -95,7 +110,7 @@ msgstr "<strong>Adverteerder</strong>"
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
 msgid "<strong>Date Req.</strong>"
-msgstr "<strong>Datum Nodig</strong>"
+msgstr "<strong>Datum Req.</strong>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
@@ -173,14 +188,14 @@ msgid "<strong>Unit Price</strong>"
 msgstr "<strong>Prijs</strong>"
 
 #. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.view_partners_form_bdu_account
+msgid "Additional Information"
+msgstr "Aanvullende informatie"
+
+#. module: bdu_account
 #: model:ir.model.fields,field_description:bdu_account.field_account_invoice_published_customer
 msgid "Advertiser"
 msgstr "Adverteerder"
-
-#. module: bdu_account
-#: model:ir.actions.report.xml,name:bdu_account.report_sale_order1
-msgid "Advertising Quotation / Order"
-msgstr "Advertentie offerte"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
@@ -228,11 +243,22 @@ msgid "Companies"
 msgstr "Bedrijven"
 
 #. module: bdu_account
-#: model:ir.model.fields,field_description:bdu_account.field_account_invoice_line_sol_computed_discount
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "Computed Discount"
 msgstr "Berekende korting"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_create_uid
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_create_uid
+msgid "Created by"
+msgstr "Aangemaakt door"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_create_date
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_create_date
+msgid "Created on"
+msgstr "Aangemaakt op"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
@@ -241,14 +267,24 @@ msgid "Date"
 msgstr "Datum"
 
 #. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_date_established
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_date_established
+msgid "Date Established"
+msgstr "Oprichtingsdatum"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 msgid "Description"
 msgstr "Omschrijving"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
-#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "Description/ short content"
+msgstr "Omschrijving/ samenvatting"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Description/ short content :"
 msgstr "Omschrijving/ samenvatting"
 
 #. module: bdu_account
@@ -258,11 +294,16 @@ msgid "Disc(%)"
 msgstr "Krt(%)"
 
 #. module: bdu_account
-#: model:ir.model.fields,field_description:bdu_account.field_account_invoice_line_sol_discount
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "Discount"
 msgstr "Korting"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_display_name
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_display_name
+msgid "Display Name"
+msgstr "Weergave naam"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
@@ -276,9 +317,39 @@ msgid "Edition"
 msgstr "Editie"
 
 #. module: bdu_account
+#: code:addons/bdu_account/models/res_partner.py:58
+#, python-format
+msgid "Either field values or an id must be provided."
+msgstr "Ofwel een veldwaarde ofwel een id is benodigd"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_exact_id
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_exact_id
+msgid "Exact ID"
+msgstr "Exact ID"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_facebook
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_facebook
+msgid "Facebook"
+msgstr "Facebook"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_id
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_id
+msgid "ID"
+msgstr "ID"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 msgid "INVOICE"
 msgstr "Factuur"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_instagram
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_instagram
+msgid "Instagram"
+msgstr "Instagram"
 
 #. module: bdu_account
 #: model:ir.model,name:bdu_account.model_account_invoice
@@ -291,9 +362,51 @@ msgid "Invoice Line"
 msgstr "Factuurregel"
 
 #. module: bdu_account
-#: model:ir.model.fields,field_description:bdu_account.field_account_invoice_line_sol_issuedt
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 msgid "Issue Date"
 msgstr "Editiedatum"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms___last_update
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status___last_update
+msgid "Last Modified on"
+msgstr "Laatst gewijzigd op"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_write_uid
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_write_uid
+msgid "Last Updated by"
+msgstr "Laatst bijgewerkt door"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_write_date
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_write_date
+msgid "Last Updated on"
+msgstr "Laatst bijgewerkt op"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_linkedIn
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_linkedIn
+msgid "LinkedIn"
+msgstr "LinkedIn"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_name
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_name
+msgid "Name"
+msgstr "Naam"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_carrier_variant_name
+#: model:ir.model.fields,field_description:bdu_account.field_product_product_variant_name
+msgid "Name including Variant Characteristics"
+msgstr "Naam met Variant-kenmerken"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_newsletter_opt_out
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_newsletter_opt_out
+msgid "Newsletter opt-out"
+msgstr "Newsletter opt-out"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
@@ -301,15 +414,9 @@ msgid "ORDER CONFIRMATION"
 msgstr "Orderbevestiging"
 
 #. module: bdu_account
-#: model:ir.model.fields,field_description:bdu_account.field_account_invoice_line_so_number
-#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
-msgid "Order Number"
-msgstr "Ordernummer"
-
-#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 msgid "PRO-FORMA"
-msgstr "Pro-forma"
+msgstr "PRO-FORMA"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
@@ -317,15 +424,34 @@ msgid "PURCHASE ORDER CONFIRMATION"
 msgstr "INKOOP BESTELBEVESTIGING"
 
 #. module: bdu_account
+#: model:ir.model,name:bdu_account.model_res_partner
+#: model:ir.ui.menu,name:bdu_account.partner_custom_settings
+msgid "Partner"
+msgstr "Relatie"
+
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_product_product
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "Product"
 msgstr "Product"
 
 #. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_promille_id
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_promille_id
+msgid "Promille ID"
+msgstr "Promille ID"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_pubble_id
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_pubble_id
+msgid "Pubble ID"
+msgstr "Pubble ID"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "QUOTATION"
-msgstr "Offerte"
+msgstr "OFFERTE"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
@@ -334,9 +460,8 @@ msgstr "Hoeveelheid"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
-#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
 msgid "REQUEST FOR QUOTATION"
-msgstr "OFFERTE AANVRAGENN"
+msgstr "OFFERTE AANVRAAG"
 
 #. module: bdu_account
 #: model:ir.model,name:bdu_account.model_sale_order
@@ -364,20 +489,51 @@ msgid "Sincerely,"
 msgstr "Hoogachtend,"
 
 #. module: bdu_account
+#: model:ir.actions.act_window,name:bdu_account.action_partner_status
+#: model:ir.model,name:bdu_account.model_partner_status
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_status
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_status
+#: model:ir.ui.menu,name:bdu_account.partner_status
+#: model:ir.ui.view,arch_db:bdu_account.view_partner_status_form
+#: model:ir.ui.view,arch_db:bdu_account.view_partner_status_tree
+msgid "Status"
+msgstr "Status"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 msgid "TIN:"
 msgstr "BTW nummer:"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Tax"
+msgstr "BTW"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "Tax Excluded Price"
-msgstr "Bedrag"
+msgstr "Bedrag ex BTW"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
 msgid "Taxes"
-msgstr "Belastingen"
+msgstr "BTW"
+
+#. module: bdu_account
+#: model:ir.actions.act_window,name:bdu_account.action_delivery_terms
+#: model:ir.model,name:bdu_account.model_delivery_terms
+#: model:ir.ui.menu,name:bdu_account.partner_delivery_terms
+#: model:ir.ui.view,arch_db:bdu_account.view_delivery_terms_form
+#: model:ir.ui.view,arch_db:bdu_account.view_delivery_terms_tree
+msgid "Terms Of Delivery"
+msgstr "Leveringsvoorwaarden"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_delievery_terms
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_delievery_terms
+msgid "Terms of delivery"
+msgstr "Leveringsvoorwaarden"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
@@ -385,25 +541,31 @@ msgid "This shipment is a backorder of"
 msgstr "Deze levering is een backorder van"
 
 #. module: bdu_account
-#: model:ir.model.fields,field_description:bdu_account.field_account_invoice_line_sol_title
-msgid "Title"
-msgstr "Titel"
-
-#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
 msgid "Total Without Taxes"
 msgstr "Totaal zonder belastingen"
 
 #. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_twitter
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_twitter
+msgid "Twitter"
+msgstr "Twitter"
+
+#. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "Unit Price"
-msgstr "Prijs"
+msgstr "Prijs per eenheid"
 
 #. module: bdu_account
 #: model:ir.model.fields,field_description:bdu_account.field_res_company_use_bduprint
 msgid "Use BDUprint Layout?"
 msgstr "BDUprint Layout gebruiken?"
+
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_res_users
+msgid "Users"
+msgstr "Gebruikers"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
@@ -432,3 +594,9 @@ msgstr "Volume"
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "We would like to thank you for your request and see your response as soon as possible."
 msgstr "Bedankt voor uw verzoek. Wij zien uw reactie zo spoedig mogelijk tegemoet."
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_zeno_id
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_zeno_id
+msgid "Zeno ID"
+msgstr "Zeno ID"

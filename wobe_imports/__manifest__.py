@@ -41,6 +41,7 @@ This module does importing of XML file of Wobe Portal
     'depends' : ['sale', 'document'],
     'data' : [
             'security/ir.model.access.csv',
+            'security/wobe_security.xml',
             'data/product_data.xml',
             'data/product.attribute.value.csv',
             'data/cron_data.xml',

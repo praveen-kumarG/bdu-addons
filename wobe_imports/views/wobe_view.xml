@@ -2,7 +2,7 @@
 <odoo>
     <data>
 
-        <menuitem id="menu_wobe" parent="sales_team.menu_base_partner" name="Wobe Import/Export"/>
+        <menuitem id="menu_wobe" name="Wobe"/>
 
         <record id="view_wobe_job_form" model="ir.ui.view">
             <field name="name">view_wobe_job_form</field>
@@ -196,7 +196,8 @@
             parent="menu_wobe"
             action="action_wobe_job"
             id="menu_action_wobe_job"
-            sequence="2"/>
+            sequence="2"
+            />
 
     </data>
 </odoo>

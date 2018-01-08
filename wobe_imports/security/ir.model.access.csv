@@ -1,8 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_wobe_job,wobe_job,model_wobe_job,base.group_user,1,1,1,1
-access_wobe_booklet,wobe_booklet,model_wobe_booklet,base.group_user,1,1,1,1
-access_file_transfer,file_transfer,model_file_transfer,base.group_user,1,1,1,1
+access_wobe_job,wobe_job,model_wobe_job,wobe_imports.group_wobe_user,1,1,1,0
+access_wobe_booklet,wobe_booklet,model_wobe_booklet,wobe_imports.group_wobe_user,1,1,1,1
+access_file_transfer,file_transfer,model_file_transfer,wobe_imports.group_wobe_user,1,1,1,0
 access_file_transfer_system,file_transfer_system,model_file_transfer,base.group_system,1,1,1,1
-access_wobe_edition,wobe_edition,model_wobe_edition,base.group_user,1,1,1,1
-access_file_register,file_registry,model_file_registry,base.group_user,1,1,1,1
-access_wobe_paper_product,wobe_paper_product,model_wobe_paper_product,base.group_user,1,1,1,1
+access_wobe_edition,wobe_edition,model_wobe_edition,wobe_imports.group_wobe_user,1,1,1,1
+access_file_register,file_registry,model_file_registry,wobe_imports.group_wobe_manager,1,1,1,0
+access_wobe_paper_product,wobe_paper_product,model_wobe_paper_product,wobe_imports.group_wobe_user,1,1,1,1

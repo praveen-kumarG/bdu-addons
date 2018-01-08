@@ -158,7 +158,7 @@
     </record>
 
     <menuitem id="menu_file_registry" parent="menu_wobe" sequence="3"
-              action="action_file_registry" groups="base.group_system"/>
+              action="action_file_registry" groups="base.group_system,wobe_imports.group_wobe_manager"/>
 
 
 
