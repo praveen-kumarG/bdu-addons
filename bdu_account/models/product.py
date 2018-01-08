@@ -12,8 +12,8 @@ class Product(models.Model):
 
         # all user don't have access to seller and partner
         # check access and use superuser
-        self.check_access_rights("read")
-        self.check_access_rule("read")
+#        self.check_access_rights("read")
+#        self.check_access_rule("read")
 
         result = []
         for product in self.sudo():
