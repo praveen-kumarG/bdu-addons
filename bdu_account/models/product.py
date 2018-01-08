@@ -16,7 +16,7 @@ class Product(models.Model):
 #        self.check_access_rule("read")
 
         result = []
-        for product in self.sudo():
+        for product in self:
             # display only the attributes with multiple possible values on the template
             variable_attributes = product.attribute_line_ids.filtered(lambda l: len(l.value_ids) > 1).mapped(
                 'attribute_id')
