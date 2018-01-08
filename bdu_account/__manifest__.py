@@ -52,10 +52,9 @@ This module adds customization as per BDU Media
          "report/purchase_order_templates.xml",
          "report/report_deliveryslip.xml",
          "report/report.xml",
-
          "views/res_company_view.xml",
          "views/res_partner_view.xml",
-         "views/product_view.xml",
+#         "views/product_view.xml",
     ],
     'demo' : [],
     'installable': True
