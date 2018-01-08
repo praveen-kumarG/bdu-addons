@@ -15,11 +15,11 @@
                        attrs="{'readonly': [('product_variant_count', '&gt;', 1)]}"/>
                 <field name="formats"
                        attrs="{'invisible': [('print_format_template', '!=', True)],
-                                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
                 <field name="booklet_surface_area"
                        attrs="{'invisible': [('print_format_template', '!=', True)],
                                'required': [('print_format_template', '=', True)],
-                               'readonly': [('product_variant_count', '&gt;', 1)]}}"/>
+                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
                 <field name="fixed_cost"
                        attrs="{'invisible': [('print_format_template', '!=', True)],
                                                  'readonly': [('product_variant_count', '&gt;', 1)]}"/>
@@ -46,10 +46,10 @@
                 <field name="booklet_surface_area"
                        attrs="{'invisible': [('print_format_template', '!=', True)],
                                'required': [('print_format_template', '=', True)],
-                               'readonly': [('product_variant_count', '&gt;', 1)]}}"/>
+                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
                 <field name="fixed_cost"
                        attrs="{'invisible': [('print_format_template', '!=', True)],
-                                                 'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
             </xpath>
         </field>
     </record>
