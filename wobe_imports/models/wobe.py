@@ -1191,12 +1191,15 @@ class Booklet(models.Model):
             product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
                                           ('attribute_value_ids', 'in', v2.ids),
                                           ('print_format_template', '=', True),
-                                          ('formats', '=', format), ], order='id desc', limit=1)
+                                          ('formats', '=', format), ], order='id desc', limit=2)
 
             #calculated_mass
             if product:
-                booklet.product_id = product.id
-                mass = (product.product_tmpl_id.booklet_surface_area * pages) * float(paper_weight) / float(2000)
+                for p in product:
+                    if p.product_tmpl_id.fixed_cost:
+                        continue
+                    booklet.product_id = p.id
+                    mass = (p.product_tmpl_id.booklet_surface_area * pages) * float(paper_weight) / float(2000)
             else:
                 mass, booklet.product_id = 0.0, False
 
