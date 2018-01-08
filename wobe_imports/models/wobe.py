@@ -1158,7 +1158,7 @@ class Booklet(models.Model):
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all')
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
 
-    @api.depends('format', 'pages', 'paper_weight', 'product_id')
+    @api.depends('format', 'pages', 'paper_weight')
     def _compute_all(self):
 
         for booklet in self:
@@ -1196,7 +1196,7 @@ class Booklet(models.Model):
             #calculated_mass
             if product:
                 booklet.product_id = product.id
-                mass = (product.product_tmpl_id.booklet_surface_area * pages) / float(2) * paper_weight / float(1000)
+                mass = (product.product_tmpl_id.booklet_surface_area * pages) * float(paper_weight) / float(2000)
             else:
                 mass, booklet.product_id = 0.0, False
 

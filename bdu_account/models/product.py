@@ -23,8 +23,7 @@ class Product(models.Model):
             variant = product.attribute_value_ids._variant_name(variable_attributes)
 
             name = variant and "%s (%s)" % (product.name, variant) or product.name
-            res = (product.id, name)
-            result.append(res)
-        return result
+            product.variant_name = name
+
 
     variant_name = fields.Char(compute='_name_var_get', string='Name including Variant Characteristics')
