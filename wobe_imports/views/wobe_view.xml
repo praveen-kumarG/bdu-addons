@@ -4,6 +4,8 @@
 
         <menuitem id="menu_wobe" name="Wobe"/>
 
+        <menuitem id="menu_wobe_header" name="Wobe Imports" parent="menu_wobe"/>
+
         <record id="view_wobe_job_form" model="ir.ui.view">
             <field name="name">view_wobe_job_form</field>
             <field name="model">wobe.job</field>
@@ -32,13 +34,13 @@
                         <div class="oe_button_box" name="button_box">
                             <field name="order_id" invisible="1"/>
                             <field name="picking_id" invisible="1"/>
-                            <button class="oe_stat_button" name="action_view_sales"
+                            <button class="oe_stat_button" name="action_view_sales" groups="sales_team.group_sale_salesman"
                                 type="object" icon="fa-usd" String="Sale Order" attrs="{'invisible': [('order_id','=',False)]}">
                             </button>
-                            <button class="oe_stat_button" name="action_view_picking"
+                            <button class="oe_stat_button" name="action_view_picking" groups="stock.group_stock_user"
                                 type="object" icon="fa-truck" String="Picking" attrs="{'invisible': [('picking_id','=',False)]}">
                             </button>
-                            <button class="oe_stat_button" name="action_view_analytic_lines"
+                            <button class="oe_stat_button" name="action_view_analytic_lines" groups="sales_team.group_sale_salesman"
                                 type="object" icon="fa-usd" attrs="{'invisible': [('analytic_count','=',0)]}">
                                 <field  String="AnalyticLines" name="analytic_count" widget="statinfo" attrs="{'invisible': [('analytic_count','=',0)]}"/>
                             </button>
@@ -193,7 +195,7 @@
 
 
         <menuitem name="Jobs Imported"
-            parent="menu_wobe"
+            parent="menu_wobe_header"
             action="action_wobe_job"
             id="menu_action_wobe_job"
             sequence="2"
