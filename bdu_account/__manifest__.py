@@ -38,8 +38,9 @@ This module adds customization as per BDU Media
     """,
     'author'  : 'Magnus - Willem Hulshof',
     'website' : 'http://www.magnus.nl',
-    'depends' : ['account',
-		'sale_advertising_order','partner_contact_gender','purchase','partner_sector','base_partner_sequence',
+    'depends' : ['account', 'sale_advertising_order',
+                 'partner_contact_gender','purchase',
+                 'partner_sector','base_partner_sequence',
     ],
     'data' : [
 
@@ -54,7 +55,7 @@ This module adds customization as per BDU Media
 
          "views/res_company_view.xml",
          "views/res_partner_view.xml",
-#         "views/product_view.xml",
+         "views/product_view.xml",
     ],
     'demo' : [],
     'installable': True

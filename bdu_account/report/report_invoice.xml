@@ -173,7 +173,8 @@
                             </td>
                             <td>
                                 <span t-if="l.account_analytic_id" t-field="l.account_analytic_id.code"/>,
-                                <span t-if="l.product_id" t-field="l.product_id"/>
+                                <span t-if="l.product_id and l.product_id.product_tmpl_id.fixed_cost" t-field="l.product_id.name"/>
+                                <span t-if="l.product_id and not l.product_id.product_tmpl_id.fixed_cost" t-field="l.product_id.variant_name"/>
                             </td>
                             <td class="text-right">
                                 <span t-field="l.price_subtotal"

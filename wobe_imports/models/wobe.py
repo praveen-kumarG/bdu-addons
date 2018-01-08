@@ -802,7 +802,9 @@ class Job(models.Model):
             number = int(roll.number_rolls)
 
             if mass not in ratioSum:
-                ratioSum[mass] = {'number_mass': number, width: {'number_width': number}}
+                ratioSum[mass] = {'number_mass': number}
+            if width not in ratioSum:
+                ratioSum[mass][width] = {'number_width': number}
             else:
                 ratioSum[mass]['number_mass'] += number
 
@@ -1017,7 +1019,9 @@ class Job(models.Model):
             number = int(roll.number_rolls)
 
             if mass not in ratioSum:
-                ratioSum[mass] = {'number_mass': number, width: {'number_width': number}}
+                ratioSum[mass] = {'number_mass': number}
+            if width not in ratioSum:
+                ratioSum[mass][width] = {'number_width': number}
             else:
                 ratioSum[mass]['number_mass'] += number
 
