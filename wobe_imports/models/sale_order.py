@@ -10,11 +10,10 @@ class SaleOrder(models.Model):
 
     @api.multi
     def action_confirm(self):
-        super(SaleOrder, self).action_confirm()
         for order in self.filtered('job_id'):
             for orderline in order.order_line:
                 if self.pricelist_id and self.partner_id:
                     orderline.price_unit = self.env['account.tax']._fix_tax_included_price_company(
                                                 orderline._get_display_price(orderline.product_id),
                                                 orderline.product_id.taxes_id, orderline.tax_id, self.company_id)
-        return True
+        return super(SaleOrder, self).action_confirm()

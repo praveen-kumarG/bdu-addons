@@ -50,16 +50,7 @@ class SaleOrder(models.Model):
                     order.pubble_sent = True
                     break
 
-    state = fields.Selection([
-        ('draft', 'Quotation'),
-        ('submitted', 'Submitted for Approval'),
-        ('approved1', 'Approved by Sales Mgr'),
-        ('pubble', 'Sent to Pubble'),
-        ('sent', 'Quotation Sent'),
-        ('sale', 'Sale Order'),
-        ('done', 'Done'),
-        ('cancel', 'Cancelled'),
-    ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
+
     order_pubble_allow = fields.Boolean(compute=_pubble_allow, string='Allow to Pubble', default=False, store=True)
     date_sent_pubble = fields.Date('Date Sent to Pubble', index=True,
                                     help="Date on which sales order is sent to Pubble.")
@@ -83,16 +74,14 @@ class SaleOrder(models.Model):
         for order in self.filtered("advertising"):
             order.action_pubble()
 #            order.with_delay().action_pubble()
-        super(SaleOrder, self).action_confirm()
-        return True
+        return super(SaleOrder, self).action_confirm()
 
     @api.multi
     def write(self, vals):
-        res = super(SaleOrder, self).write(vals)
         if self.pubble_sent and self.advertising:
             if ('partner_id' or 'published_customer' or 'advertising_agency' or 'order_line') in vals:
                 self.action_pubble()
-        return res
+        return super(SaleOrder, self).write(vals)
 
     @api.multi
     def update_pubble(self, vals):
