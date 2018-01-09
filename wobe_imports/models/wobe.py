@@ -435,7 +435,8 @@ class Job(models.Model):
             vals = case._prepare_order_data()
             if vals:
                 order = sale_obj.create(vals)
-                order_id = order.id # action confirm inherited and super returns false for job SO
+                order_id = order.id
+                # action confirm inherited and super returns false for job SO
                 order.action_confirm()
                 order = self.env['sale.order'].browse(order_id)
                 order.message_post_with_view('mail.message_origin_link',
