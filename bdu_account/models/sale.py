@@ -13,6 +13,6 @@ class Sale(models.Model):
 
         if self.advertising == True:
             self.filtered(lambda s: s.state == 'approved2').write({'state': 'sent'})
-            return self.env['report'].get_action(self, 'bdu_account.report_saleorder1')
+            return self.env['report'].get_action(self, 'sale.report_saleorder')
         else:
             return super(Sale, self).print_quotation()
