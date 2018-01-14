@@ -93,7 +93,7 @@ class Job(models.Model):
     company_id = fields.Many2one('res.company', 'Company')
     file_count = fields.Integer('Files', compute='_compute_file_count')
     edition_count = fields.Integer('Edition Count')
-
+    roll_count = fields.Integer('Roll Count')
     job_type = fields.Selection([('kba', 'KBA'), ('regioman', 'Regioman')],string='Type', default='kba',
                                 track_visibility='onchange')
     stock_ok = fields.Boolean('Ok to create Stock?', default=False)
@@ -427,7 +427,7 @@ class Job(models.Model):
             Jobs = self.search([('state','=', 'ready'), ('order_id','=',False)])
 
         for case in Jobs:
-            if case.state <> 'ready' or case.order_id:
+            if case.state != 'ready' or case.order_id:
                 continue
 
             case.button_recompute()
@@ -435,7 +435,8 @@ class Job(models.Model):
             vals = case._prepare_order_data()
             if vals:
                 order = sale_obj.create(vals)
-                order_id = order.id # action confirm inherited and super returns false for job SO
+                order_id = order.id
+                # action confirm inherited and super returns false for job SO
                 order.action_confirm()
                 order = self.env['sale.order'].browse(order_id)
                 order.message_post_with_view('mail.message_origin_link',
@@ -450,6 +451,9 @@ class Job(models.Model):
 
         return True
 
+    @api.multi
+    def compute_prices(self):
+        self.ensure_one()
 
     @api.multi
     def _prepare_order_data(self):
@@ -475,19 +479,21 @@ class Job(models.Model):
             'client_order_ref': self.bduorder_ref,
             'project_id': aa.id,
             'partner_id': partner.id,
-            'date_order': self.issue_date or res['date_order'],
+            'date_order': self.production_stop or res['date_order'],
             'company_id': self.company_id.id,
             'origin': self.bduorder_ref,
             'job_id': self.id,
+            'pricelist_id' : res.setdefault('pricelist_id',
+                                                   partner.property_product_pricelist and partner.property_product_pricelist.id)
                })
 
         def _get_linevals(productID, qty=1, forceQty=0):
-            Qty = qty * ((self.net_quantity / 1000) or 1)
-
-            return {
+            Qty = float(qty) * (float((self.planned_quantity) / 1000.0) or 1.000)
+            vals = {
                 'product_id': productID,
                 'product_uom_qty': forceQty if forceQty else Qty,
             }
+            return vals
 
         lines = []
         strook = glueing = stitching = plateChange = pressStop = False
@@ -543,10 +549,14 @@ class Job(models.Model):
                 product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
                                               ('attribute_value_ids', 'in', v2.ids),
                                               ('print_format_template','=', True),
-                                              ('formats','=', pFormat),], order='id desc', limit=1)
+                                              ('formats','=', pFormat),], order='id desc', limit=2)
                 # Booklet-Product
                 if product:
-                    lines.append(_get_linevals(product.ids[0]))
+                    for p in product:
+                        if p.fixed_cost:
+                            lines.append(_get_linevals(p.id, forceQty=1 ))
+                        else:
+                            lines.append(_get_linevals(p.id))
                 else:
                     body = _("Product not found for this variants 'Pages: %s', 'Format: %s', 'Paper Weight: %s'!!"
                               %(str(pages), pFormat, booklet.paper_weight))
@@ -721,7 +731,7 @@ class Job(models.Model):
         return  {
             'picking_type_id': picking_type.id,
             'partner_id': partner.id,
-            'min_date': self.issue_date+' '+datetime.now().strftime("%H:%M:%S"),
+            'min_date': self.production_stop,
             'origin': self.name,
             'location_dest_id': partner.property_stock_customer.id,
             'location_id': picking_type.default_location_src_id.id,
@@ -744,7 +754,7 @@ class Job(models.Model):
             'product_id': product_obj.id,
             'product_uom': product_obj.uom_id.id,
             'product_uom_qty': line['product_uom_qty'],
-            'date': job.issue_date,
+            'date': job.production_stop,
             'date_expected': picking.min_date,
             'location_id':picking.location_id.id,
             'location_dest_id': picking.location_dest_id.id,
@@ -787,21 +797,18 @@ class Job(models.Model):
             return m, w
 
         # Ratio-Width per PaperType
-        RatioWidth, ratioSum = {}, {}
+        ratioSum = {}
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
+            number = int(roll.number_rolls)
 
             if mass not in ratioSum:
-                ratioSum[mass] = width
+                ratioSum[mass] = {'number_mass': number}
+            if width not in ratioSum:
+                ratioSum[mass][width] = {'number_width': number}
             else:
-                ratioSum[mass] += width
+                ratioSum[mass]['number_mass'] += number
 
-            key = (mass, width)
-            RatioWidth[key] = 0 # Value Summed up below
-
-        # Ratio-Width per PaperType [Consolidated]
-        for key in RatioWidth.keys():
-            RatioWidth[key] = ratioSum.get(key[0], 0)
 
         # Total Mass per PaperMass
         MassPerUnit = {}
@@ -816,17 +823,18 @@ class Job(models.Model):
         # Paper Rolls
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-            key = (mass, width)
+            num_mass = ratioSum[mass]['number_mass']
+            num_width = ratioSum[mass][width]['number_width']
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
-            Qty = (NetMass / RatioWidth.get(key, 1)) * width
+            Qty = (NetMass * num_width / num_mass)
             lines.append({'productObj': roll.product_id, 'name': 'Net Paper: ' + str(roll.product_id.name),
                           'product_uom_qty': Qty})
 
             # Waste Production: (in Kg)
             WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
-            Qty = (WasteMass / RatioWidth.get(key, 1)) * width
+            Qty = (WasteMass * num_width / num_mass)
             lines.append({'productObj': roll.product_id, 'name': 'Waste Paper: ' + str(roll.product_id.name),
                           'product_uom_qty': Qty})
 
@@ -910,18 +918,20 @@ class Job(models.Model):
         prodTemp_obj = self.env['product.template']
         variant_obj = self.env['product.attribute.value']
 
-        domain = [('print_category','=', 'paper_regioman')]
+        domain = ['|',('print_category','=', 'paper_regioman'),('applicable_to_regioman','=', True)]
 
-        MassWidth = []
+        MassWidth = {}
+
         for idx in range(1, 8):
             M = self['paper_mass_' + str(idx)]
             W = self['paper_width_' + str(idx)]
 
             if not M or not W: continue
 
-            key = (M, W)
-            if key not in MassWidth:
-                MassWidth.append(key)
+            key = (M, W,)
+            if not key in MassWidth:
+                MassWidth[key] = {'counter': 0}
+            MassWidth[key]['counter'] += 1
 
         pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
         pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
@@ -934,13 +944,13 @@ class Job(models.Model):
                 lines.append({'product_id': p.id})
 
             if not prods:
-                self.message_post(body=_("Product not found for the print-category : 'Paper Regioman'"))
+                self.message_post(body=_("Product not found for the print-category : 'Paper Regioman' or \"applicable to regioman\""))
                 stockOk = False
 
         RollX = []
         # Products: Paper KBA
         if self.job_type == 'kba':
-            for x in MassWidth:
+            for x, cnt in MassWidth.items():
                 M, W = x[0], x[1]
 
                 m1 = M / 100.0
@@ -956,7 +966,10 @@ class Job(models.Model):
                     msg += '(%s, %s); '%(m1, W)
                     continue
 
-                lines.append({'product_id': product.id})
+                if str(cnt['counter']) not in ['1','2','3','4']:
+                    self.message_post(body=_(
+                        "Number of rolls used not possible : must be one of '1','2','3','4'"))
+                lines.append({'product_id': product.id, 'number_rolls': str(cnt['counter'])})
 
         if msg:
             self.message_post(body=_("Product not found for the print-category : 'Paper KBA' for these variants - %s"%msg))
@@ -1001,21 +1014,18 @@ class Job(models.Model):
             return m, w
 
         # Ratio-Width per PaperType
-        RatioWidth, ratioSum = {}, {}
+        ratioSum = {}
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
+            number = int(roll.number_rolls)
 
             if mass not in ratioSum:
-                ratioSum[mass] = width
+                ratioSum[mass] = {'number_mass': number}
+            if width not in ratioSum:
+                ratioSum[mass][width] = {'number_width': number}
             else:
-                ratioSum[mass] += width
+                ratioSum[mass]['number_mass'] += number
 
-            key = (mass, width)
-            RatioWidth[key] = 0  # Value Summed up below
-
-        # Ratio-Width per PaperType [Consolidated]
-        for key in RatioWidth.keys():
-            RatioWidth[key] = ratioSum.get(key[0], 0)
 
         # Total Mass per PaperMass
         MassPerUnit = {}
@@ -1030,17 +1040,20 @@ class Job(models.Model):
         paperAmount = 0.0
 
         # Paper Rolls
+
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-            key = (mass, width)
+            num_mass = ratioSum[mass]['number_mass']
+            num_width = ratioSum[mass][width]['number_width']
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
-            NetQty = (NetMass / RatioWidth.get(key, 1)) * width
+            NetQty = (NetMass * num_width / num_mass)
+
 
             # Waste Production: (in Kg)
             WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
-            WasteQty = (WasteMass / RatioWidth.get(key, 1)) * width
+            WasteQty = (WasteMass * num_width / num_mass)
 
             paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price
 
@@ -1129,7 +1142,11 @@ class Booklet(models.Model):
 
     job_id = fields.Many2one('wobe.job', required=True, ondelete='cascade', index=True, copy=False)
     booklet_ref = fields.Char('Booklet Ref', help='XML reference', required=True, index=True)
-
+    job_type = fields.Selection(related='job_id.job_type', type='selection', string='Type', track_visibility='onchange',
+                                selection=[
+                                ('kba', 'KBA'),
+                                ('regioman', 'Regioman'),
+                                ], default='kba')
     pages = fields.Char('Pages')
     format = fields.Char('Format')
     paper_weight = fields.Char('Paper Weight')
@@ -1142,7 +1159,7 @@ class Booklet(models.Model):
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all')
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
 
-    @api.depends('format', 'pages', 'paper_weight', 'product_id')
+    @api.depends('format', 'pages', 'paper_weight')
     def _compute_all(self):
 
         for booklet in self:
@@ -1152,15 +1169,15 @@ class Booklet(models.Model):
             paper_weight = float(booklet.paper_weight)
             format = 'MP' if booklet.format == 'MAG' else booklet.format
 
-            if pages <= 48.0:
+            if format == 'BS':
                 plates = pages * 4
-            elif pages > 48.0:
-                if format == 'BS':
-                    plates = pages * 4
-                elif format == 'TB':
-                    plates = pages * 2
-                elif format == 'MP':
-                    plates = pages
+            elif format == 'TB':
+                plates = pages * 2
+            elif format == 'MP':
+                plates = (int(pages / 4) + 1) * 4
+            if booklet.job_type != 'regioman' and pages <= 48.0:
+                plates = plates * 2
+
             booklet.calculated_plates = round(plates,0)
 
             product_obj = self.env['product.product']
@@ -1175,12 +1192,15 @@ class Booklet(models.Model):
             product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
                                           ('attribute_value_ids', 'in', v2.ids),
                                           ('print_format_template', '=', True),
-                                          ('formats', '=', format), ], order='id desc', limit=1)
+                                          ('formats', '=', format), ], order='id desc', limit=2)
 
             #calculated_mass
             if product:
-                booklet.product_id = product.id
-                mass = (product.product_tmpl_id.booklet_surface_area * pages) / float(2) * paper_weight / float(1000)
+                for p in product:
+                    if p.product_tmpl_id.fixed_cost:
+                        continue
+                    booklet.product_id = p.id
+                    mass = (p.product_tmpl_id.booklet_surface_area * pages) * float(paper_weight) / float(2000)
             else:
                 mass, booklet.product_id = 0.0, False
 
@@ -1256,4 +1276,12 @@ class PaperRollProduct(models.Model):
 
     job_id = fields.Many2one('wobe.job', required=True, ondelete='cascade', index=True, copy=False)
     product_id = fields.Many2one('product.product', 'Product', required=True)
+    number_rolls = fields.Selection([
+                        ('0', '0 rollen gebruikt'),
+                        ('1', '1 rollen gebruikt'),
+                        ('2', '2 rollen gebruikt'),
+                        ('3', '3 rollen gebruikt'),
+                        ('4', '4 rollen gebruikt'),
+                        ], string='# Rollen Gebruikt', default='0',
+                        copy=False, required=True, track_visibility='onchange')
     name = fields.Char(related='product_id.default_code', string='Internal Reference', store=True)

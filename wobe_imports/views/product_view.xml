@@ -5,15 +5,24 @@
         <field name="name">product_normal_form_view_inherit</field>
         <field name="model">product.product</field>
         <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="groups_id" eval="[(4, ref('wobe_imports.group_wobe_manager'))]"/>
         <field name="priority" eval="7" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='default_code']" position="after">
                 <field name="print_category"/>
                 <field name="applicable_to_regioman"/>
-                <field name="print_format_template" attrs="{'readonly': [('product_variant_count', '&gt;', 1)]}"/>
-                <field name="formats" attrs="{'invisible': [('print_format_template', '!=', True)],
-                                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
-
+                <field name="print_format_template"
+                       attrs="{'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+                <field name="formats"
+                       attrs="{'invisible': [('print_format_template', '!=', True)],
+                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+                <field name="booklet_surface_area"
+                       attrs="{'invisible': [('print_format_template', '!=', True)],
+                               'required': [('print_format_template', '=', True)],
+                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+                <field name="fixed_cost"
+                       attrs="{'invisible': [('print_format_template', '!=', True)],
+                                                 'readonly': [('product_variant_count', '&gt;', 1)]}"/>
             </xpath>
         </field>
     </record>
@@ -24,13 +33,23 @@
         <field name="mode">primary</field>
         <field name="priority" eval="7" />
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="groups_id" eval="[(4, ref('wobe_imports.group_wobe_manager'))]"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='default_code']" position="after">
                 <field name="print_category" />
                 <field name="applicable_to_regioman"/>
-                <field name="print_format_template" />
-                <field name="formats" attrs="{'invisible': [('print_format_template', '!=', True)],
-                                               'required': [('print_format_template', '=', True)]}"/>
+                <field name="print_format_template"
+                       attrs="{'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+                <field name="formats"
+                       attrs="{'invisible': [('print_format_template', '!=', True)],
+                                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+                <field name="booklet_surface_area"
+                       attrs="{'invisible': [('print_format_template', '!=', True)],
+                               'required': [('print_format_template', '=', True)],
+                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
+                <field name="fixed_cost"
+                       attrs="{'invisible': [('print_format_template', '!=', True)],
+                               'readonly': [('product_variant_count', '&gt;', 1)]}"/>
             </xpath>
         </field>
     </record>
@@ -39,6 +58,7 @@
 		   <field name="name">product.template.common.form</field>
 		   <field name="model">product.template</field>
 		   <field name="inherit_id" ref="product.product_template_form_view"/>
+           <field name="groups_id" eval="[(4, ref('wobe_imports.group_wobe_manager'))]"/>
 		   <field name="arch" type="xml">
 			  <field name="categ_id" position="after">
 				 <field name="booklet_surface_area"/>

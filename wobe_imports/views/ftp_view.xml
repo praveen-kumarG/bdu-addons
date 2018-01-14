@@ -62,7 +62,7 @@
         </field>
     </record>
 
-    <menuitem id="menu_file_transfer" parent="menu_wobe" sequence="1"
+    <menuitem id="menu_file_transfer" parent="menu_wobe_header" sequence="1"
               action="action_file_transfer" groups="base.group_system"/>
 
 
@@ -157,8 +157,8 @@
         </field>
     </record>
 
-    <menuitem id="menu_file_registry" parent="menu_wobe" sequence="3"
-              action="action_file_registry" groups="base.group_system"/>
+    <menuitem id="menu_file_registry" parent="menu_wobe_header" sequence="3"
+              action="action_file_registry" groups="base.group_system,wobe_imports.group_wobe_user"/>
 
 
 

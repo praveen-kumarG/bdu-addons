@@ -153,7 +153,7 @@
                 <table class="table table-condensed table-padding">
                     <thead>
                         <tr>
-                            <th width="15%">Order Number</th>
+                            <th width="15%">Issue Date</th>
                             <th width="15%" class="text-right">Quantity</th>
                             <th width="55%">Description</th>
                             <th width="15%" class="text-right">Unit Price</th>
@@ -161,7 +161,7 @@
                     </thead>
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l">
-                            <td><span t-field="l.sale_line_ids.order_id.name"/>
+                            <td><span t-field="l.sale_line_ids.order_id.issue_date"/>
                             </td>
                             <td class="text-right">
                                 <t t-if="l.uom_id.uom_type == 'bigger'">
@@ -173,7 +173,8 @@
                             </td>
                             <td>
                                 <span t-if="l.account_analytic_id" t-field="l.account_analytic_id.code"/>,
-                                <span t-if="l.product_id" t-field="l.product_id"/>
+                                <span t-if="l.product_id and l.product_id.product_tmpl_id.fixed_cost" t-field="l.product_id.name"/>
+                                <span t-if="l.product_id and not l.product_id.product_tmpl_id.fixed_cost" t-field="l.product_id.variant_name"/>
                             </td>
                             <td class="text-right">
                                 <span t-field="l.price_subtotal"

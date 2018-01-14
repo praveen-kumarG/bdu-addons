@@ -2,7 +2,9 @@
 <odoo>
     <data>
 
-        <menuitem id="menu_wobe" parent="sales_team.menu_base_partner" name="Wobe Import/Export"/>
+        <menuitem id="menu_wobe" name="Wobe"/>
+
+        <menuitem id="menu_wobe_header" name="Wobe Imports" parent="menu_wobe"/>
 
         <record id="view_wobe_job_form" model="ir.ui.view">
             <field name="name">view_wobe_job_form</field>
@@ -11,19 +13,19 @@
                 <form string="Job" create="false" edit="true" delete="false" copy="false">
                     <header>
                         <button name="action_create_order" type="object" string="Create SaleOrder"
-                                states="ready" class="oe_highlight"/>
+                                states="ready" class="oe_highlight" groups="sales_team.group_sale_salesman"/>
                         <button name="action_create_picking" type="object" string="Create Picking"
-                                states="order_created" class="oe_highlight"/>
+                                states="order_created" class="oe_highlight" groups="stock.group_stock_user"/>
 
                         <button name="action_create_costing" type="object" string="Create Costing"
-                                states="picking_created" class="oe_highlight"/>
+                                states="picking_created" class="oe_highlight" groups="sales_team.group_sale_salesman"/>
 
                         <button name="action_force_ready" type="object" string="Force Ready"
-                                states="waiting" class="oe_highlight"/>
+                                states="waiting" class="oe_highlight" groups="sales_team.group_sale_salesman"/>
                         <button name="action_reset" type="object" string="Reset Status"
-                                states="waiting,exception" class="oe_highlight"/>
+                                states="waiting,exception" class="oe_highlight" groups="wobe_imports.group_wobe_user"/>
 
-                        <button name="button_convert_regioman" type="object" string="Convert as Regioman"
+                        <button name="button_convert_regioman" type="object" string="Convert as Regioman" groups="wobe_imports.group_wobe_user"
                                 attrs="{'invisible':[('convert_ok','=',False)]}" confirm="Do you really want to proceed?"/>
                         <field name="state" widget="statusbar" nolabel="1" statusbar_visible="ready,order_created,picking_created,cost_created"/>
 
@@ -32,13 +34,13 @@
                         <div class="oe_button_box" name="button_box">
                             <field name="order_id" invisible="1"/>
                             <field name="picking_id" invisible="1"/>
-                            <button class="oe_stat_button" name="action_view_sales"
+                            <button class="oe_stat_button" name="action_view_sales" groups="sales_team.group_sale_salesman"
                                 type="object" icon="fa-usd" String="Sale Order" attrs="{'invisible': [('order_id','=',False)]}">
                             </button>
-                            <button class="oe_stat_button" name="action_view_picking"
+                            <button class="oe_stat_button" name="action_view_picking" groups="stock.group_stock_user"
                                 type="object" icon="fa-truck" String="Picking" attrs="{'invisible': [('picking_id','=',False)]}">
                             </button>
-                            <button class="oe_stat_button" name="action_view_analytic_lines"
+                            <button class="oe_stat_button" name="action_view_analytic_lines" groups="sales_team.group_sale_salesman"
                                 type="object" icon="fa-usd" attrs="{'invisible': [('analytic_count','=',0)]}">
                                 <field  String="AnalyticLines" name="analytic_count" widget="statinfo" attrs="{'invisible': [('analytic_count','=',0)]}"/>
                             </button>
@@ -96,6 +98,7 @@
                                         attrs="{'readonly': [('job_type','=','kba')]}">
                                     <tree string="Paper Products" editable="bottom">
                                         <field name="product_id" domain="[('print_category','=','paper_regioman')]"/>
+                                        <field name="number_rolls" />
                                         <field name="name" />
                                     </tree>
                                 </field>
@@ -192,10 +195,11 @@
 
 
         <menuitem name="Jobs Imported"
-            parent="menu_wobe"
+            parent="menu_wobe_header"
             action="action_wobe_job"
             id="menu_action_wobe_job"
-            sequence="2"/>
+            sequence="2"
+            />
 
     </data>
 </odoo>

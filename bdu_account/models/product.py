@@ -3,7 +3,27 @@
 from odoo import api, fields, models, _
 
 
-#class ProductUoM(models.Model):
-#    _inherit = 'product.uom'
+class Product(models.Model):
+    _inherit = "product.product"
 
-#    qty_rounding = fields.Boolean('Quantity Rounding', help="Check the quantity will be rounding off for report.")
+    @api.multi
+    def _name_var_get(self):
+        '''Alternative name for variant name without [default_code]'''
+
+        # all user don't have access to seller and partner
+        # check access and use superuser
+#        self.check_access_rights("read")
+#        self.check_access_rule("read")
+
+        result = []
+        for product in self:
+            # display only the attributes with multiple possible values on the template
+            variable_attributes = product.attribute_line_ids.filtered(lambda l: len(l.value_ids) > 1).mapped(
+                'attribute_id')
+            variant = product.attribute_value_ids._variant_name(variable_attributes)
+
+            name = variant and "%s (%s)" % (product.name, variant) or product.name
+            product.variant_name = name
+
+
+    variant_name = fields.Char(compute='_name_var_get', string='Name including Variant Characteristics')

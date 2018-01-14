@@ -39,7 +39,7 @@ This module does importing of XML file of Wobe Portal
     'author'  : 'Magnus - Willem Hulshof',
     'website' : 'http://www.magnus.nl',
     'depends' : ['sale', 'document'],
-    'data' : [
+    'data' : ['security/wobe_security.xml',
             'security/ir.model.access.csv',
             'data/product_data.xml',
             'data/product.attribute.value.csv',
