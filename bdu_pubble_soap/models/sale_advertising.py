@@ -283,7 +283,7 @@ class SofromOdootoPubble(models.Model):
             ad.status = "active" if line.ad_status else "deleted"
 
             SalesOrder.orderLine_Ads.adPlacement.append(ad)
-
+        print SalesOrder
         response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
         self.write({'pubble_response': response})
         if response == True:
