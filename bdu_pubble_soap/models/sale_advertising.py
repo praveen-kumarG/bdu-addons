@@ -120,7 +120,8 @@ class SaleOrder(models.Model):
                     'transmission_id': self.env['sofrom.odooto.pubble'].get_next_ref(),
                     'sale_order_id': self.id,
                     'salesorder_extorderid': self.name,
-                    'salesorder_reference': self.opportunity_subject,
+                    'salesorder_reference': 'Subject:' + str(self.opportunity_subject or '') + '\n' +
+                                            'Order Nr.:' + str(self.name or ''),
                     'salesorder_createdby': self.user_id.email,
                     'salesorder_debtor_extaccountingid': self.published_customer.ref,
                     'salesorder_debtor_extdebtorid': self.published_customer.ref,
@@ -151,7 +152,7 @@ class SaleOrder(models.Model):
                             'odoo_order_line': line.id,
                             'ad_adsize_adtypename': line.ad_class.name,
                             'ad_adsize_extadsizeid': line.product_id.default_code,
-                            'ad_adsize_height': line.product_template_id.height,
+                            'ad_adsize_height': line.product_uom_qty if line.product_uom.name == 'mm' else line.product_template_id.height,
                             'ad_adsize_name': line.analytic_tag_ids.name or '',
                             'ad_adsize_width': line.product_template_id.width,
                             'ad_edition_editiondate': line.adv_issue.issue_date,
@@ -161,9 +162,10 @@ class SaleOrder(models.Model):
                             'ad_productiondetail_color': True,
                             'ad_productiondetail_isclassified': False,
                             'ad_productiondetail_dtpcomments': line.layout_remark,
-                            'ad_productiondetail_placementcomments': 'Advertentie referentie:' + str(line.ad_number) or '' + '\n' +
-                                                                     'Paginaverwijzing:' + str(line.page_reference) or '' + '\n' +
-                                                                     'Advertentiemateriaal:' + str(line.url_to_material) or '' + '\n',
+                            'ad_productiondetail_placementcomments': 'External Reference:' + str(line.ad_number or '') + '\n' +
+                                                                     'Material Reference:' + str(line.page_reference or '') + '\n' +
+                                                                     'Material URL:' + str(line.url_to_material or '') + '\n' +
+                                                                     'Product Name:' + line.product_template_id.name_get()[0][1],
                             'ad_status': del_param,
                     }
                     self.env['soline.from.odooto.pubble'].sudo().create(lvals)
