@@ -54,7 +54,7 @@ This module adds customization as per BDU Media
          "report/report.xml",
          "views/res_company_view.xml",
          "views/res_partner_view.xml",
-#         "views/product_view.xml",
+         "views/product_view.xml",
     ],
     'demo' : [],
     'installable': True

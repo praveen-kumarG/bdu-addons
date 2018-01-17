@@ -27,3 +27,8 @@ class Product(models.Model):
 
 
     variant_name = fields.Char(compute='_name_var_get', string='Name including Variant Characteristics')
+
+class ProductTemplate(models.Model):
+    _inherit = "product.template"
+
+    invoice_description = fields.Boolean('Invoice Description', help='Set True to add order line description in Invoice.')

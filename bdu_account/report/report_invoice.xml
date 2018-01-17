@@ -173,8 +173,16 @@
                             </td>
                             <td>
                                 <span t-if="l.account_analytic_id" t-field="l.account_analytic_id.code"/>,
-                                <span t-if="l.product_id and l.product_id.product_tmpl_id.fixed_cost" t-field="l.product_id.name"/>
-                                <span t-if="l.product_id and not l.product_id.product_tmpl_id.fixed_cost" t-field="l.product_id.variant_name"/>
+                                <t t-if="l.product_id and not l.product_id.product_tmpl_id.invoice_description">
+                                    <span t-if="l.product_id and l.product_id.product_tmpl_id.fixed_cost" t-field="l.product_id.name"/>
+                                    <span t-if="l.product_id and not l.product_id.product_tmpl_id.fixed_cost" t-field="l.product_id.variant_name"/>
+                                </t>
+                                <!--print sale line description if template_description is true-->
+                                <t t-if="l.product_id and l.product_id.product_tmpl_id.invoice_description">
+                                    <t t-foreach="l.sale_line_ids" t-as="sale_line">
+                                        <span t-field="sale_line.name"/>
+                                    </t>
+                                </t>
                             </td>
                             <td class="text-right">
                                 <span t-field="l.price_subtotal"
@@ -185,7 +193,7 @@
                 </table>
             </div>
 
-            <div class="row" style="padding-left:85px;">
+            <div class="row" style="padding-left:85px;page-break-inside:avoid;">
                 <div class="col-xs-4 pull-right">
                     <table class="table table-condensed">
                         <tr class="border-black">
