@@ -64,6 +64,7 @@
                 </form>
             </field>
         </record>
+
         <record id="view_sofrom_odooto_pubble_tree" model="ir.ui.view">
             <field name="name">view_sofrom_odooto_pubble_tree</field>
             <field name="model">sofrom.odooto.pubble</field>
@@ -79,6 +80,7 @@
                 </tree>
             </field>
         </record>
+
         <record id="view_sofrom_odooto_pubble_filter" model="ir.ui.view">
             <field name="name">view_sofrom_odooto_pubble_filter</field>
             <field name="model">sofrom.odooto.pubble</field>
@@ -94,6 +96,7 @@
                </search>
             </field>
         </record>
+
         <record id="action_staged_pubble" model="ir.actions.act_window">
             <field name="name">Staged Pubble</field>
             <field name="res_model">sofrom.odooto.pubble</field>

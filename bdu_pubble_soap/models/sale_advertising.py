@@ -36,6 +36,7 @@ class SaleOrder(models.Model):
     @api.multi
     def _pubble_allow(self):
         for order in self:
+            order.order_pubble_allow = False
             for line in order.order_line:
                 if line.line_pubble_allow:
                     order.order_pubble_allow = True
@@ -45,6 +46,7 @@ class SaleOrder(models.Model):
     @api.multi
     def _pubble_sent(self):
         for order in self:
+            order.pubble_sent = False
             for line in order.order_line:
                 if line.pubble_sent:
                     order.pubble_sent = True
@@ -58,23 +60,26 @@ class SaleOrder(models.Model):
     publog_id = fields.Many2one('sofrom.odooto.pubble')
 
 
-    @job
+
     def action_pubble(self, arg):
         self.ensure_one()
         res = self.transfer_order_to_pubble(arg)
         self._cr.commit()
         if self.order_pubble_allow:
-            res.call_wsdl()
-            self.date_sent_pubble = fields.Date.context_today(self)
-            self.publog_id = res.id
+            self.send_to_pubble(res)
         return True
+
+
+    def send_to_pubble(self, res):
+        res.with_delay().call_wsdl()
+        for line in res.pubble_so_line:
+            self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
 
     @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
         for order in self.filtered("advertising"):
             order.action_pubble('update')
-            #            order.with_delay().action_pubble()
         return res
 
 
@@ -191,8 +196,9 @@ class SaleOrderLine(models.Model):
     @api.multi
     def write(self, vals):
         res = super(SaleOrderLine, self).write(vals)
-        if self.advertising and ('product_template_id' or 'adv_issue' or 'product_uom_qty' or 'layout_remark' or 'name') in vals:
-            for order in self.mapped('order_id').filtered(lambda s: s.order_pubble_allow and s.pubble_sent and s.advertising):
+        for order in self.mapped('order_id').filtered(lambda s: s.order_pubble_allow and s.pubble_sent and s.advertising):
+            if self.advertising and ('product_template_id' or 'adv_issue' or 'product_uom_qty' or 'layout_remark' or 'name') in vals:
+
                 order.action_pubble('update')
         return res
 
@@ -231,7 +237,7 @@ class SofromOdootoPubble(models.Model):
     salesorder_agency_name = fields.Char(string='Agency Name', size=64)
     salesorder_agency_postalcode = fields.Char(string='Agency Zip Code', size=32)
 
-
+    @job
     def call_wsdl(self):
         self.ensure_one()
         if self.pubble_response and self.pubble_response == 'True':
@@ -290,8 +296,8 @@ class SofromOdootoPubble(models.Model):
         self.write({'pubble_response': response})
         if response == True:
             self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).write({'date_sent_pubble': datetime.datetime.now()})
-            for line in self.pubble_so_line:
-                self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
+#            for line in self.pubble_so_line:
+#                self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
 
         return True
 
