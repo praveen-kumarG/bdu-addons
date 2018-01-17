@@ -164,11 +164,13 @@ class SaleOrder(models.Model):
                             'ad_price': 0,
                             'ad_productiondetail_color': True,
                             'ad_productiondetail_isclassified': False,
-                            'ad_productiondetail_dtpcomments': line.layout_remark,
-                            'ad_productiondetail_placementcomments': 'External Reference:' + str(line.ad_number or '') + '\n' +
-                                                                     'Material Reference:' + str(line.page_reference or '') + '\n' +
-                                                                     'Material URL:' + str(line.url_to_material or '') + '\n' +
-                                                                     'Product Name:' + line.product_template_id.name_get()[0][1],
+                            'ad_productiondetail_dtpcomments': 'External Reference:' + str(line.ad_number or '') + '\n' +
+                                                               'Material Reference:' + str(line.page_reference or '') + '\n' +
+                                                               'Material URL:' + str(line.url_to_material or '') + '\n' 
+                                                               'Paginasoort:' + line.analytic_tag_ids.name or '' + '\n' + '\n' +
+                                                                line.layout_remark,
+                            'ad_productiondetail_placementcomments':'Product Name:' + line.product_template_id.name_get()[0][1] or '' + '\n' +
+                                                                    line.name or '',
                             'ad_status': del_param,
                     }
                     self.env['soline.from.odooto.pubble'].sudo().create(lvals)
@@ -195,6 +197,7 @@ class SaleOrderLine(models.Model):
     def write(self, vals):
         res = super(SaleOrderLine, self).write(vals)
         for order in self.mapped('order_id').filtered(lambda s: s.order_pubble_allow and s.advertising):
+#            for
             if self.advertising and ('product_template_id' or 'adv_issue' or 'product_uom_qty' or 'layout_remark' or 'name') in vals:
                 order.action_pubble('update')
         return res
