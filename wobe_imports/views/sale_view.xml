@@ -14,5 +14,20 @@
             </field>
         </record>
 
+        <record id="view_sales_order_filter_wobe" model="ir.ui.view">
+            <field name="name">sale.order.list.select.wobe</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="groups_id" eval="[(4, ref('wobe_imports.group_wobe_user'))]"/>
+            <field name="arch" type="xml">
+                    <field name="project_id" position="attributes">
+                        <attribute name="string" >Title</attribute>
+                    </field>
+                    <filter name="customer" position="after">
+                        <filter string="Title" domain="[]" context="{'group_by':'project_id'}"/>
+                        <filter string="Issue Date" domain="[]" context="{'group_by':'issue_date'}"/>
+                    </filter>
+            </field>
+        </record>
     </data>
 </odoo>

@@ -6,7 +6,7 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     job_id = fields.Many2one('wobe.job','Job Ref #', ondelete='set null', index=True, default=False)
-    issue_date = fields.Date(related='job_id.issue_date')
+    issue_date = fields.Date(related='job_id.issue_date', store=True)
 
     @api.multi
     def action_confirm(self):

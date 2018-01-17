@@ -546,7 +546,6 @@ class Job(models.Model):
                 paper_weight = float(booklet.paper_weight)
                 paper_weight = int(paper_weight) if paper_weight % 1 == 0 else paper_weight
                 v2 = variant_obj.search([('name','=', str(paper_weight)), ('attribute_id','=', pWeight.id)])
-                import pdb; pdb.set_trace()
                 product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
                                               ('attribute_value_ids', 'in', v2.ids),
                                               ('print_format_template','=', True),
