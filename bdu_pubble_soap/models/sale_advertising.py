@@ -168,7 +168,7 @@ class SaleOrder(models.Model):
                                                                'Material Reference:' + str(line.page_reference or '') + '\n' +
                                                                'Material URL:' + str(line.url_to_material or '') + '\n' 
                                                                'Paginasoort:' + str(line.analytic_tag_ids.name or '') + '\n' + '\n' +
-                                                                line.layout_remark,
+                                                                str(line.layout_remark or ''),
                             'ad_productiondetail_placementcomments':'Product Name:' + str(line.product_template_id.name_get()[0][1] or '') + '\n' +
                                                                     str(line.name or ''),
                             'ad_status': del_param,
