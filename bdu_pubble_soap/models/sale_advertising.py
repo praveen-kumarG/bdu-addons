@@ -64,7 +64,7 @@ class SaleOrder(models.Model):
     def action_pubble(self, arg):
         self.ensure_one()
         res = self.transfer_order_to_pubble(arg)
-        self._cr.commit()
+#        self._cr.commit()
         if self.order_pubble_allow:
             self.send_to_pubble(res)
         return True
@@ -72,6 +72,7 @@ class SaleOrder(models.Model):
 
     def send_to_pubble(self, res):
         res.with_delay().call_wsdl()
+        self.write({'publog_id': res.id})
         for line in res.pubble_so_line:
             self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
 
@@ -87,11 +88,8 @@ class SaleOrder(models.Model):
     @api.multi
     def write(self, vals):
         res = super(SaleOrder, self).write(vals)
-#        if self.env.context.get('LoopBreaker'):
-#            return
-#        self = self.with_context(LoopBreaker=True)
         if ('partner_id' or 'published_customer' or 'advertising_agency' ) in vals:
-            for order in self.filtered(lambda s: s.order_pubble_allow and s.pubble_sent and s.advertising):
+            for order in self.filtered(lambda s: s.order_pubble_allow and s.advertising):
                 order.action_pubble('update')
         return res
 
@@ -196,9 +194,8 @@ class SaleOrderLine(models.Model):
     @api.multi
     def write(self, vals):
         res = super(SaleOrderLine, self).write(vals)
-        for order in self.mapped('order_id').filtered(lambda s: s.order_pubble_allow and s.pubble_sent and s.advertising):
+        for order in self.mapped('order_id').filtered(lambda s: s.order_pubble_allow and s.advertising):
             if self.advertising and ('product_template_id' or 'adv_issue' or 'product_uom_qty' or 'layout_remark' or 'name') in vals:
-
                 order.action_pubble('update')
         return res
 
@@ -291,7 +288,7 @@ class SofromOdootoPubble(models.Model):
             ad.status = "active" if line.ad_status else "deleted"
 
             SalesOrder.orderLine_Ads.adPlacement.append(ad)
-        print SalesOrder
+#        print SalesOrder
         response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
         self.write({'pubble_response': response})
         if response == True:
