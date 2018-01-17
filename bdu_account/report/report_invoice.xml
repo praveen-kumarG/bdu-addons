@@ -177,7 +177,7 @@
                                     <span t-if="l.product_id and l.product_id.product_tmpl_id.fixed_cost" t-field="l.product_id.name"/>
                                     <span t-if="l.product_id and not l.product_id.product_tmpl_id.fixed_cost" t-field="l.product_id.variant_name"/>
                                 </t>
-                                <!--print sale line description if template_description is true-->
+                                <!--print sale line description if template invoice_descriptionis true-->
                                 <t t-if="l.product_id and l.product_id.product_tmpl_id.invoice_description">
                                     <t t-foreach="l.sale_line_ids" t-as="sale_line">
                                         <span t-field="sale_line.name"/>
