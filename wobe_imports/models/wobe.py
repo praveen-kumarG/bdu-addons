@@ -828,15 +828,17 @@ class Job(models.Model):
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
-            Qty = (NetMass * num_width / num_mass)
-            lines.append({'productObj': roll.product_id, 'name': 'Net Paper: ' + str(roll.product_id.name),
-                          'product_uom_qty': Qty})
+            if num_mass and num_mass > 0:
+                Qty = (NetMass * num_width / num_mass)
+                lines.append({'productObj': roll.product_id, 'name': 'Net Paper: ' + str(roll.product_id.name),
+                              'product_uom_qty': Qty})
 
             # Waste Production: (in Kg)
             WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
-            Qty = (WasteMass * num_width / num_mass)
-            lines.append({'productObj': roll.product_id, 'name': 'Waste Paper: ' + str(roll.product_id.name),
-                          'product_uom_qty': Qty})
+            if num_mass and num_mass > 0:
+                Qty = (WasteMass * num_width / num_mass)
+                lines.append({'productObj': roll.product_id, 'name': 'Waste Paper: ' + str(roll.product_id.name),
+                              'product_uom_qty': Qty})
 
         if job.plate_type == 'PA':
             print_category3 = 'plates_kba'
