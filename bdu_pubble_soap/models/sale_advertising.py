@@ -42,6 +42,7 @@ class SaleOrder(models.Model):
                     order.order_pubble_allow = True
                     break
 
+
     @api.depends('order_line.pubble_sent')
     @api.multi
     def _pubble_sent(self):
@@ -53,11 +54,11 @@ class SaleOrder(models.Model):
                     break
 
 
-    order_pubble_allow = fields.Boolean(compute=_pubble_allow, string='Allow to Pubble', default=False, store=True)
+    order_pubble_allow = fields.Boolean(compute=_pubble_allow, string='Allow to Pubble', default=False, store=False)
     date_sent_pubble = fields.Date('Date Sent to Pubble', index=True,
                                     help="Date on which sales order is sent to Pubble.")
     pubble_sent = fields.Boolean(compute=_pubble_sent, string='Order to Pubble', default=False, store=True)
-    publog_id = fields.Many2one('sofrom.odooto.pubble')
+    publog_id = fields.Many2one('sofrom.odooto.pubble', )
 
 
 
@@ -72,14 +73,14 @@ class SaleOrder(models.Model):
 
     def send_to_pubble(self, res):
         res.with_delay().call_wsdl()
-        self.write({'publog_id': res.id})
-        for line in res.pubble_so_line:
-            self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
+#        self.write({'publog_id': res.id})
+#        for line in res.pubble_so_line:
+#            self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
 
     @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
-        for order in self.filtered("advertising"):
+        for order in self.filtered('advertising'):
             order.action_pubble('update')
         return res
 
@@ -87,9 +88,14 @@ class SaleOrder(models.Model):
 
     @api.multi
     def write(self, vals):
+#        import pdb; pdb.set_trace()
         res = super(SaleOrder, self).write(vals)
-        if ('partner_id' or 'published_customer' or 'advertising_agency' ) in vals:
-            for order in self.filtered(lambda s: s.order_pubble_allow and s.advertising):
+        for order in self.filtered(lambda s: s.advertising and s.order_pubble_allow and s.state == 'sale'):
+#            if order.env.context.get('LoopBreaker2'):
+#                continue
+#            order = order.with_context(LoopBreaker2=True)
+            if ('published_customer' in vals or 'partner_id' in vals or 'customer_contact' in vals or 'advertising_agency'
+                in vals or 'opportunity_subject' in vals or 'order_line' in vals):
                 order.action_pubble('update')
         return res
 
@@ -108,9 +114,6 @@ class SaleOrder(models.Model):
     @api.multi
     def transfer_order_to_pubble(self, arg):
         self.ensure_one()
-        del_param = True
-        if arg == 'delete':
-            del_param = False
         if not self.order_pubble_allow:
             vals = {
                 'sale_order_id': self.id,
@@ -147,8 +150,9 @@ class SaleOrder(models.Model):
             }
             res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
             for line in self.order_line:
+                del_param = True
                 if line.line_pubble_allow:
-                    if int(line.product_uom_qty) == 0:
+                    if int(line.product_uom_qty) == 0 or arg == 'delete':
                         del_param = False
                     lvals = {
                             'order_id': res.id,
@@ -156,7 +160,7 @@ class SaleOrder(models.Model):
                             'ad_adsize_adtypename': line.ad_class.name,
                             'ad_adsize_extadsizeid': line.product_id.default_code,
                             'ad_adsize_height': line.product_uom_qty if line.product_uom.name == 'mm' else line.product_template_id.height,
-                            'ad_adsize_name': line.analytic_tag_ids.name or '',
+                            'ad_adsize_name': line.product_id.name or '',
                             'ad_adsize_width': line.product_template_id.width,
                             'ad_edition_editiondate': line.adv_issue.issue_date,
                             'ad_edition_extpublicationid': line.title.name,
@@ -165,13 +169,13 @@ class SaleOrder(models.Model):
                             'ad_productiondetail_color': True,
                             'ad_productiondetail_isclassified': False,
                             'ad_productiondetail_dtpcomments': 'External Reference:' + str(line.ad_number or '') + '\n' +
-                                                               'Material Reference:' + str(line.page_reference or '') + '\n' +
-                                                               'Material URL:' + str(line.url_to_material or '') + '\n' 
-                                                               'Paginasoort:' + str(line.analytic_tag_ids.name or '') + '\n' + '\n' +
-                                                                str(line.layout_remark or ''),
-                            'ad_productiondetail_placementcomments':'Product Name:' + str(line.product_template_id.name_get()[0][1] or '') + '\n' +
-                                                                    str(line.name or ''),
+                                                               'Material URL:' + str(line.url_to_material or '') + '\n' +
+                                                                                str(line.layout_remark or ''),
+                            'ad_productiondetail_placementcomments': 'Page Preference:' + str(line.page_reference or '') + '\n' +
+                                                                     'Page Type:' + str(line.analytic_tag_ids.name or '') + '\n' +
+                                                                                    str(line.name or ''),
                             'ad_status': del_param,
+                            'ad_materialid': line.url_to_material or 0,
                     }
                     self.env['soline.from.odooto.pubble'].sudo().create(lvals)
 
@@ -185,22 +189,24 @@ class SaleOrderLine(models.Model):
     def _compute_allowed(self):
         for line in self.filtered('advertising'):
             res = False
-            if line.ad_class and line.adv_issue.medium.pubble:
+            if line.ad_class.pubble and line.adv_issue.medium.pubble:
                 res = True
             line.line_pubble_allow = res
 
 
     pubble_sent = fields.Boolean('Order Line sent to Pubble')
-    line_pubble_allow = fields.Boolean(compute='_compute_allowed', string='Pubble Allowed', store=True)
+    line_pubble_allow = fields.Boolean(compute='_compute_allowed', string='Pubble Allowed', store=False)
 
-    @api.multi
+    '''@api.multi
     def write(self, vals):
         res = super(SaleOrderLine, self).write(vals)
-        for order in self.mapped('order_id').filtered(lambda s: s.order_pubble_allow and s.advertising):
-#            for
-            if self.advertising and ('product_template_id' or 'adv_issue' or 'product_uom_qty' or 'layout_remark' or 'name') in vals:
-                order.action_pubble('update')
-        return res
+        for order in self.mapped('order_id').filtered(lambda s: s.order_pubble_allow and s.advertising and s.state == 'sale'):
+            if order.env.context.get('LoopBreaker1'):
+                continue
+            order = order.with_context(LoopBreaker1=True)
+#            if self.advertising and ('product_template_id' or 'adv_issue' or 'product_uom_qty' or 'layout_remark' or 'name') in vals:
+            self.env['sale.order'].search([('id','=',order.id)]).write({'opportunity_subject': order.opportunity_subject})
+        return res'''
 
 
 class SofromOdootoPubble(models.Model):
@@ -214,6 +220,7 @@ class SofromOdootoPubble(models.Model):
     transmission_id = fields.Char(string='Transmission ID', store=True, size=16, readonly=True)
     pubble_so_line = fields.One2many('soline.from.odooto.pubble', 'order_id', string='Order Lines', copy=True)
     pubble_response = fields.Text('Pubble Response')
+    json_message = fields.Text('JSON message')
     sale_order_id = fields.Many2one('sale.order',string='Sale Order')
     salesorder_extorderid = fields.Char(string='Sale Order ID')
     salesorder_reference = fields.Char(string='Opportunity Subject', size=64)
@@ -289,15 +296,17 @@ class SofromOdootoPubble(models.Model):
             ad.productionDetail.dtpComments = line.ad_productiondetail_dtpcomments
             ad.productionDetail.placementComments = line.ad_productiondetail_placementcomments
             ad.status = "active" if line.ad_status else "deleted"
+            ad.materialID = int(line.ad_materialid)
 
             SalesOrder.orderLine_Ads.adPlacement.append(ad)
-#        print SalesOrder
+        self.write({'json_message': str(SalesOrder)})
+        self._cr.commit()
         response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
         self.write({'pubble_response': response})
         if response == True:
-            self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).write({'date_sent_pubble': datetime.datetime.now()})
-#            for line in self.pubble_so_line:
-#                self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
+            self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).write({'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
+            for line in self.pubble_so_line:
+                self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
 
         return True
 
@@ -307,7 +316,7 @@ class SoLinefromOdootoPubble(models.Model):
 
 
     order_id = fields.Many2one('sofrom.odooto.pubble', string='Order Reference', required=True, ondelete='cascade', index=True, copy=False)
-    odoo_order_line = fields.Many2one('sale.order.line', string='Order Line Reference', required=True, index=True, copy=False)
+    odoo_order_line = fields.Many2one('sale.order.line', string='Order Line Reference', ondelete='cascade', required=False, index=True, copy=False)
     ad_adsize_adtypename = fields.Char(string='Advertising Class Name', size=64)
     ad_adsize_extadsizeid = fields.Char(string='Product ID')
     ad_adsize_height = fields.Integer(string='Height mm')
@@ -322,4 +331,5 @@ class SoLinefromOdootoPubble(models.Model):
     ad_productiondetail_dtpcomments = fields.Text(string='Layout Remarks')
     ad_productiondetail_placementcomments = fields.Text(string='Placement Remarks')
     ad_status = fields.Boolean(string='Active')
+    ad_materialid = fields.Char(string='Material ID')
 

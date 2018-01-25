@@ -44,22 +44,32 @@
                                 <field name="salesorder_agency_postalcode" />
                             </group>
                         </group>
-                            <field name="pubble_so_line" nolabel="1" widget="one2many_list" mode="tree">
-                                <tree string="Order Lines" >
-                                    <field name="ad_adsize_adtypename"/>
-                                    <field name="ad_adsize_extadsizeid"/>
-                                    <field name="ad_adsize_height"/>
-                                    <field name="ad_adsize_name"/>
-                                    <field name="ad_adsize_width"/>
-                                    <field name="ad_edition_editiondate"/>
-                                    <field name="ad_edition_extpublicationid"/>
-                                    <field name="ad_extplacementid"/>
-                                    <field name="ad_productiondetail_isclassified"/>
-                                    <field name="ad_productiondetail_dtpcomments"/>
-                                    <field name="ad_productiondetail_placementcomments"/>
-                                    <field name="ad_status"/>
-                                </tree>
-                            </field>
+                        <notebook>
+                            <page name="order_lines" string="SO lines">
+                                <field name="pubble_so_line" nolabel="1" widget="one2many_list" mode="tree">
+                                    <tree string="Order Lines" >
+                                        <field name="ad_adsize_adtypename"/>
+                                        <field name="ad_adsize_extadsizeid"/>
+                                        <field name="ad_adsize_name"/>
+                                        <field name="ad_adsize_height"/>
+                                        <field name="ad_adsize_width"/>
+                                        <field name="ad_edition_editiondate"/>
+                                        <field name="ad_edition_extpublicationid"/>
+                                        <field name="ad_extplacementid"/>
+                                        <field name="ad_productiondetail_isclassified"/>
+                                        <field name="ad_productiondetail_dtpcomments"/>
+                                        <field name="ad_productiondetail_placementcomments"/>
+                                        <field name="ad_materialid"/>
+                                        <field name="ad_status"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page name="json_msg" string="JSON Message">
+                                <group>
+                                    <field name="json_message"/>
+                                </group>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>

@@ -45,27 +45,19 @@ class Partner(models.Model):
     @api.multi
     def _needsRef(self, vals=None):
         """
+        Override base_partner_sequence method
         Checks whether a sequence value should be assigned to a partner's 'ref'
 
-        :param cr: database cursor
-        :param uid: current user id
-        :param id: id of the partner object
+        :param self: recordset(s) of the partner object
         :param vals: known field values of the partner object
-        :return: true iff a sequence value should be assigned to the\
+        :return: true if a sequence value should be assigned to the\
                       partner's 'ref'
         """
-        if not vals and not self:  # pragma: no cover
-            raise exceptions.UserError(_(
-                'Either field values or an id must be provided.'))
-        # only assign a 'ref' to commercial partners
-        if self:
-            vals = {}
-            vals['is_company'] = self.is_company
-            vals['parent_id'] = self.parent_id
+        res = super(Partner, self)._needsRef(vals)
         # to check partner belongs to res users or res company, if yes no sequence created
         if self._context.get('no_partner_sequence', False):
             return False
-        return vals.get('is_company') or not vals.get('parent_id')
+        return res
 
     promille_id = fields.Char('Promille ID')
     pubble_id = fields.Char('Pubble ID')
