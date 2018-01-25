@@ -79,7 +79,7 @@
             <field name="name">view_sofrom_odooto_pubble_tree</field>
             <field name="model">sofrom.odooto.pubble</field>
             <field name="arch" type="xml">
-                <tree string="SO to Pubble" create="false" edit="false" delete="false" copy="false"
+                <tree string="SO to Pubble" create="false" edit="false" delete="true" copy="false"
                         decoration-danger="pubble_response == ''" decoration-info="pubble_response == 'true'">
                     <field name="salesorder_extorderid"/>
                     <field name="salesorder_reference"/>
