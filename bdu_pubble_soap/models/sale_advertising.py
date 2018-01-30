@@ -328,8 +328,8 @@ class SoLinefromOdootoPubble(models.Model):
     ad_price = fields.Integer(string='Price', default=0)
     ad_productiondetail_color = fields.Boolean(string='Color')
     ad_productiondetail_isclassified = fields.Boolean(string='Classified')
-    ad_productiondetail_dtpcomments = fields.Text(string='Layout Remarks')
-    ad_productiondetail_placementcomments = fields.Text(string='Placement Remarks')
+    ad_productiondetail_dtpcomments = fields.Text(string='Material Remarks')
+    ad_productiondetail_placementcomments = fields.Text(string='Mapping Remarks')
     ad_status = fields.Boolean(string='Active')
     ad_materialid = fields.Char(string='Material ID')
 
