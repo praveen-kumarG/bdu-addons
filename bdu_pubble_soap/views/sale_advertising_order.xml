@@ -13,7 +13,7 @@
                     <sheet string="SO to Pubble">
                         <h1 class="mt0">
                             <label string="Sale Order :"/>
-                            <field name="sale_order_id"/>
+                            <field name="sale_order_id" context="{'form_view_ref': 'sale_advertising_order.view_order_form_advertising'}"/>
                         </h1>
                         <group>
                             <group>
