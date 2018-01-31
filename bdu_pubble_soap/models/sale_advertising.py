@@ -172,7 +172,8 @@ class SaleOrder(models.Model):
                                                                                 str(line.layout_remark or ''),
                             'ad_productiondetail_placementcomments': str(line.page_reference or '') + '\n' +
                                                                      'Page Type:' + str(line.analytic_tag_ids.name or '') + '\n' +
-                                                                                    str(line.name or ''),
+                                                                                    str(line.name or '') + '\n' +
+                                                                                    str(self.opportunity_subject or ''),
                             'ad_status': del_param,
                             'ad_materialid': 0,
                             'ad_materialUrl': line.url_to_material or False,
