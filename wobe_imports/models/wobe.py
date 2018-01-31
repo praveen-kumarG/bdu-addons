@@ -1050,7 +1050,6 @@ class Job(models.Model):
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
-            num_mass = num_mass if num_mass > 0 else 1
             NetQty = (NetMass * num_width / num_mass)
 
 

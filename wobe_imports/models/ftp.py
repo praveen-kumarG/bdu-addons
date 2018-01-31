@@ -141,10 +141,10 @@ class FileTransfer(models.Model):
         Job.action_create_order()
 
         # Call: Picking Creation
-        Job.action_create_picking()
+#        Job.action_create_picking()
 
         # Call: Costing Creation
-        Job.action_create_costing()
+#        Job.action_create_costing()
 
 
 class Registry(models.Model):
