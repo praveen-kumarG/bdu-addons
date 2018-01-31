@@ -111,12 +111,12 @@
                         <tr>
                             <th width="10%">Date</th>
                             <th width="20%">Description/ short content</th>
-                            <th width="10%">Edition</th>
+                            <th width="10%">Reference</th>
                             <th width="10%">Product</th>
                             <th width="10%" class="text-right">Volume</th>
-                            <th width="10%" class="text-right">Unit Price</th>
+                            <!--<th width="10%" class="text-right">Unit Price</th>-->
                             <th width="10%" t-if="display_discount" class="text-right">Disc(%)</th>
-                            <th width="10%" t-if="display_Cdiscount" class="text-right">Computed Discount</th>
+                            <!--<th width="10%" t-if="display_Cdiscount" class="text-right">Computed Discount</th>-->
                             <th width="10%" class="text-right">Tax Excluded Price</th>
                         </tr>
                     </thead>
@@ -125,22 +125,24 @@
                             <t t-set="tot_Cdiscount" t-value="tot_Cdiscount + l.sale_line_ids.computed_discount"/>
 
                             <td><span t-field="l.sale_line_ids.issue_date"/></td>
-                            <td><span t-field="l.name"/></td>
-                            <td><span t-field="l.sale_line_ids.title"/></td>
+                            <!--<td><span t-field="l.name"/></td>-->
+                            <td><span t-field="l.sale_line_ids.order_id.opportunity_subject"/></td>
+                            <!--<td><span t-field="l.sale_line_ids.title"/></td>-->
+                            <td><span t-field="l.sale_line_ids.ad_number"/></td>
                             <td><span t-if="l.product_id" t-field="l.product_id.name"/></td>
                             <td class="text-right">
                                 <span t-field="l.quantity"/>
                                 <span t-field="l.uom_id"  groups="product.group_uom"/>
                             </td>
-                            <td class="text-right">
-                                <span t-field="l.price_unit"/>
-                            </td>
+                            <!--<td class="text-right">-->
+                                <!--<span t-field="l.price_unit"/>-->
+                            <!--</td>-->
                             <td t-if="display_discount" class="text-right">
                                 <span t-field="l.sale_line_ids.discount"/>
                             </td>
-                            <td t-if="display_Cdiscount" class="text-right">
-                                <span t-field="l.sale_line_ids.computed_discount"/>
-                            </td>
+                            <!--<td t-if="display_Cdiscount" class="text-right">-->
+                                <!--<span t-field="l.sale_line_ids.computed_discount"/>-->
+                            <!--</td>-->
 
                             <td class="text-right">
                                 <span t-field="l.price_subtotal"
@@ -203,11 +205,18 @@
                                 <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                             </td>
                         </tr>
-                        <t t-if="not o.company_id.use_bduprint">
+                        <!--<t t-if="not o.company_id.use_bduprint">-->
+                            <!--<tr>-->
+                                <!--<td>Discount</td>-->
+                                <!--<td class="text-right">-->
+                                    <!--<span t-raw="tot_Cdiscount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                        <!--</t>-->
+                        <t t-if="not o.company_id.use_bduprint and o.partner_id.is_ad_agency">
                             <tr>
-                                <td>Discount</td>
-                                <td class="text-right">
-                                    <span t-raw="tot_Cdiscount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                <td>Agency Discount</td>
+                                <td class="text-right"> <span t-field="o.partner_id.agency_discount"/> %
                                 </td>
                             </tr>
                         </t>
@@ -255,11 +264,11 @@
                 </div>
             </div>
 
-            <t t-if="not o.company_id.use_bduprint">
-                <p t-if="o.comment" class='text-center' style="padding-left:75px;padding-right:70px;padding-top:30px;">
-                    <strong><span t-field="o.comment"/></strong>
-                </p>
-            </t>
+            <!--<t t-if="not o.company_id.use_bduprint">-->
+                <!--<p t-if="o.comment" class='text-center' style="padding-left:75px;padding-right:70px;padding-top:30px;">-->
+                    <!--<strong><span t-field="o.comment"/></strong>-->
+                <!--</p>-->
+            <!--</t>-->
             <p t-if="o.payment_term_id" class='text-center' style="padding-left:85px;padding-right:70px;padding-top:30px;">
                 <span t-field="o.payment_term_id.note"/>
             </p>
