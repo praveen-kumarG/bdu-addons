@@ -168,14 +168,15 @@ class SaleOrder(models.Model):
                             'ad_price': 0,
                             'ad_productiondetail_color': True,
                             'ad_productiondetail_isclassified': False,
-                            'ad_productiondetail_dtpcomments': 'External Reference:' + str(line.ad_number or '') + '\n' +
-                                                               'Material URL:' + str(line.url_to_material or '') + '\n' +
+                            'ad_productiondetail_dtpcomments': 'Externe Referentie:' + str(line.ad_number or '') + '\n' +
                                                                                 str(line.layout_remark or ''),
-                            'ad_productiondetail_placementcomments': 'Page Preference:' + str(line.page_reference or '') + '\n' +
+                            'ad_productiondetail_placementcomments': str(line.page_reference or '') + '\n' +
                                                                      'Page Type:' + str(line.analytic_tag_ids.name or '') + '\n' +
                                                                                     str(line.name or ''),
                             'ad_status': del_param,
-                            'ad_materialid': line.url_to_material or 0,
+                            'ad_materialid': 0,
+                            'ad_materialUrl': line.url_to_material or False,
+                            'ad_materialChecksum': False,
                     }
                     self.env['soline.from.odooto.pubble'].sudo().create(lvals)
 
@@ -196,17 +197,6 @@ class SaleOrderLine(models.Model):
 
     pubble_sent = fields.Boolean('Order Line sent to Pubble')
     line_pubble_allow = fields.Boolean(compute='_compute_allowed', string='Pubble Allowed', store=False)
-
-    '''@api.multi
-    def write(self, vals):
-        res = super(SaleOrderLine, self).write(vals)
-        for order in self.mapped('order_id').filtered(lambda s: s.order_pubble_allow and s.advertising and s.state == 'sale'):
-            if order.env.context.get('LoopBreaker1'):
-                continue
-            order = order.with_context(LoopBreaker1=True)
-#            if self.advertising and ('product_template_id' or 'adv_issue' or 'product_uom_qty' or 'layout_remark' or 'name') in vals:
-            self.env['sale.order'].search([('id','=',order.id)]).write({'opportunity_subject': order.opportunity_subject})
-        return res'''
 
 
 class SofromOdootoPubble(models.Model):
@@ -297,6 +287,8 @@ class SofromOdootoPubble(models.Model):
             ad.productionDetail.placementComments = line.ad_productiondetail_placementcomments
             ad.status = "active" if line.ad_status else "deleted"
             ad.materialID = int(line.ad_materialid)
+            ad.materialUrl = str(line.ad_materialUrl)
+            ad.materialChecksum = str(line.ad_materialChecksum)
 
             SalesOrder.orderLine_Ads.adPlacement.append(ad)
         self.write({'json_message': str(SalesOrder)})
@@ -331,5 +323,6 @@ class SoLinefromOdootoPubble(models.Model):
     ad_productiondetail_dtpcomments = fields.Text(string='Material Remarks')
     ad_productiondetail_placementcomments = fields.Text(string='Mapping Remarks')
     ad_status = fields.Boolean(string='Active')
-    ad_materialid = fields.Char(string='Material ID')
-
+    ad_materialid = fields.Integer(string='Material ID')
+    ad_materialUrl = fields.Char(string='URL to Material')
+    ad_materialChecksum = fields.Char(string='Material Checksum')
