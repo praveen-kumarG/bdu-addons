@@ -297,7 +297,7 @@ class SofromOdootoPubble(models.Model):
         response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
         self.write({'pubble_response': response})
         if response == True:
-            self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).write({'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
+            self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).with_context(pubble_call=True).write({'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
             for line in self.pubble_so_line:
                 self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
 
