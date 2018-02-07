@@ -800,11 +800,11 @@ class Job(models.Model):
         ratioSum = {}
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-
+            number = int(roll.number_rolls)
             if mass not in ratioSum:
-                ratioSum[mass] = {'width_mass_total': width}
+                ratioSum[mass] = {'width_mass_total': width * number}
             else:
-                ratioSum[mass]['width_mass_total'] += width
+                ratioSum[mass]['width_mass_total'] += width * number
 
 
 
