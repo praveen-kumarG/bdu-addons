@@ -801,13 +801,11 @@ class Job(models.Model):
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
             number = int(roll.number_rolls)
-
             if mass not in ratioSum:
-                ratioSum[mass] = {'number_mass': number}
-            if width not in ratioSum:
-                ratioSum[mass][width] = {'number_width': number}
+                ratioSum[mass] = {'width_mass_total': width * number}
             else:
-                ratioSum[mass]['number_mass'] += number
+                ratioSum[mass]['width_mass_total'] += width * number
+
 
 
         # Total Mass per PaperMass
@@ -823,8 +821,8 @@ class Job(models.Model):
         # Paper Rolls
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-            num_mass = ratioSum[mass]['number_mass']
-            num_width = ratioSum[mass][width]['number_width']
+            num_mass = ratioSum[mass]['width_mass_total']
+            num_width = width * int(roll.number_rolls)
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0

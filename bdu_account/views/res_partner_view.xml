@@ -17,13 +17,13 @@
             </xpath>
 
             <field name="street" position="attributes">
-                <attribute name="attrs">{'required':[('is_company','=',True)]}</attribute>
+                <attribute name="attrs">{'required':[('is_company','=',True),('customer','=', True)]}</attribute>
             </field>
             <field name="email" position="attributes">
-                <attribute name="attrs">{'required':[('is_company','=',True)]}</attribute>
+                <attribute name="attrs">{'required':[('is_company','=',True),('customer','=', True)]}</attribute>
             </field>
             <field name="user_id" position="attributes">
-                <attribute name="attrs">{'required':[('is_company','=',True)]}</attribute>
+                <attribute name="attrs">{'required':[('is_company','=',True),('customer','=', True)]}</attribute>
             </field>
             <page name="sales_purchases" position="after">
                 <page string="Additional Information" name="additional_information">
@@ -56,7 +56,7 @@
         <field name="inherit_id" ref="partner_sector.view_partner_form_sector"/>
         <field name="arch" type="xml">
             <field name="sector_id" position="attributes">
-                <attribute name="attrs">{'required':[('is_company','=',True)]}</attribute>
+                <attribute name="attrs">{'required':[('is_company','=',True),('customer','=', True)]}</attribute>
             </field>
         </field>
     </record>

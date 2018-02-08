@@ -172,7 +172,8 @@ class SaleOrder(models.Model):
                                                                                 str(line.layout_remark or ''),
                             'ad_productiondetail_placementcomments': str(line.page_reference or '') + '\n' +
                                                                      'Page Type:' + str(line.analytic_tag_ids.name or '') + '\n' +
-                                                                                    str(line.name or ''),
+                                                                                    str(line.name or '') + '\n' +
+                                                                                    str(self.opportunity_subject or ''),
                             'ad_status': del_param,
                             'ad_materialid': 0,
                             'ad_materialUrl': line.url_to_material or False,
@@ -296,7 +297,7 @@ class SofromOdootoPubble(models.Model):
         response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
         self.write({'pubble_response': response})
         if response == True:
-            self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).write({'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
+            self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).with_context(pubble_call=True).write({'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
             for line in self.pubble_so_line:
                 self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
 
