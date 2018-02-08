@@ -123,12 +123,28 @@
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l">
                             <t t-set="tot_Cdiscount" t-value="tot_Cdiscount + l.sale_line_ids.computed_discount"/>
-
-                            <td><span t-field="l.sale_line_ids.issue_date"/></td>
+                            <t t-if="o.type != 'out_refund'">
+                                <td><span t-field="l.sale_line_ids.issue_date"/></td>
+                            </t>
+                            <t t-if="o.type == 'out_refund'">
+                                <td t-if="o.refund_invoice_id"><span t-field="o.refund_invoice_id.date_invoice"/></td>
+                                <td t-if="not o.refund_invoice_id"><span t-field="l.sale_line_ids.issue_date"/></td>
+                            </t>
                             <!--<td><span t-field="l.name"/></td>-->
-                            <td><span t-field="l.sale_line_ids.order_id.opportunity_subject"/></td>
+                            <t t-if="o.type != 'out_refund'">
+                                <td><span t-field="l.sale_line_ids.order_id.opportunity_subject"/></td>
+                            </t>
+                            <t t-if="o.type == 'out_refund'">
+                                <td>Creditnote for invoice</td>
+                            </t>
                             <!--<td><span t-field="l.sale_line_ids.title"/></td>-->
-                            <td><span t-field="l.sale_line_ids.ad_number"/></td>
+                            <t t-if="o.type != 'out_refund'">
+                                <td><span t-field="l.sale_line_ids.ad_number"/></td>
+                            </t>
+                            <t t-if="o.type == 'out_refund'">
+                                <td t-if="o.refund_invoice_id"><span t-field="o.refund_invoice_id.number"/></td>
+                                <td t-if="not o.refund_invoice_id"><span t-field="o.origin"/></td>
+                            </t>
                             <td><span t-if="l.product_id" t-field="l.product_id.name"/></td>
                             <td class="text-right">
                                 <span t-field="l.quantity"/>
@@ -145,7 +161,7 @@
                             <!--</td>-->
 
                             <td class="text-right">
-                                <span t-field="l.price_subtotal"
+                                <span t-if="o.type == 'out_refund'">-</span><span t-field="l.price_subtotal"
                                     t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                             </td>
                         </tr>
@@ -231,7 +247,7 @@
                         <tr class="border-black">
                             <td><strong>Total</strong></td>
                             <td class="text-right">
-                                 <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                 <span t-if="not o.company_id.use_bduprint and o.type == 'out_refund'">-</span><span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                             </td>
                         </tr>
                     </table>
