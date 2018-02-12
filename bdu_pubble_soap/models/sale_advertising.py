@@ -65,17 +65,12 @@ class SaleOrder(models.Model):
     def action_pubble(self, arg):
         self.ensure_one()
         res = self.transfer_order_to_pubble(arg)
-#        self._cr.commit()
         if self.order_pubble_allow:
             self.send_to_pubble(res)
         return True
 
-
     def send_to_pubble(self, res):
-        res.with_delay().call_wsdl()
-#        self.write({'publog_id': res.id})
-#        for line in res.pubble_so_line:
-#            self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
+        res.with_delay(description=res.salesorder_reference).call_wsdl()
 
     @api.multi
     def action_confirm(self):
@@ -84,21 +79,14 @@ class SaleOrder(models.Model):
             order.action_pubble('update')
         return res
 
-
-
     @api.multi
     def write(self, vals):
-#        import pdb; pdb.set_trace()
         res = super(SaleOrder, self).write(vals)
         for order in self.filtered(lambda s: s.advertising and s.order_pubble_allow and s.state == 'sale'):
-#            if order.env.context.get('LoopBreaker2'):
-#                continue
-#            order = order.with_context(LoopBreaker2=True)
-            if ('published_customer' in vals or 'partner_id' in vals or 'customer_contact' in vals or 'advertising_agency'
-                in vals or 'opportunity_subject' in vals or 'order_line' in vals):
+            if ('published_customer' in vals) or ('partner_id' in vals) or ('customer_contact' in vals) or ('advertising_agency'in vals) \
+                                              or ('opportunity_subject' in vals) or ('order_line' in vals):
                 order.action_pubble('update')
         return res
-
 
     @api.multi
     def action_cancel(self):
