@@ -115,7 +115,7 @@
                             <th width="10%">Reference</th>
                             <th width="10%">Product</th>
                             <th width="10%" class="text-right">Volume</th>
-                            <th width="10%" class="text-right">Unit Price</th>
+                            <t t-if="o.partner_id.is_ad_agency"><th width="10%" class="text-right">Unit Price</th></t>
                             <th width="10%" t-if="display_discount" class="text-right">Disc(%)</th>
                             <!--<th width="10%" t-if="display_Cdiscount" class="text-right">Computed Discount</th>-->
                             <th width="10%" class="text-right">Tax Excluded Price</th>
@@ -152,9 +152,11 @@
                                 <span t-field="l.quantity"/>
                                 <span t-field="l.uom_id"  groups="product.group_uom"/>
                             </td>
-                            <td class="text-right">
-                                <span t-field="l.price_unit"/>
-                            </td>
+                            <t t-if="o.partner_id.is_ad_agency">
+                                <td class="text-right">
+                                    <span t-field="l.price_unit"/>
+                                </td>
+                            </t>
                             <td t-if="display_discount" class="text-right">
                                 <span t-field="l.sale_line_ids.discount"/>
                             </td>
