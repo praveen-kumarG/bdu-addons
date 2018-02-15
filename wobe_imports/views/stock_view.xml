@@ -12,4 +12,30 @@
             </xpath>
         </field>
     </record>
+
+
+    <record id="view_move_tree_wobe_inherit" model="ir.ui.view">
+        <field name="name">Stock Moves</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="job_title"/>
+                <field name="job_issue_date"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_form_wobe_inherit" model="ir.ui.view">
+        <field name="name">Stock Moves</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="analytic_account_id" attrs="{'invisible': [('analytic_account_id', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+
 </odoo>
