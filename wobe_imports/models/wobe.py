@@ -731,7 +731,7 @@ class Job(models.Model):
         return  {
             'picking_type_id': picking_type.id,
             'partner_id': partner and partner.id or False,
-            'min_date': self.production_stop,
+            'min_date': self.issue_date,
             'origin': self.name,
             'location_dest_id': partner and partner.property_stock_customer.id or False,
             'location_id': picking_type.default_location_src_id.id,
