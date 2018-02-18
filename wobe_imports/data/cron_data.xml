@@ -16,5 +16,49 @@
             <field eval="'()'" name="args"/>
             <field eval="False" name="active"/>
         </record>
+        <record id="ir_cron_wobe_create_jobs" model="ir.cron">
+            <field name="name">Create WOBE Jobs</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+            <field eval="'wobe.job'" name="model"/>
+            <field eval="'action_create_job'" name="function"/>
+            <field eval="'()'" name="args"/>
+            <field eval="False" name="active"/>
+        </record>
+        <record id="ir_cron_wobe_create_sale_orders" model="ir.cron">
+            <field name="name">Wobe Sale Order Creation</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+            <field eval="'wobe.job'" name="model"/>
+            <field eval="'action_create_order'" name="function"/>
+            <field eval="'()'" name="args"/>
+            <field eval="False" name="active"/>
+        </record>
+        <record id="ir_cron_wobe_create_pickings" model="ir.cron">
+            <field name="name">Wobe Picking Creation</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+            <field eval="'wobe.job'" name="model"/>
+            <field eval="'action_create_picking'" name="function"/>
+            <field eval="'()'" name="args"/>
+            <field eval="False" name="active"/>
+        </record>
+        <record id="ir_cron_wobe_create_costing" model="ir.cron">
+            <field name="name">Wobe Costing Creation</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+            <field eval="'wobe.job'" name="model"/>
+            <field eval="'action_create_costing'" name="function"/>
+            <field eval="'()'" name="args"/>
+            <field eval="False" name="active"/>
+        </record>
     </data>
 </odoo>
