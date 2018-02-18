@@ -754,7 +754,7 @@ class Job(models.Model):
             'product_id': product_obj.id,
             'product_uom': product_obj.uom_id.id,
             'product_uom_qty': line['product_uom_qty'],
-            'date': job.production_stop,
+            'date': job.issue_date,
             'date_expected': picking.min_date,
             'location_id':picking.location_id.id,
             'location_dest_id': picking.location_dest_id.id,
