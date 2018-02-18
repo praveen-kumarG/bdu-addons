@@ -1239,7 +1239,7 @@ class Edition(models.Model):
     @api.onchange('name')
     def edition_create(self):
         self.name = self.job_id.title
-        self.plate_amount = sum(line.calculated_plates if int(line.pages) >= 48 else line.calculated_plates / 2 for line in self.job_id.booklet_ids)
+        self.plate_amount = sum(line.calculated_plates if int(line.pages) > 48 else line.calculated_plates / 2 for line in self.job_id.booklet_ids)
         self.net_quantity = self.job_id.planned_quantity
 
     @api.onchange('gross_quantity')
