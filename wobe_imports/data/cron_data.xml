@@ -6,7 +6,7 @@
             FTP
         -->
         <record id="ir_cron_file_transfer_actions" model="ir.cron">
-            <field name="name">FTP &amp; Import WOBE Jobs</field>
+            <field name="name">WOBE FTP &amp; Import Jobs</field>
             <field name="interval_number">1</field>
             <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
@@ -17,7 +17,7 @@
             <field eval="False" name="active"/>
         </record>
         <record id="ir_cron_wobe_create_jobs" model="ir.cron">
-            <field name="name">Create WOBE Jobs</field>
+            <field name="name">WOBE Create Jobs</field>
             <field name="interval_number">1</field>
             <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
