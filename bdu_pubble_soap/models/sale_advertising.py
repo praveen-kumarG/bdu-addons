@@ -151,19 +151,22 @@ class SaleOrder(models.Model):
                             'ad_adsize_name': line.product_id.name or '',
                             'ad_adsize_width': line.product_template_id.width,
                             'ad_edition_editiondate': line.adv_issue.issue_date,
-                            'ad_edition_extpublicationid': line.title.name,
+                            'ad_edition_extpublicationid': line.title.name if line.ad_class.name != 'Webvertorial' else line.adv_issue.name,
                             'ad_extplacementid': line.id,
                             'ad_price': 0,
                             'ad_productiondetail_classifiedCategory': line.analytic_tag_ids.name or '' if line.ad_class.name == 'Regiotreffers' else False,
                             'ad_productiondetail_color': True,
                             'ad_productiondetail_isclassified': True if line.ad_class.name == 'Regiotreffers' else False,
                             'ad_productiondetail_dtpcomments': 'Externe Referentie:' + str(line.ad_number or '') + '\n' +
-                                                                                str(line.layout_remark or ''),
+                                                                                       str(line.layout_remark or ''),
                             'ad_productiondetail_placementcomments': str(line.page_reference or '') + '\n' +
-                                                                     'Page Type:' + str(line.analytic_tag_ids.name or '') + '\n' +
-                                                                                    str(line.name or '') + '\n' +
-                                                                                    str(self.opportunity_subject or ''),
-                            'ad_productiondetail_pageType': line.analytic_tag_ids.name or 'Advertentiepagina' if line.ad_class.name == 'GA' else 'Redactiepagina',
+                                                                     str(line.name or '') + '\n' +
+                                                                     str(self.opportunity_subject or ''),
+                            'ad_productiondetail_pageType': line.analytic_tag_ids.name or ('Advertentiepagina' if line.ad_class.name == 'GA' else
+                                                                                           'Redactiepagina' if line.ad_class.name == 'IM' else
+                                                                                           'Familiebericht' if line.ad_class.name == 'FAM' else
+                                                                                           'Voorpagina' if line.ad_class.name == 'VP' else
+                                                                                           'Advertentiepagina') if line.ad_class.name != 'Regiotreffers' else 'Regiotreffers',
                             'ad_status': del_param,
                             'ad_materialid': 0,
                             'ad_materialUrl': line.url_to_material or False,
