@@ -56,10 +56,12 @@
                                         <field name="ad_edition_editiondate"/>
                                         <field name="ad_edition_extpublicationid"/>
                                         <field name="ad_extplacementid"/>
+                                        <field name="ad_productiondetail_pageType"/>
                                         <field name="ad_productiondetail_isclassified"/>
+                                        <field name="ad_productiondetail_classifiedCategory"/>
                                         <field name="ad_productiondetail_dtpcomments"/>
                                         <field name="ad_productiondetail_placementcomments"/>
-                                        <field name="ad_materialid"/>
+                                        <field name="ad_materialUrl"/>
                                         <field name="ad_status"/>
                                     </tree>
                                 </field>
