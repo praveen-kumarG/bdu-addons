@@ -204,6 +204,7 @@ class SofromOdootoPubble(models.Model):
     transmission_id = fields.Char(string='Transmission ID', store=True, size=16, readonly=True)
     pubble_so_line = fields.One2many('soline.from.odooto.pubble', 'order_id', string='Order Lines', copy=True)
     pubble_response = fields.Text('Pubble Response')
+    pubble_environment = fields.Char('Pubble Environment')
     json_message = fields.Text('JSON message')
     sale_order_id = fields.Many2one('sale.order',string='Sale Order')
     salesorder_extorderid = fields.Char(string='Sale Order ID')
@@ -290,7 +291,7 @@ class SofromOdootoPubble(models.Model):
         self.write({'json_message': str(SalesOrder)})
         self._cr.commit()
         response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
-        self.write({'pubble_response': response})
+        self.write({'pubble_response': response,'pubble_environment': publisher})
         if response == True:
             self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).with_context(pubble_call=True).write({'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
             for line in self.pubble_so_line:
