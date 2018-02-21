@@ -1,0 +1,156 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* bdu_crm
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-02-09 10:47+0000\n"
+"PO-Revision-Date: 2018-02-09 11:51+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: en\n"
+"X-Generator: Poedit 2.0.4\n"
+
+#. module: bdu_crm
+#: model:ir.actions.act_window,help:bdu_crm.action_project_issue_type
+msgid "Create Project Issue Type."
+msgstr "Maak type project issue aan."
+
+#. module: bdu_crm
+#: model:ir.actions.act_window,help:bdu_crm.action_project_source
+msgid "Create Project Source."
+msgstr "Maak project bron aan."
+
+#. module: bdu_crm
+#: model:ir.actions.act_window,help:bdu_crm.action_task_type
+msgid "Create Task Type."
+msgstr "Maak taak type aan."
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_type_create_uid
+#: model:ir.model.fields,field_description:bdu_crm.field_project_source_create_uid
+#: model:ir.model.fields,field_description:bdu_crm.field_task_type_create_uid
+msgid "Created by"
+msgstr "Aangemaakt door"
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_type_create_date
+#: model:ir.model.fields,field_description:bdu_crm.field_project_source_create_date
+#: model:ir.model.fields,field_description:bdu_crm.field_task_type_create_date
+msgid "Created on"
+msgstr "Aangemaakt op"
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_deadline
+msgid "Deadline"
+msgstr "Deadline"
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_type_display_name
+#: model:ir.model.fields,field_description:bdu_crm.field_project_source_display_name
+#: model:ir.model.fields,field_description:bdu_crm.field_task_type_display_name
+msgid "Display Name"
+msgstr "Weergave naam"
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_type_id
+#: model:ir.model.fields,field_description:bdu_crm.field_project_source_id
+#: model:ir.model.fields,field_description:bdu_crm.field_task_type_id
+msgid "ID"
+msgstr "ID"
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_issue_type
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_type_name
+#: model:ir.ui.view,arch_db:bdu_crm.view_project_issue_type_form
+#: model:ir.ui.view,arch_db:bdu_crm.view_project_issue_type_tree
+#: model:ir.ui.view,arch_db:bdu_crm.view_task_type_form
+msgid "Issue Type"
+msgstr "Type issue"
+
+#. module: bdu_crm
+#: model:ir.actions.act_window,name:bdu_crm.action_project_issue_type
+#: model:ir.ui.menu,name:bdu_crm.menu_project_issue_type
+msgid "Issues Type"
+msgstr "Type issue"
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_type___last_update
+#: model:ir.model.fields,field_description:bdu_crm.field_project_source___last_update
+#: model:ir.model.fields,field_description:bdu_crm.field_task_type___last_update
+msgid "Last Modified on"
+msgstr "Laatst gewijzigd op"
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_type_write_uid
+#: model:ir.model.fields,field_description:bdu_crm.field_project_source_write_uid
+#: model:ir.model.fields,field_description:bdu_crm.field_task_type_write_uid
+msgid "Last Updated by"
+msgstr "Laatst bijgewerkt door"
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_type_write_date
+#: model:ir.model.fields,field_description:bdu_crm.field_project_source_write_date
+#: model:ir.model.fields,field_description:bdu_crm.field_task_type_write_date
+msgid "Last Updated on"
+msgstr "Laatst bijgewerkt op"
+
+#. module: bdu_crm
+#: model:ir.model,name:bdu_crm.model_project_issue
+msgid "Project Issue"
+msgstr "Project issues"
+
+#. module: bdu_crm
+#: model:ir.model,name:bdu_crm.model_project_issue_type
+msgid "Project Issue Type"
+msgstr "Type project issue"
+
+#. module: bdu_crm
+#: model:ir.model,name:bdu_crm.model_project_source
+msgid "Project Source"
+msgstr "Project bron"
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_solution
+#: model:ir.ui.view,arch_db:bdu_crm.project_issue_form_view_bdu_crm
+msgid "Solution"
+msgstr "Oplossing"
+
+#. module: bdu_crm
+#: model:ir.model.fields,field_description:bdu_crm.field_project_issue_source
+#: model:ir.model.fields,field_description:bdu_crm.field_project_source_name
+#: model:ir.ui.view,arch_db:bdu_crm.view_project_source_form
+#: model:ir.ui.view,arch_db:bdu_crm.view_project_source_tree
+msgid "Source"
+msgstr "Bron"
+
+#. module: bdu_crm
+#: model:ir.actions.act_window,name:bdu_crm.action_project_source
+#: model:ir.ui.menu,name:bdu_crm.menu_project_source
+msgid "Sources"
+msgstr "Bronnen"
+
+#. module: bdu_crm
+#: model:ir.model,name:bdu_crm.model_project_task
+msgid "Task"
+msgstr "Taak"
+
+#. module: bdu_crm
+#: model:ir.model,name:bdu_crm.model_task_type
+#: model:ir.model.fields,field_description:bdu_crm.field_project_task_task_type
+#: model:ir.model.fields,field_description:bdu_crm.field_task_type_name
+#: model:ir.ui.view,arch_db:bdu_crm.view_task_type_tree
+msgid "Task Type"
+msgstr "Type taak"
+
+#. module: bdu_crm
+#: model:ir.actions.act_window,name:bdu_crm.action_task_type
+#: model:ir.ui.menu,name:bdu_crm.menu_task_type
+msgid "Tasks Type"
+msgstr "Type taken"

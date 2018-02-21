@@ -152,7 +152,6 @@
             </field>
         </record>
 
-
         <record id="view_wobe_job_filter" model="ir.ui.view">
             <field name="name">view_wobe_job_filter</field>
             <field name="model">wobe.job</field>

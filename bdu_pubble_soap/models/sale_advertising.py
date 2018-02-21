@@ -151,17 +151,22 @@ class SaleOrder(models.Model):
                             'ad_adsize_name': line.product_id.name or '',
                             'ad_adsize_width': line.product_template_id.width,
                             'ad_edition_editiondate': line.adv_issue.issue_date,
-                            'ad_edition_extpublicationid': line.title.name,
+                            'ad_edition_extpublicationid': line.title.name if line.ad_class.name != 'Webvertorial' else line.adv_issue.name,
                             'ad_extplacementid': line.id,
                             'ad_price': 0,
+                            'ad_productiondetail_classifiedCategory': line.analytic_tag_ids.name or '' if line.ad_class.name == 'Regiotreffers' else False,
                             'ad_productiondetail_color': True,
-                            'ad_productiondetail_isclassified': False,
+                            'ad_productiondetail_isclassified': True if line.ad_class.name == 'Regiotreffers' else False,
                             'ad_productiondetail_dtpcomments': 'Externe Referentie:' + str(line.ad_number or '') + '\n' +
-                                                                                str(line.layout_remark or ''),
+                                                                                       str(line.layout_remark or ''),
                             'ad_productiondetail_placementcomments': str(line.page_reference or '') + '\n' +
-                                                                     'Page Type:' + str(line.analytic_tag_ids.name or '') + '\n' +
-                                                                                    str(line.name or '') + '\n' +
-                                                                                    str(self.opportunity_subject or ''),
+                                                                     str(line.name or '') + '\n' +
+                                                                     str(self.opportunity_subject or ''),
+                            'ad_productiondetail_pageType': line.analytic_tag_ids.name or ('Advertentiepagina' if line.ad_class.name == 'GA' else
+                                                                                           'Redactiepagina' if line.ad_class.name == 'IM' else
+                                                                                           'Familiebericht' if line.ad_class.name == 'FAM' else
+                                                                                           'Voorpagina' if line.ad_class.name == 'VP' else
+                                                                                           'Advertentiepagina') if line.ad_class.name != 'Regiotreffers' else 'Regiotreffers',
                             'ad_status': del_param,
                             'ad_materialid': 0,
                             'ad_materialUrl': line.url_to_material or False,
@@ -199,6 +204,7 @@ class SofromOdootoPubble(models.Model):
     transmission_id = fields.Char(string='Transmission ID', store=True, size=16, readonly=True)
     pubble_so_line = fields.One2many('soline.from.odooto.pubble', 'order_id', string='Order Lines', copy=True)
     pubble_response = fields.Text('Pubble Response')
+    pubble_environment = fields.Char('Pubble Environment')
     json_message = fields.Text('JSON message')
     sale_order_id = fields.Many2one('sale.order',string='Sale Order')
     salesorder_extorderid = fields.Char(string='Sale Order ID')
@@ -270,10 +276,12 @@ class SofromOdootoPubble(models.Model):
             ad.edition.extPublicationID = line.ad_edition_extpublicationid
             ad.extPlacementID = int(float(line.ad_extplacementid))
             ad.price = 0
+            ad.productionDetail.classifiedCategory = line.ad_productiondetail_classifiedCategory
             ad.productionDetail.color = "true" if line.ad_productiondetail_color else "false"
             ad.productionDetail.isClassified = "true" if line.ad_productiondetail_isclassified else "false"
             ad.productionDetail.dtpComments = line.ad_productiondetail_dtpcomments
             ad.productionDetail.placementComments = line.ad_productiondetail_placementcomments
+            ad.productionDetail.pageType = line.ad_productiondetail_pageType
             ad.status = "active" if line.ad_status else "deleted"
             ad.materialID = int(line.ad_materialid)
             ad.materialUrl = str(line.ad_materialUrl)
@@ -283,7 +291,7 @@ class SofromOdootoPubble(models.Model):
         self.write({'json_message': str(SalesOrder)})
         self._cr.commit()
         response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
-        self.write({'pubble_response': response})
+        self.write({'pubble_response': response,'pubble_environment': publisher})
         if response == True:
             self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).with_context(pubble_call=True).write({'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
             for line in self.pubble_so_line:
@@ -307,11 +315,15 @@ class SoLinefromOdootoPubble(models.Model):
     ad_edition_extpublicationid = fields.Char(string='Advertising Title Name', size=64)
     ad_extplacementid = fields.Integer(string='Line ID')
     ad_price = fields.Integer(string='Price', default=0)
+    ad_productiondetail_classifiedCategory = fields.Char(string='Classified Category', size=90)
     ad_productiondetail_color = fields.Boolean(string='Color')
     ad_productiondetail_isclassified = fields.Boolean(string='Classified')
-    ad_productiondetail_dtpcomments = fields.Text(string='Material Remarks')
-    ad_productiondetail_placementcomments = fields.Text(string='Mapping Remarks')
+    ad_productiondetail_dtpcomments = fields.Char(string='Material Remarks')
+    ad_productiondetail_placementcomments = fields.Char(string='Mapping Remarks')
+    ad_productiondetail_pageType = fields.Char(string='Page Type', size=90)
     ad_status = fields.Boolean(string='Active')
     ad_materialid = fields.Integer(string='Material ID')
     ad_materialUrl = fields.Char(string='URL to Material')
     ad_materialChecksum = fields.Char(string='Material Checksum')
+
+
