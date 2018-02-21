@@ -237,7 +237,7 @@ class SofromOdootoPubble(models.Model):
         transmissionID = int(float(self.transmission_id))
         client = Client("https://ws.pubble.nl/Sales.svc?singleWsdl")
         SalesOrder = client.factory.create('ns1:salesOrder')
-        publisher = "nhbdudata"
+        publisher = "testbdudata"
         apiKey = "9tituo3t2qo4zk7emvlb"
 
 
