@@ -212,7 +212,7 @@ class Registry(models.Model):
             fileLists = os.listdir(dir_toRead)
 
         for filename in fileLists:
-            if not filename.endswith('.xml'): continue
+            if not filename.lower().endswith('.xml'): continue
             File = os.path.join(dir_toRead, filename)
             fileStat = os.stat(File)
             file_create_date = fileStat.st_ctime
