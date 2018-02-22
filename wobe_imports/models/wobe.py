@@ -902,6 +902,17 @@ class Job(models.Model):
                     'partner_id': picking.partner_id.id
                 })
             case.write({'picking_id':picking.id,'state':'picking_created'})
+            # Force picking confirmation
+            if picking:
+                picking.action_confirm()
+                picking.action_assign()
+                # update done qty from demand qty
+                for pack in picking.pack_operation_ids:
+                    if pack.product_qty > 0:
+                        pack.write({'qty_done': pack.product_qty})
+                    else:
+                        pack.unlink()
+                picking.do_transfer()
         return True
 
     @api.model
