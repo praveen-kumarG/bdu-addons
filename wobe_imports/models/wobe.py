@@ -730,10 +730,10 @@ class Job(models.Model):
 
         return  {
             'picking_type_id': picking_type.id,
-            'partner_id': partner.id,
-            'min_date': self.production_stop,
+            'partner_id': partner and partner.id or False,
+            'min_date': self.issue_date,
             'origin': self.name,
-            'location_dest_id': partner.property_stock_customer.id,
+            'location_dest_id': partner and partner.property_stock_customer.id or False,
             'location_id': picking_type.default_location_src_id.id,
             'company_id': self.company_id.id,
             'order_id': self.order_id.id,
@@ -754,7 +754,7 @@ class Job(models.Model):
             'product_id': product_obj.id,
             'product_uom': product_obj.uom_id.id,
             'product_uom_qty': line['product_uom_qty'],
-            'date': job.production_stop,
+            'date': job.issue_date,
             'date_expected': picking.min_date,
             'location_id':picking.location_id.id,
             'location_dest_id': picking.location_dest_id.id,
@@ -801,13 +801,11 @@ class Job(models.Model):
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
             number = int(roll.number_rolls)
-
             if mass not in ratioSum:
-                ratioSum[mass] = {'number_mass': number}
-            if width not in ratioSum:
-                ratioSum[mass][width] = {'number_width': number}
+                ratioSum[mass] = {'width_mass_total': width * number}
             else:
-                ratioSum[mass]['number_mass'] += number
+                ratioSum[mass]['width_mass_total'] += width * number
+
 
 
         # Total Mass per PaperMass
@@ -823,8 +821,8 @@ class Job(models.Model):
         # Paper Rolls
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
-            num_mass = ratioSum[mass]['number_mass']
-            num_width = ratioSum[mass][width]['number_width']
+            num_mass = ratioSum[mass]['width_mass_total']
+            num_width = width * int(roll.number_rolls)
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
@@ -1050,6 +1048,7 @@ class Job(models.Model):
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
+            num_mass = num_mass if num_mass > 0 else 1
             NetQty = (NetMass * num_width / num_mass)
 
 
@@ -1240,7 +1239,7 @@ class Edition(models.Model):
     @api.onchange('name')
     def edition_create(self):
         self.name = self.job_id.title
-        self.plate_amount = sum(line.calculated_plates if int(line.pages) >= 48 else line.calculated_plates / 2 for line in self.job_id.booklet_ids)
+        self.plate_amount = sum(line.calculated_plates if int(line.pages) > 48 else line.calculated_plates / 2 for line in self.job_id.booklet_ids)
         self.net_quantity = self.job_id.planned_quantity
 
     @api.onchange('gross_quantity')

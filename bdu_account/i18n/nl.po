@@ -1,336 +1,664 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* bdu_pubble_soap
+# 	* bdu_account
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-26 16:24+0000\n"
-"PO-Revision-Date: 2017-12-26 17:32+0100\n"
+"POT-Creation-Date: 2018-02-09 10:47+0000\n"
+"PO-Revision-Date: 2018-02-09 11:59+0100\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: \n"
-"Language: en\n"
-"X-Generator: Poedit 2.0.5\n"
+"Language: nl\n"
+"X-Generator: Poedit 2.0.4\n"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_status
-msgid "Active"
-msgstr "Actief"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "&amp;bull;"
+msgstr "&amp;bull;"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_debtor_addedby
-msgid "Advertiser Added by"
-msgstr "Adverteerder toegevoegd door"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid ""
+"<br/>\n"
+"                            <strong>Your Ref</strong>"
+msgstr ""
+"<br/>\n"
+"                            <strong>uw referentie</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_debtor_city
-msgid "Advertiser City"
-msgstr "Plaats adverteerder"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<span class=\"pull-left\">Lot/Serial Number</span>"
+msgstr "<span class=\"pull-left\">Batch/serie nummer</span>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_debtor_addeddate
-msgid "Advertiser Date Added"
-msgstr "Adverteerder toegevoegd op"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<span><strong>Customer Address:</strong></span>"
+msgstr "<span><strong>Klantadres:</strong></span>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_debtor_lastmodified
-msgid "Advertiser Date Last Modified"
-msgstr "Adverteerder laatst bewerkt op"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<span><strong>Date</strong></span>"
+msgstr "<span><strong>Datum</strong></span>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_debtor_emailadres
-msgid "Advertiser Email"
-msgstr "Email adverteerder"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid ""
+"<span><strong>Date</strong></span><br/>\n"
+"                                    <span><strong>Order (Origin)</strong></span>"
+msgstr ""
+"<span><strong>Datum</strong></span><br/>\n"
+"                                    <span><strong>Datum (Bron)</strong></span>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_debtor_name
-msgid "Advertiser Name"
-msgstr "Naam adverteerder"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid ""
+"<span><strong>Invoice Date</strong></span>\n"
+"                         <br/>\n"
+"                         <span><strong>Invoice Number</strong></span>\n"
+"                         <br/>\n"
+"                         <span><strong>Customer Code</strong></span>"
+msgstr ""
+"<span><strong>Factuur datum</strong></span>\n"
+"                         <br/>\n"
+"                         <span><strong>Factuurnummer</strong></span>\n"
+"                         <br/>\n"
+"                         <span><strong>Klantnummer</strong></span>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_debtor_extaccountingid
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_debtor_extdebtorid
-msgid "Advertiser Number"
-msgstr "Debiteurennummer"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid ""
+"<span><strong>Order Date</strong></span>\n"
+"                         <br/>\n"
+"                         <span><strong>Order Number</strong></span>\n"
+"                         <br/>\n"
+"                         <span><strong>Customer Code</strong></span>"
+msgstr ""
+"<span><strong>Order datum</strong></span>\n"
+"                         <br/>\n"
+"                         <span><strong>Ordernummer</strong></span>\n"
+"                         <br/>\n"
+"                         <span><strong>Klantnummer</strong></span>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_debtor_postalcode
-msgid "Advertiser Zip Code"
-msgstr "Postcode adverteerder"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid ""
+"<span><strong>Order Date</strong></span><br/>\n"
+"                        <span><strong>Order Number</strong></span>"
+msgstr ""
+"<span><strong>Order datum</strong></span><br/>\n"
+"                        <span><strong>Ordernummer</strong></span>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_adsize_adtypename
-msgid "Advertising Class Name"
-msgstr "Adverteerder soortnaam"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid "<span>REQUEST FOR QUOTATION</span>"
+msgstr "<span>Offerte aanvraag</span>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_adsize_name
-msgid "Advertising Product Name"
-msgstr "Adverteerder productnaam"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "<strong>Advertiser</strong>"
+msgstr "<strong>Adverteerder</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_edition_extpublicationid
-msgid "Advertising Title Name"
-msgstr "Adverteerder titel naam"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "<strong>Date Req.</strong>"
+msgstr "<strong>Datum aanvraag</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_agency
-msgid "Agency"
-msgstr "Mediabureau"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<strong>Delivered Quantity</strong>"
+msgstr "<strong>Geleverde hoeveelheid</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_agency_city
-msgid "Agency City"
-msgstr "Plaats mediabureau"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid "<strong>Description</strong>"
+msgstr "<strong>Omschrijving</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_agency_addeddate
-msgid "Agency Date Added"
-msgstr "Bureau toegevoegd op"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid "<strong>Expected Date</strong>"
+msgstr "<strong>Verwachte datum</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_agency_lastmodified
-msgid "Agency Date Last Modified"
-msgstr "Bureau laatst bewerkt op"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "<strong>For approval:</strong>"
+msgstr "<strong>Voor akkoord:</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_agency_emailadres
-msgid "Agency Email"
-msgstr "Email mediabureau"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "<strong>Gross</strong>"
+msgstr "<strong>Bruto</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_agency_name
-msgid "Agency Name"
-msgstr "Naam mediabureau"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "<strong>Net Price</strong>"
+msgstr "<strong>Nettoprijs</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_agency_extaccountingid
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_agency_extdebtorid
-msgid "Agency Number"
-msgstr "Debiteurennummer mediabureau"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "<strong>Opportunity Subject</strong>"
+msgstr "<strong>Onderwerp</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_agency_postalcode
-msgid "Agency Zip Code"
-msgstr "Posctode mediabureau"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<strong>Ordered Quantity</strong>"
+msgstr "<strong>Aantal</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_productiondetail_isclassified
-msgid "Classified"
-msgstr "Geclassificeerd"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "<strong>Product</strong>"
+msgstr "<strong>Product</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_productiondetail_color
-msgid "Color"
-msgstr "Kleur"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+msgid "<strong>Qty</strong>"
+msgstr "<strong>Hvh</strong>"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_create_uid
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_create_uid
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "<strong>Subtotal: </strong>"
+msgstr "<strong>Subtotaal: </strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "<strong>Taxes</strong>"
+msgstr "<strong>BTW</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
+msgid "<strong>Total Due</strong>"
+msgstr "<strong>Totaal verschuldigd</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
+msgid "<strong>Total Invoiced</strong>"
+msgstr "<strong>Totaal gefactureerd</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "<strong>Total</strong>"
+msgstr "<strong>Totaal</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "<strong>Unit Price</strong>"
+msgstr "<strong>Prijs</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.view_partners_form_bdu_account
+msgid "Additional Information"
+msgstr "Aanvullende informatie"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_account_invoice_published_customer
+msgid "Advertiser"
+msgstr "Adverteerder"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Agency Discount"
+msgstr "Bureau Commissie"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "All items couldn't be shipped, the remaining ones will be shipped as soon as they become available."
+msgstr "Niet alle item konden worden verzonden, de resterende items worden verzonden zodra deze beschikbaar komen."
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Amount"
+msgstr "Bedrag"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.view_res_company_form_inherits
+msgid "Background Image for Invoice"
+msgstr "Achtergrondafbeelding voor factuur"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_company_report_background_image2
+msgid "Background Image for Report Following Pages"
+msgstr "Achtergrondafbeelding voor de rapportage op volgende pagina's"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_company_report_background_image1
+msgid "Background Image for Report Frontpage"
+msgstr "Achtergrondafbeelding voor de voorpagina"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Base"
+msgstr "Grondslag"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "CREDIT INVOICE"
+msgstr "Creditnota"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Cancelled INVOICE"
+msgstr "Geannuleerde factuur"
+
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_res_company
+msgid "Companies"
+msgstr "Bedrijven"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Computed Discount"
+msgstr "Berekende korting"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_create_uid
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_create_uid
 msgid "Created by"
 msgstr "Aangemaakt door"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_create_date
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_create_date
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_create_date
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_create_date
 msgid "Created on"
 msgstr "Aangemaakt op"
 
-#. module: bdu_pubble_soap
-#: model:ir.ui.view,arch_db:bdu_pubble_soap.view_sofrom_odooto_pubble_tree
-msgid "Creation Date"
-msgstr "Aanmaakdatum"
-
-#. module: bdu_pubble_soap
-#: model:ir.ui.view,arch_db:bdu_pubble_soap.view_sofrom_odooto_pubble_filter
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "Date"
 msgstr "Datum"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,help:bdu_pubble_soap.field_sale_order_date_sent_pubble
-msgid "Date on which sales order is sent to Pubble."
-msgstr "Datum waarop order naar Pubble is verstuurd"
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_date_established
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_date_established
+msgid "Date Established"
+msgstr "Aanmaak datum"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sale_order_date_sent_pubble
-msgid "Date order sent to Pubble"
-msgstr "Datum verstuurd naar Pubble"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
+msgid "Date due"
+msgstr "Datum"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_display_name
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_display_name
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Description"
+msgstr "Omschrijving"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Description/ short content"
+msgstr "Omschrijving"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Description/ short content :"
+msgstr "Omschrijving/samenvatting"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Disc(%)"
+msgstr "Commissie (%)"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Discount"
+msgstr "Korting"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_display_name
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_display_name
 msgid "Display Name"
 msgstr "Weergave naam"
 
-#. module: bdu_pubble_soap
-#: model:ir.ui.view,arch_db:bdu_pubble_soap.view_sofrom_odooto_pubble_filter
-msgid "Group By"
-msgstr "Groepeer op"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Draft INVOICE"
+msgstr "Conceptfactuur"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_adsize_height
-msgid "Height mm"
-msgstr "Hoogte in mm"
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_exact_id
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_exact_id
+msgid "Exact ID"
+msgstr "Exact ID"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_id
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_id
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_facebook
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_facebook
+msgid "Facebook"
+msgstr "Facebook"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_id
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_id
 msgid "ID"
 msgstr "ID"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_edition_editiondate
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "INVOICE"
+msgstr "Factuur"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_instagram
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_instagram
+msgid "Instagram"
+msgstr "Instagram"
+
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_account_invoice
+msgid "Invoice"
+msgstr "Factuur"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_carrier_invoice_description
+#: model:ir.model.fields,field_description:bdu_account.field_product_product_invoice_description
+#: model:ir.model.fields,field_description:bdu_account.field_product_template_invoice_description
+msgid "Invoice Description"
+msgstr "Factuur omschrijving"
+
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_account_invoice_line
+msgid "Invoice Line"
+msgstr "Factuurregel"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
+msgid "Invoice date"
+msgstr "Factuurdatum"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
+msgid "Invoice number"
+msgstr "Factuurnummer"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
+msgid "Invoiced amount"
+msgstr "Gefactureerd bedrag"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 msgid "Issue Date"
 msgstr "Editiedatum"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble___last_update
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble___last_update
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms___last_update
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status___last_update
 msgid "Last Modified on"
 msgstr "Laatst gewijzigd op"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_write_uid
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_write_uid
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_write_uid
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_write_uid
 msgid "Last Updated by"
 msgstr "Laatst bijgewerkt door"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_write_date
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_write_date
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_write_date
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_write_date
 msgid "Last Updated on"
 msgstr "Laatst bijgewerkt op"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_productiondetail_dtpcomments
-msgid "Layout Remarks"
-msgstr "Opmerkingen layout"
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_linkedIn
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_linkedIn
+msgid "LinkedIn"
+msgstr "LinkedIn"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_extplacementid
-msgid "Line ID"
-msgstr "Orderregelnummer"
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_terms_name
+#: model:ir.model.fields,field_description:bdu_account.field_partner_status_name
+msgid "Name"
+msgstr "Naam"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_reference
-msgid "Opportunity Subject"
-msgstr "Onderwerp opportunity"
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_delivery_carrier_variant_name
+#: model:ir.model.fields,field_description:bdu_account.field_product_product_variant_name
+msgid "Name including Variant Characteristics"
+msgstr "Naam inclusief variant eigenschappen"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_pubble_so_line
-#: model:ir.ui.view,arch_db:bdu_pubble_soap.view_sofrom_odooto_pubble_form
-msgid "Order Lines"
-msgstr "Orderregels"
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_newsletter_opt_out
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_newsletter_opt_out
+msgid "Newsletter opt-out"
+msgstr "Nieuwsbrief opt-out"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_order_id
-msgid "Order Reference"
-msgstr "Order referentie"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "ORDER CONFIRMATION"
+msgstr "Orderbevestiging"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_productiondetail_placementcomments
-msgid "Placement Remarks"
-msgstr "Opmerkingen plaatsing"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
+msgid "Open amount"
+msgstr "Openstaand bedrag"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_price
-msgid "Price"
-msgstr "Prijs"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "PRO-FORMA"
+msgstr "PRO-FORMA"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_adsize_extadsizeid
-msgid "Product ID"
-msgstr "Productcode"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "PURCHASE ORDER CONFIRMATION"
+msgstr "INKOOP BESTELBEVESTIGING"
 
-#. module: bdu_pubble_soap
-#: model:ir.ui.menu,name:bdu_pubble_soap.menu_pubble
-msgid "Pubble Interface"
-msgstr "Pubble Interface"
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_res_partner
+#: model:ir.ui.menu,name:bdu_account.partner_custom_settings
+msgid "Partner"
+msgstr "Relatie"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_pubble_response
-msgid "Pubble Response"
-msgstr "Reactie Pubble"
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_product_product
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Product"
+msgstr "Product"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sale_order_publog_id
-msgid "Publog id"
-msgstr "Publog id"
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_product_template
+msgid "Product Template"
+msgstr "Product sjabloon"
 
-#. module: bdu_pubble_soap
-#: model:ir.ui.view,arch_db:bdu_pubble_soap.view_sofrom_odooto_pubble_form
-#: model:ir.ui.view,arch_db:bdu_pubble_soap.view_sofrom_odooto_pubble_tree
-msgid "SO to Pubble"
-msgstr "Order naar Pubble"
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_promille_id
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_promille_id
+msgid "Promille ID"
+msgstr "Promille ID"
 
-#. module: bdu_pubble_soap
-#: model:ir.ui.view,arch_db:bdu_pubble_soap.view_sofrom_odooto_pubble_form
-msgid "Sale Order :"
-msgstr "Verkooporder:"
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_pubble_id
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_pubble_id
+msgid "Pubble ID"
+msgstr "Pubble ID"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_extorderid
-msgid "Sale Order ID"
-msgstr "Verkooporder nummer"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "QUOTATION"
+msgstr "Offerte"
 
-#. module: bdu_pubble_soap
-#: model:ir.model,name:bdu_pubble_soap.model_sale_order
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Quantity"
+msgstr "Aantal"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "REQUEST FOR QUOTATION"
+msgstr "OFFERTE AANVRAGENN"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Reference"
+msgstr "Referentie"
+
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_sale_order
 msgid "Sales Order"
 msgstr "Verkooporder"
 
-#. module: bdu_pubble_soap
-#: model:ir.model,name:bdu_pubble_soap.model_sale_order_line
-msgid "Sales Order Line"
-msgstr "Verkooporderregel"
+#. module: bdu_account
+#: model:ir.model.fields,help:bdu_account.field_res_company_use_bduprint
+msgid "Set 'True' to print the Invoice as per BDUprint layout."
+msgstr "Zet op \"waar\" om de factuur te printen volgens de BDUprint layout"
 
-#. module: bdu_pubble_soap
-#: model:ir.ui.view,arch_db:bdu_pubble_soap.view_sofrom_odooto_pubble_filter
-msgid "Search Pubble Updates"
-msgstr "Zoek naar updates Pubble"
+#. module: bdu_account
+#: model:ir.model.fields,help:bdu_account.field_res_company_report_background_image2
+msgid "Set Background Image for Report Following Pages"
+msgstr "Stel achtergrondafbeelding in "
 
-#. module: bdu_pubble_soap
-#: model:ir.actions.act_window,name:bdu_pubble_soap.action_staged_pubble
-#: model:ir.ui.menu,name:bdu_pubble_soap.menu_action_staged_pubble
-msgid "Staged Pubble"
-msgstr "Status Pubble"
+#. module: bdu_account
+#: model:ir.model.fields,help:bdu_account.field_res_company_report_background_image1
+msgid "Set Background Image for Report Frontpage"
+msgstr "Stel achtergrondafbeelding voor de rapportagepagina in"
 
-#. module: bdu_pubble_soap
-#: model:ir.ui.view,arch_db:bdu_pubble_soap.view_sofrom_odooto_pubble_filter
-msgid "Success"
-msgstr "Succes"
+#. module: bdu_account
+#: model:ir.model.fields,help:bdu_account.field_delivery_carrier_invoice_description
+#: model:ir.model.fields,help:bdu_account.field_product_product_invoice_description
+#: model:ir.model.fields,help:bdu_account.field_product_template_invoice_description
+msgid "Set True to add order line description in Invoice."
+msgstr "Kies True om een orderregel omschrijving toe te voegen aan de factuur"
 
-#. module: bdu_pubble_soap
-#: code:addons/bdu_pubble_soap/models/sale_advertising.py:186
-#, python-format
-msgid "This Sale Order already has been succesfully sent to Pubble."
-msgstr "Deze verkooporder is reeds met succes naar Pubble verstuurd."
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Sincerely,"
+msgstr "Hoogachtend,"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_transmission_id
-msgid "Transmission ID"
-msgstr "Overdrachtsnummer"
+#. module: bdu_account
+#: model:ir.actions.act_window,name:bdu_account.action_partner_status
+#: model:ir.model,name:bdu_account.model_partner_status
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_status
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_status
+#: model:ir.ui.menu,name:bdu_account.partner_status
+#: model:ir.ui.view,arch_db:bdu_account.view_partner_status_form
+#: model:ir.ui.view,arch_db:bdu_account.view_partner_status_tree
+msgid "Status"
+msgstr "Status"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_sofrom_odooto_pubble_salesorder_createdby
-msgid "User Name"
-msgstr "Gebruikersnaam"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
+msgid "Summary"
+msgstr "Samenvatting"
 
-#. module: bdu_pubble_soap
-#: model:ir.model.fields,field_description:bdu_pubble_soap.field_soline_from_odooto_pubble_ad_adsize_width
-msgid "Width mm"
-msgstr "Breedte in mm"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "TIN:"
+msgstr "BTW nummer:"
 
-#. module: bdu_pubble_soap
-#: model:ir.model,name:bdu_pubble_soap.model_sofrom_odooto_pubble
-msgid "sofrom.odooto.pubble"
-msgstr "sofrom.odooto.pubble"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Tax"
+msgstr "BTW"
 
-#. module: bdu_pubble_soap
-#: model:ir.model,name:bdu_pubble_soap.model_soline_from_odooto_pubble
-msgid "soline.from.odooto.pubble"
-msgstr "soline.from.odooto.pubble"
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Tax Excluded Price"
+msgstr "Bedrag"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "Taxes"
+msgstr "BTW"
+
+#. module: bdu_account
+#: model:ir.actions.act_window,name:bdu_account.action_delivery_terms
+#: model:ir.model,name:bdu_account.model_delivery_terms
+#: model:ir.ui.menu,name:bdu_account.partner_delivery_terms
+#: model:ir.ui.view,arch_db:bdu_account.view_delivery_terms_form
+#: model:ir.ui.view,arch_db:bdu_account.view_delivery_terms_tree
+msgid "Terms Of Delivery"
+msgstr "Leveringsvoorwaarden"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_delievery_terms
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_delievery_terms
+msgid "Terms of delivery"
+msgstr "Leveringsvoorwaarden"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_delivery_document1
+msgid "This shipment is a backorder of"
+msgstr "Deze levering is een backorder van"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+msgid "Total Without Taxes"
+msgstr "Totaal zonder belastingen"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_twitter
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_twitter
+msgid "Twitter"
+msgstr "Twitter"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Unit Price"
+msgstr "Prijs per stuk"
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_company_use_bduprint
+msgid "Use BDUprint Layout?"
+msgstr "BDUprint Layout gebruiken?"
+
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_res_users
+msgid "Users"
+msgstr "Gebruikers"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_purchasequotation_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "VAT:"
+msgstr "BTW:"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Vendor Bill"
+msgstr "Leveranciersfactuur"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+msgid "Vendor Refund"
+msgstr "Creditnota Leverancier"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Volume"
+msgstr "Volume"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "We would like to thank you for your request and see your response as soon as possible."
+msgstr "Bedankt voor uw verzoek. Wij zien uw reactie zo spoedig mogelijk tegemoet."
+
+#. module: bdu_account
+#: model:ir.model.fields,field_description:bdu_account.field_res_partner_zeno_id
+#: model:ir.model.fields,field_description:bdu_account.field_res_users_zeno_id
+msgid "Zeno ID"
+msgstr "Zeno ID"
+
+#. module: bdu_account
+#: model:ir.model,name:bdu_account.model_credit_control_communication
+msgid "credit control communication"
+msgstr "credit control communicatie"

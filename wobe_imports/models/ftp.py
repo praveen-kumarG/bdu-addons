@@ -128,17 +128,17 @@ class FileTransfer(models.Model):
 
     @api.model
     def run_wobejob_process(self, ids=None):
-        Job = self.env['wobe.job']
+#        Job = self.env['wobe.job']
 
         # Call: FTP & Registry Creation
         self.process_file_transfer()
-        self._cr.commit()
+#        self._cr.commit()
 
         # Call: WobeJob Creation
-        Job.action_create_job()
+#        Job.action_create_job()
 
         # Call: Sale Order Creation
-        Job.action_create_order()
+#        Job.action_create_order()
 
         # Call: Picking Creation
 #        Job.action_create_picking()

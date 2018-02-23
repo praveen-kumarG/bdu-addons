@@ -4,17 +4,24 @@
         <t t-call="bdu_account.external_layout_bdu">
             <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})" />
             <div class="page" style="font-family: 'Titillium Web', sans-serif;">
-                <div class="row" id="address">
-                    <div class="col-xs-5 col-xs-offset-7">
-                        <address t-field="doc.contact_address"
-                                 t-field-options='{"widget": "contact",
-                                                   "fields": ["address", "name"],
-                                                   "no_marker": true}'/>
-                    </div>
-                    <div class="col-xs-5 col-xs-offset-7">
-                        <span t-field="doc.report_date"/>
-                    </div>
+                <div class="row" style="padding-left:85px;">
+                <div name="invoice_title" class="col-xs-5 col-xs-offset-7" style="padding:0px;">
+                    <h3>
+                        <span>Reminder</span>
+                    </h3>
                 </div>
+            </div>
+            <div class="row" id="address" style="padding-left:85px;">
+                <div class="col-xs-5 col-xs-offset-7" style="padding:0px;">
+                    <address t-field="doc.contact_address"
+                             t-field-options='{"widget": "contact",
+                                               "fields": ["address", "name"],
+                                               "no_marker": true}'/>
+                </div>
+                <div class="col-xs-5 col-xs-offset-7" style="padding:0px;">
+                    <span t-field="doc.report_date"/>
+                </div>
+            </div>
 
                 <h2 id="policy_level" style="padding-left:20px;">
                     <span t-field="doc.current_policy_level.name"/>
@@ -35,6 +42,7 @@
                                 <th>Invoice number</th>
                                 <th>Invoice date</th>
                                 <th>Date due</th>
+                                <th>Description</th>
                                 <th class="text-right">Invoiced amount</th>
                                 <th class="text-right">Open amount</th>
                             </tr>
@@ -60,7 +68,16 @@
                                 <td>
                                     <span t-field="l.date_due"/>
                                 </td>
-
+                                <t t-if="l.invoice_id">
+                                    <td>
+                                        <span t-field="l.move_line_id.name"/>
+                                    </td>
+                                </t>
+                                <t t-if="not l.invoice_id">
+                                    <td>
+                                        <span t-field="l.move_line_id.ref"/>
+                                    </td>
+                                </t>
                                 <td class="text-right">
                                     <span t-field="l.amount_due"/>
                                 </td>
