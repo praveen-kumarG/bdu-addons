@@ -115,8 +115,8 @@ class SaleOrder(models.Model):
                     'transmission_id': self.env['sofrom.odooto.pubble'].get_next_ref(),
                     'sale_order_id': self.id,
                     'salesorder_extorderid': self.name,
-                    'salesorder_reference': 'Subject:' + str(self.opportunity_subject or '') + '\n' +
-                                            'Order Nr.:' + str(self.name or ''),
+                    'salesorder_reference': 'Subject:' + unidecode(self.opportunity_subject or '') + '\n' +
+                                            'Order Nr.:' + unidecode(self.name or ''),
                     'salesorder_createdby': self.user_id.email,
                     'salesorder_debtor_extaccountingid': self.published_customer.ref,
                     'salesorder_debtor_extdebtorid': self.published_customer.ref,
@@ -158,8 +158,8 @@ class SaleOrder(models.Model):
                             'ad_productiondetail_classifiedCategory': line.analytic_tag_ids.name or '' if line.ad_class.name == 'Regiotreffers' else False,
                             'ad_productiondetail_color': True,
                             'ad_productiondetail_isclassified': True if line.ad_class.name == 'Regiotreffers' else False,
-                            'ad_productiondetail_dtpcomments': 'Externe Referentie:' + str(line.ad_number or '') + '\n' +
-                                                                                       str(line.layout_remark or ''),
+                            'ad_productiondetail_dtpcomments': 'Externe Referentie:' + unidecode(line.ad_number or '') + '\n' +
+                                                                                       unidecode(line.layout_remark or ''),
                             'ad_productiondetail_placementcomments': unidecode(line.page_reference or '') + '\n' +
                                                                      unidecode(line.name or '') + '\n' +
                                                                      unidecode(self.opportunity_subject or ''),
