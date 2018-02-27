@@ -26,6 +26,7 @@ from odoo.exceptions import UserError
 from suds.client import Client
 from odoo.addons.queue_job.job import job, related_action
 from odoo.addons.queue_job.exception import FailedJobError
+from unidecode import unidecode
 import datetime
 
 
@@ -159,9 +160,9 @@ class SaleOrder(models.Model):
                             'ad_productiondetail_isclassified': True if line.ad_class.name == 'Regiotreffers' else False,
                             'ad_productiondetail_dtpcomments': 'Externe Referentie:' + str(line.ad_number or '') + '\n' +
                                                                                        str(line.layout_remark or ''),
-                            'ad_productiondetail_placementcomments': str(line.page_reference or '') + '\n' +
-                                                                     str(line.name or '') + '\n' +
-                                                                     str(self.opportunity_subject or ''),
+                            'ad_productiondetail_placementcomments': unidecode(line.page_reference or '') + '\n' +
+                                                                     unidecode(line.name or '') + '\n' +
+                                                                     unidecode(self.opportunity_subject or ''),
                             'ad_productiondetail_pageType': line.analytic_tag_ids.name or ('Advertentiepagina' if line.ad_class.name == 'GA' else
                                                                                            'Redactiepagina' if line.ad_class.name == 'IM' else
                                                                                            'Familiebericht' if line.ad_class.name == 'FAM' else
