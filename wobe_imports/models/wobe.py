@@ -140,11 +140,11 @@ class Job(models.Model):
         # ----------------------------
         # Registry Files: Search
         # ----------------------------
-        for x1 in Reg.search([('state','<>','done'), ('part','=', 'xml1')]
+        for x1 in Reg.search([('state','!=','done'), ('part','=', 'xml1')]
                 , order='run_date, file_create_date, is_duplicate'):
             part1[x1.bduorder_ref] = [x1, x1.edition_count]
 
-        for x3 in Reg.search([('state','<>','done'), ('part','=', 'xml3')]
+        for x3 in Reg.search([('state','!=','done'), ('part','=', 'xml3')]
                 , order='run_date, file_create_date, is_duplicate'):
             BDUOrder = x3.bduorder_ref
             KBAJobId = x3.job_ref
@@ -153,7 +153,7 @@ class Job(models.Model):
             else:
                 part3[BDUOrder].update({KBAJobId: x3})
 
-        for x4 in Reg.search([('state','<>','done'), ('part','=', 'xml4')]
+        for x4 in Reg.search([('state','!=','done'), ('part','=', 'xml4')]
                 , order='run_date, file_create_date, is_duplicate'):
             part4[x4.job_ref] = x4
 
@@ -231,7 +231,7 @@ class Job(models.Model):
                     continue
 
                 # --------------------------------------------
-                # Regitry: Update Status
+                # Registry: Update Status
                 # --------------------------------------------
                 rDone = {'job_id': job.id, 'state':'done'}
                 rPending = {'job_id': job.id, 'state':'pending'}
