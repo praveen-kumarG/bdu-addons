@@ -79,8 +79,12 @@
                  </div>
 
                  <div name="invoice_address" class="col-xs-5" style="padding:0px;">
-                     <address t-field="o.partner_id"
-                        t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' />
+                      <t t-if="o.partner_id.zip">
+                            <address t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                      </t>
+                      <t t-if=" not o.partner_id.zip">
+                            <address t-field="o.partner_id.parent_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                      </t>
                      <span t-if="o.partner_id.vat">TIN: <span t-field="o.partner_id.vat"/></span>
                  </div>
 
