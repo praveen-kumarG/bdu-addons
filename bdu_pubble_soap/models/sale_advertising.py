@@ -140,7 +140,7 @@ class SaleOrder(models.Model):
             res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
             for line in self.order_line:
                 del_param = True
-                if line.line_pubble_allow:
+                if line.line_pubble_allow :
                     if int(line.product_uom_qty) == 0 or arg == 'delete':
                         del_param = False
                     lvals = {
@@ -151,7 +151,7 @@ class SaleOrder(models.Model):
                             'ad_adsize_height': line.product_uom_qty if line.product_uom.name == 'mm' else line.product_template_id.height,
                             'ad_adsize_name': line.product_id.name or '',
                             'ad_adsize_width': line.product_template_id.width,
-                            'ad_edition_editiondate': line.adv_issue.issue_date,
+                            'ad_edition_editiondate': line.issue_date,
                             'ad_edition_extpublicationid': line.title.name if line.ad_class.name != 'Webvertorial' else line.adv_issue.name,
                             'ad_extplacementid': line.id,
                             'ad_price': 0,
@@ -185,7 +185,7 @@ class SaleOrderLine(models.Model):
     def _compute_allowed(self):
         for line in self.filtered('advertising'):
             res = False
-            if line.ad_class.pubble and line.adv_issue.medium.pubble:
+            if line.ad_class.pubble and line.adv_issue.medium.pubble and fields.Datetime.from_string(line.issue_date) > datetime.datetime.now():
                 res = True
             line.line_pubble_allow = res
 
@@ -294,7 +294,8 @@ class SofromOdootoPubble(models.Model):
         response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
         self.write({'pubble_response': response,'pubble_environment': publisher})
         if response == True:
-            self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).with_context(pubble_call=True).write({'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
+            self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).with_context(pubble_call=True).write(
+                                                    {'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
             for line in self.pubble_so_line:
                 self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
 
