@@ -261,6 +261,13 @@ class Job(models.Model):
         self._reset_Job_status()
         return True
 
+    def _edition_alternating_pages(self, name, data1):
+        alternatingPages = 0
+        for edition in data1.findall("Edition"):
+            if str(edition.attrib['name']) == str(name):
+                alternatingPages = len(edition.findall('AlternatingPage'))
+        return alternatingPages
+            # print(child.tag, child.attrib)
 
     @api.multi
     def _prepare_job_data(self, data1, edData, Job=False):
@@ -288,6 +295,10 @@ class Job(models.Model):
                     found = Job.edition_ids.filtered(lambda x: x.name == val.get('infojob_ref'))
 
             elnvals = {'name' : name }
+
+            #get count of alternating pages per edition
+            elnvals['alternating_pages'] = self._edition_alternating_pages(name, data1)
+
             for x in editionInfoL:
                 elnvals[x] = val.get(x, False)
 
@@ -939,6 +950,7 @@ class Job(models.Model):
 
             if not M or not W: continue
 
+            W = 1445 if W == 1555 else W #In case of value 1555, the paper roll with width 1445 is selected
             key = (M, W,)
             if not key in MassWidth:
                 MassWidth[key] = {'counter': 0}
@@ -1171,7 +1183,7 @@ class Booklet(models.Model):
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all')
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
 
-    @api.depends('format', 'pages', 'paper_weight')
+    @api.depends('format', 'pages', 'paper_weight','job_type')
     def _compute_all(self):
 
         for booklet in self:
@@ -1246,6 +1258,7 @@ class Edition(models.Model):
     kbajob_ref  = fields.Char('KBA Job #', help='KBA Job (XML3)', copy=False)
     infojob_ref = fields.Char('Info Job #', help='Info Job (XML4)', copy=False)
     info_product = fields.Char('Info Product', help='Info product / Edition Name', copy=False)
+    alternating_pages = fields.Integer(string='Alternating Pages', help="Count of number of Alternating Pages", copy=False)
 
     @api.onchange('name')
     def edition_create(self):

@@ -17,3 +17,24 @@ class SaleOrder(models.Model):
                                                 orderline._get_display_price(orderline.product_id),
                                                 orderline.product_id.taxes_id, orderline.tax_id, self.company_id)
         return super(SaleOrder, self).action_confirm()
+
+    @api.model
+    def create(self, vals):
+        """Fill the payment_term_id & user_id from the partner if none is provided on
+        creation, using same method as upstream."""
+        onchanges = {
+            'onchange_partner_id': ['payment_term_id'],
+            'onchange_partner_id': ['user_id'],
+        }
+        for onchange_method, changed_fields in onchanges.items():
+            if any(f not in vals for f in changed_fields):
+                order = self.new(vals)
+                getattr(order, onchange_method)()
+                for field in changed_fields:
+                    if field not in vals and order[field]:
+                        vals[field] = order._fields[field].convert_to_write(
+                            order[field], order,
+                        )
+        if not vals.get('user_id',False):
+            vals['user_id'] = self.env.user.id
+        return super(SaleOrder, self).create(vals)
