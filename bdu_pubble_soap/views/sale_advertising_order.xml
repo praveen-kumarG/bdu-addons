@@ -135,10 +135,6 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale_advertising_order.view_order_form_advertising"/>
             <field name="arch" type="xml">
-                <button name="action_cancel" position="before">
-                    <button name="action_pubble_update" states="sale" type="object" string="Update Pubble"
-                            attrs="{'invisible': [('order_pubble_allow','=', False)]}"/>
-                </button>
                 <group name="ad_refs" position="after">
                     <group string="Pubble" name="pubble" >
                         <field name="line_pubble_allow" readonly="1" />
@@ -153,6 +149,10 @@
                         <field name="publog_id" readonly="1"/>
                     </group>
                 </group>
+                <button name="action_cancel" position="before">
+                    <button name="action_pubble_update" type="object" string="Update Pubble"
+                            attrs="{'invisible': ['|',('order_pubble_allow','!=', True),('state','!=','sale')]}"/>
+                </button>
             </field>
         </record>
 
