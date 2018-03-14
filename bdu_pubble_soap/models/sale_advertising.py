@@ -62,6 +62,9 @@ class SaleOrder(models.Model):
 
 
 
+    def send_to_pubble(self, res):
+        res.with_delay(description=res.salesorder_reference).call_wsdl()
+
     def action_pubble(self, arg):
         self.ensure_one()
         res = self.transfer_order_to_pubble(arg)
@@ -69,14 +72,15 @@ class SaleOrder(models.Model):
             self.send_to_pubble(res)
         return True
 
-    def send_to_pubble(self, res):
-        res.with_delay(description=res.salesorder_reference).call_wsdl()
+    @api.multi
+    def action_pubble_update(self):
+        for order in self.filtered('advertising'):
+            order.action_pubble('update')
 
     @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
-        for order in self.filtered('advertising'):
-            order.action_pubble('update')
+        self.action_pubble_update()
         return res
 
     @api.multi
