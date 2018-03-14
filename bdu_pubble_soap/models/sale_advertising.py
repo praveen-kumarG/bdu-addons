@@ -189,7 +189,7 @@ class SaleOrderLine(models.Model):
     def _compute_allowed(self):
         for line in self.filtered('advertising'):
             res = False
-            if line.ad_class.pubble and line.adv_issue.medium.pubble and fields.Datetime.from_string(line.issue_date) >= datetime.datetime.now():
+            if line.ad_class.pubble and line.adv_issue.medium.pubble and fields.Date.from_string(line.issue_date) >= datetime.date.today():
                 res = True
             line.line_pubble_allow = res
 
