@@ -129,12 +129,32 @@
                         <tr t-foreach="o.invoice_line_ids" t-as="l">
                             <t t-set="tot_Cdiscount" t-value="tot_Cdiscount + l.sale_line_ids.computed_discount"/>
                             <t t-if="o.type != 'out_refund'">
-                                <td><span t-field="l.sale_line_ids.issue_date"/></td>
+                                <t t-if="l.sale_line_ids.date_type == 'validity'">
+                                        <td t-if="not l.sale_line_ids.from_date"><span t-field="l.sale_line_ids.dateperiods[0].from_date"/>
+                                                                                       <span > - </span>
+                                                                                       <span t-field="l.sale_line_ids.dateperiods[0].to_date"/></td>
+                                        <td t-if="l.sale_line_ids.from_date"><span t-field="l.sale_line_ids.from_date"/>
+                                                                                       <span > - </span>
+                                                                                       <span t-field="l.sale_line_ids.to_date"/></td>
+                                </t>
+                                <td t-if="l.sale_line_ids.date_type == 'issue_date'"><span t-field="l.sale_line_ids.issue_date"/></td>
                             </t>
                             <td><span t-field="l.sale_line_ids.adv_issue.default_note"/></td>
                             <t t-if="o.type == 'out_refund'">
                                 <td t-if="o.refund_invoice_id"><span t-field="o.refund_invoice_id.date_invoice"/></td>
-                                <td t-if="not o.refund_invoice_id"><span t-field="l.sale_line_ids.issue_date"/></td>
+                                <t t-if="not o.refund_invoice_id">
+                                    <t t-if="l.sale_line_ids.date_type == 'validity'">
+                                        <td t-if="not l.sale_line_ids.from_date"><span t-field="l.sale_line_ids.dateperiods[0].from_date"/>
+                                                                                       <span > - </span>
+                                                                                       <span t-field="l.sale_line_ids.dateperiods[0].to_date"/></td>
+                                        <td t-if="l.sale_line_ids.from_date"><span t-field="l.sale_line_ids.from_date"/>
+                                                                                       <span > - </span>
+                                                                                       <span t-field="l.sale_line_ids.to_date"/></td>
+                                    </t>
+                                </t>
+                                <t t-if="l.sale_line_ids.date_type == 'issue_date'">
+                                    <td t-if="not o.refund_invoice_id"><span t-field="l.sale_line_ids.issue_date"/></td>
+                                </t>
                             </t>
                             <!--<td><span t-field="l.name"/></td>-->
                             <t t-if="o.type != 'out_refund'">
