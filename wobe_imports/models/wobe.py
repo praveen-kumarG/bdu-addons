@@ -267,7 +267,6 @@ class Job(models.Model):
             if str(edition.attrib['name']) == str(name):
                 alternatingPages = len(edition.findall('AlternatingPage'))
         return alternatingPages
-            # print(child.tag, child.attrib)
 
     @api.multi
     def _prepare_job_data(self, data1, edData, Job=False):
@@ -495,8 +494,10 @@ class Job(models.Model):
             'origin': self.bduorder_ref,
             'job_id': self.id,
             'pricelist_id' : res.setdefault('pricelist_id',
-                                                   partner.property_product_pricelist and partner.property_product_pricelist.id)
-               })
+                                                   partner.property_product_pricelist and partner.property_product_pricelist.id),
+            'payment_term_id': res.setdefault('payment_term_id',
+                                              partner.property_payment_term_id and partner.property_payment_term_id.id)
+            })
 
         def _get_linevals(productID, qty=1, forceQty=0):
             Qty = float(qty) * (float((self.planned_quantity) / 1000.0) or 1.000)
