@@ -950,7 +950,7 @@ class Job(models.Model):
 
             if not M or not W: continue
 
-            W = 1445 if W == 1444 else W #In case of value 1555, the paper roll with width 1445 is selected
+            W = 1444 if W == 1445 else W #In case of value 1555, the paper roll with width 1445 is selected
             key = (M, W,)
             if not key in MassWidth:
                 MassWidth[key] = {'counter': 0}
