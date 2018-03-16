@@ -496,10 +496,8 @@ class Job(models.Model):
             'company_id': self.company_id.id,
             'origin': self.bduorder_ref,
             'job_id': self.id,
-            'pricelist_id' : res.setdefault('pricelist_id',
-                                                   partner.property_product_pricelist and partner.property_product_pricelist.id),
-            'payment_term_id': res.setdefault('payment_term_id',
-                                              partner.property_payment_term_id and partner.property_payment_term_id.id)
+            'pricelist_id' : res.setdefault('pricelist_id', partner.property_product_pricelist and partner.property_product_pricelist.id),
+            'payment_term_id': res.setdefault('payment_term_id', partner.property_payment_term_id and partner.property_payment_term_id.id)
             })
 
         def _get_linevals(productID, qty=1, forceQty=0):
@@ -953,7 +951,7 @@ class Job(models.Model):
             W = self['paper_width_' + str(idx)]
 
             if not M or not W: continue
-
+            M = 6500 if M == 7000 else M  # In case of value 70, the paper roll with width 65 is selected
             W = 1444 if W == 1445 else W #In case of value 1555, the paper roll with width 1445 is selected
             key = (M, W,)
             if not key in MassWidth:
