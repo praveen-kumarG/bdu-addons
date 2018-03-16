@@ -111,6 +111,7 @@
                                         <field name="plate_amount"/>
                                         <field name="net_quantity"/>
                                         <field name="gross_quantity"/>
+                                        <field name="alternating_pages"/>
                                         <field name="waste_total" invisible="True"/>
                                         <field name="production_start" attrs="{'required':[('kbajob_ref','=',False)]}"/>
                                         <field name="production_stop" attrs="{'required':[('kbajob_ref','=',False)]}"/>

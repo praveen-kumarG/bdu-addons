@@ -22,14 +22,17 @@ class Job(models.Model):
     _description = 'WOBE Job'
 
     @api.one
-    @api.depends('edition_ids')
+    @api.depends('edition_ids','booklet_ids','job_type')
     def _compute_all(self):
         self.waste_start = sum(line.waste_start for line in self.edition_ids)
         self.waste_total = sum(line.waste_total for line in self.edition_ids)
-        self.plate_amount = sum(line.plate_amount for line in self.edition_ids)
+        # self.plate_amount = sum(line.plate_amount for line in self.edition_ids)
         self.gross_quantity = sum(line.gross_quantity for line in self.edition_ids)
         self.net_quantity = sum(line.net_quantity for line in self.edition_ids)
-
+        if self.job_type == 'kba':
+            self.plate_amount = sum(line.calculated_plates for line in self.booklet_ids)
+        elif self.job_type == 'regioman':
+            self.plate_amount = sum(line.plate_amount for line in self.edition_ids)
         prodStart = self.edition_ids and min(line.production_start for line in self.edition_ids) or False
         prodEnd = self.edition_ids and max(line.production_stop for line in self.edition_ids) or False
 
@@ -261,6 +264,12 @@ class Job(models.Model):
         self._reset_Job_status()
         return True
 
+    def _edition_alternating_pages(self, name, data1):
+        alternatingPages = 0
+        for edition in data1.findall("Edition"):
+            if str(edition.attrib['name']) == str(name):
+                alternatingPages = len(edition.findall('AlternatingPage'))
+        return alternatingPages
 
     @api.multi
     def _prepare_job_data(self, data1, edData, Job=False):
@@ -288,6 +297,10 @@ class Job(models.Model):
                     found = Job.edition_ids.filtered(lambda x: x.name == val.get('infojob_ref'))
 
             elnvals = {'name' : name }
+
+            #get count of alternating pages per edition
+            elnvals['alternating_pages'] = self._edition_alternating_pages(name, data1)
+
             for x in editionInfoL:
                 elnvals[x] = val.get(x, False)
 
@@ -483,9 +496,9 @@ class Job(models.Model):
             'company_id': self.company_id.id,
             'origin': self.bduorder_ref,
             'job_id': self.id,
-            'pricelist_id' : res.setdefault('pricelist_id',
-                                                   partner.property_product_pricelist and partner.property_product_pricelist.id)
-               })
+            'pricelist_id' : res.setdefault('pricelist_id', partner.property_product_pricelist and partner.property_product_pricelist.id),
+            'payment_term_id': res.setdefault('payment_term_id', partner.property_payment_term_id and partner.property_payment_term_id.id)
+            })
 
         def _get_linevals(productID, qty=1, forceQty=0):
             Qty = float(qty) * (float((self.planned_quantity) / 1000.0) or 1.000)
@@ -902,6 +915,17 @@ class Job(models.Model):
                     'partner_id': picking.partner_id.id
                 })
             case.write({'picking_id':picking.id,'state':'picking_created'})
+            # Force picking confirmation
+            if picking:
+                picking.action_confirm()
+                picking.action_assign()
+                # update done qty from demand qty
+                for pack in picking.pack_operation_ids:
+                    if pack.product_qty > 0:
+                        pack.write({'qty_done': pack.product_qty})
+                    else:
+                        pack.unlink()
+                picking.do_transfer()
         return True
 
     @api.model
@@ -927,7 +951,8 @@ class Job(models.Model):
             W = self['paper_width_' + str(idx)]
 
             if not M or not W: continue
-
+            M = 6500 if M == 7000 else M  # In case of value 70, the paper roll with width 65 is selected
+            W = 1444 if W == 1445 else W #In case of value 1555, the paper roll with width 1445 is selected
             key = (M, W,)
             if not key in MassWidth:
                 MassWidth[key] = {'counter': 0}
@@ -1160,7 +1185,7 @@ class Booklet(models.Model):
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all')
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
 
-    @api.depends('format', 'pages', 'paper_weight')
+    @api.depends('format', 'pages', 'paper_weight','job_id.job_type')
     def _compute_all(self):
 
         for booklet in self:
@@ -1222,7 +1247,7 @@ class Edition(models.Model):
     job_id = fields.Many2one('wobe.job', required=True, ondelete='cascade', index=True, copy=False)
     name = fields.Char('Edition', help='Edition Name', required=True, copy=False)
 
-    plate_amount = fields.Integer('Plate Amount')
+    plate_amount = fields.Integer('Plate Amount', store=True, compute='_compute_all')
     net_quantity = fields.Integer('Net Qty', help='Prints Net')
 
     gross_quantity = fields.Integer('Gross Qty', help='Prints Gross')
@@ -1235,12 +1260,18 @@ class Edition(models.Model):
     kbajob_ref  = fields.Char('KBA Job #', help='KBA Job (XML3)', copy=False)
     infojob_ref = fields.Char('Info Job #', help='Info Job (XML4)', copy=False)
     info_product = fields.Char('Info Product', help='Info product / Edition Name', copy=False)
+    alternating_pages = fields.Integer(string='Alternating Pages', help="Count of number of Alternating Pages", copy=False)
 
     @api.onchange('name')
     def edition_create(self):
         self.name = self.job_id.title
-        self.plate_amount = sum(line.calculated_plates if int(line.pages) > 48 else line.calculated_plates / 2 for line in self.job_id.booklet_ids)
+        # self.plate_amount = sum(line.calculated_plates if int(line.pages) > 48 else line.calculated_plates / 2 for line in self.job_id.booklet_ids)
         self.net_quantity = self.job_id.planned_quantity
+
+    @api.depends('name','job_id.job_type','job_id.booklet_ids')
+    def _compute_all(self):
+        for edition in self:
+            edition.plate_amount = sum(line.calculated_plates for line in edition.job_id.booklet_ids) if edition.job_id.job_type == 'regioman' else sum(line.calculated_plates if int(line.pages) > 48 else line.calculated_plates / 2 for line in edition.job_id.booklet_ids)
 
     @api.onchange('gross_quantity')
     def waste_compute(self):
