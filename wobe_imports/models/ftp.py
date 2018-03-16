@@ -171,6 +171,39 @@ class Registry(models.Model):
     duplicate_ref = fields.Many2one('file.registry','Duplicate Ref#')
     file_create_date = fields.Float('File Create Date')
 
+    @api.multi
+    def merge_xml4(self):
+        for registry in self:
+            edlines = []
+            vals = {}
+            if registry.duplicate_ref and registry.is_duplicate:
+
+                Job = registry.duplicate_ref.job_id
+
+                if Job and not Job.order_id and Job.state in ('waiting','ready','exception'):
+
+                    File4 = base64.decodestring(registry.xmlfile)
+                    data4 = ET.fromstring(File4)
+                    edData = Job._extract_EditionData({}, False, {}, RegFile4=registry, data4=data4)
+
+                    for key, elnvals in edData.iteritems():
+
+                        found = Job.edition_ids.filtered(lambda x: x.name == key)
+                        if not found and key.isalpha():
+                            found = Job.edition_ids.filtered(lambda x: x.name == elnvals.get('infojob_ref'))
+
+                        if found:
+                            edlines.append((1, found.id, elnvals))
+                        else:
+                            elnvals.update({'name': key,'kbajob_ref':registry.job_ref})
+                            edlines.append((0, 0, elnvals))
+
+                    Job.write({'edition_ids': edlines})
+                    vals = {'job_id':Job.id,'is_duplicate':False, 'state':'done'}
+
+                registry.write(vals)
+            return True
+
     @api.model
     def create(self, vals):
         condition = False
@@ -185,7 +218,10 @@ class Registry(models.Model):
             if reg_obj:
                 vals['is_duplicate'] = True
                 vals['duplicate_ref'] = reg_obj.id
-        return super(Registry, self).create(vals)
+        res = super(Registry, self).create(vals)
+        if res.part == 'xml4':
+            res.merge_xml4()
+        return res
 
 
     @api.multi
