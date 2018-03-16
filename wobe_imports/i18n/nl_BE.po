@@ -1,0 +1,1423 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* wobe_imports
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-03-14 13:01+0000\n"
+"PO-Revision-Date: 2018-03-14 13:01+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product_number_rolls
+msgid "# Rollen Gebruikt"
+msgstr "# Rollen Gebruikt"
+
+#. module: wobe_imports
+#: selection:wobe.paper.product,number_rolls:0
+msgid "0 rollen gebruikt"
+msgstr "0 rollen gebruikt"
+
+#. module: wobe_imports
+#: selection:wobe.paper.product,number_rolls:0
+msgid "1 rollen gebruikt"
+msgstr "1 rollen gebruikt"
+
+#. module: wobe_imports
+#: selection:wobe.paper.product,number_rolls:0
+msgid "2 rollen gebruikt"
+msgstr "2 rollen gebruikt"
+
+#. module: wobe_imports
+#: selection:wobe.paper.product,number_rolls:0
+msgid "3 rollen gebruikt"
+msgstr "3 rollen gebruikt"
+
+#. module: wobe_imports
+#: selection:wobe.paper.product,number_rolls:0
+msgid "4 rollen gebruikt"
+msgstr "4 rollen gebruikt"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_active
+msgid "Active"
+msgstr "Actief"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_convert_ok
+msgid "Allow conversion of Job to Regioman?"
+msgstr "Allow conversion of Job to Regioman?"
+
+#. module: wobe_imports
+#: constraint:product.product:0
+msgid "Already exists"
+msgstr "Already exists"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_alternating_pages
+msgid "Alternating Pages"
+msgstr "Wisselpagina’s"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_stock_move_analytic_account_id
+msgid "Analytic Account"
+msgstr "Analytische rekening"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_stock_move_analytic_account_id
+msgid "Analytic Account associated to this move"
+msgstr "Analytic Account associated to this move"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:481
+#, python-format
+msgid "Analytic Account not found for this NewspaperTitle."
+msgstr "Analytic Account not found for this NewspaperTitle."
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_analytic_count
+msgid "Analytic Count"
+msgstr "Analytic Count"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_account_analytic_line
+msgid "Analytic Line"
+msgstr "Analytische lijn"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_filter
+msgid "Analytic Lines Created"
+msgstr "Analytic Lines Created"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_analytic_line_ids
+msgid "Analytic Lines associated to this Job"
+msgstr "Analytic Lines associated to this Job"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_delivery_carrier_applicable_to_regioman
+#: model:ir.model.fields,field_description:wobe_imports.field_product_product_applicable_to_regioman
+#: model:ir.model.fields,field_description:wobe_imports.field_product_template_applicable_to_regioman
+msgid "Applicable To Regioman"
+msgstr "Applicable To Regioman"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_order_id
+msgid "Associated Sale Order"
+msgstr "Associated Sale Order"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_picking_id
+msgid "Associated Stock Picking"
+msgstr "Associated Stock Picking"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "BDU Order :"
+msgstr "BDU Order :"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_bduorder_ref
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_bduorder_ref
+msgid "BDUOrder #"
+msgstr "BDUOrder #"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_file_registry_bduorder_ref
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_bduorder_ref
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_name
+msgid "BDUOrder reference"
+msgstr "BDUOrder reference"
+
+#. module: wobe_imports
+#: selection:product.template,formats:0
+msgid "BS"
+msgstr "BS"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Booklet Details"
+msgstr "Booklet Details"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_booklet_ref
+msgid "Booklet Ref"
+msgstr "Booklet Ref"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_booklet_ids
+msgid "Booklets"
+msgstr "Booklets"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_calculated_hours
+msgid "Calculated Hours"
+msgstr "Calculated Hours"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_calculated_ink
+msgid "Calculated Ink"
+msgstr "Calculated Ink"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_calculated_mass
+msgid "Calculated Mass"
+msgstr "Calculated Mass"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_calculated_plates
+msgid "Calculated Plates"
+msgstr "Calculated Plates"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_company_id
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_company_id
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_company_id
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_filter
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_filter
+msgid "Company"
+msgstr "Bedrijf"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_file_transfer_company_id
+msgid "Company, to which records needs to be imported"
+msgstr "Company, to which records needs to be imported"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_msg
+msgid "Connection Message"
+msgstr "Connection Message"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Convert as Regioman"
+msgstr "Convert as Regioman"
+
+#. module: wobe_imports
+#: selection:wobe.job,state:0
+msgid "Costing Created"
+msgstr "Costing Created"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_edition_alternating_pages
+msgid "Count of number of Alternating Pages"
+msgstr "Count of number of Alternating Pages"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Create Costing"
+msgstr "Create Costing"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Create Picking"
+msgstr "Create Picking"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Create SaleOrder"
+msgstr "Create SaleOrder"
+
+#. module: wobe_imports
+#: model:ir.actions.act_window,help:wobe_imports.action_file_transfer
+msgid "Create server connection."
+msgstr "Create server connection."
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_create_uid
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_create_uid
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_create_uid
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_create_uid
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_create_uid
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product_create_uid
+msgid "Created by"
+msgstr "Aangemaakt door"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_create_date
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_create_date
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_create_date
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_create_date
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_create_date
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product_create_date
+msgid "Created on"
+msgstr "Aangemaakt op"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_tree
+msgid "Creation Date"
+msgstr "Aanmaakdatum"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_run_date
+msgid "Cron Time"
+msgstr "Cron Time"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_file_registry_run_date
+msgid "Cron run date/time"
+msgstr "Cron run date/time"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_local_path
+msgid "Destination Path"
+msgstr "Destination Path"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_file_transfer_local_path
+msgid "Destination/Copy Directory"
+msgstr "Destination/Copy Directory"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_display_name
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_display_name
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_display_name
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_display_name
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_display_name
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product_display_name
+msgid "Display Name"
+msgstr "Weergave naam"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Do you really want to proceed?"
+msgstr "Do you really want to proceed?"
+
+#. module: wobe_imports
+#: selection:file.registry,state:0
+msgid "Done"
+msgstr "Done"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_server_path
+msgid "Download Path"
+msgstr "Download Path"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_filter
+msgid "Duplicate"
+msgstr "Duplicate"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_is_duplicate
+msgid "Duplicate Record"
+msgstr "Duplicate Record"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_duplicate_ref
+msgid "Duplicate Ref#"
+msgstr "Duplicate Ref#"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_name
+msgid "Edition"
+msgstr "Edition"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_edition_count
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_edition_count
+msgid "Edition Count"
+msgstr "Edition Count"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Edition Details"
+msgstr "Edition Details"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_edition_name
+msgid "Edition Name"
+msgstr "Edition Name"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_edition_ids
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Editions"
+msgstr "Editions"
+
+#. module: wobe_imports
+#: model:ir.actions.act_window,help:wobe_imports.action_wobe_job
+msgid "Enable the schedular \"FTP &amp; Import WOBE Jobs\", to create records."
+msgstr "Enable the schedular \"FTP &amp; Import WOBE Jobs\", to create records."
+
+#. module: wobe_imports
+#: selection:wobe.job,state:0
+msgid "Exception"
+msgstr "Exception"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_filter
+msgid "Exceptions"
+msgstr "Fouten"
+
+#. module: wobe_imports
+#: model:ir.actions.act_window,name:wobe_imports.action_file_transfer
+#: model:ir.ui.menu,name:wobe_imports.menu_file_transfer
+msgid "FTP Settings"
+msgstr "FTP Settings"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_file_create_date
+msgid "File Create Date"
+msgstr "File Create Date"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_name
+msgid "File Name"
+msgstr "Bestandsnaam"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_part
+msgid "File Part"
+msgstr "File Part"
+
+#. module: wobe_imports
+#: model:ir.actions.act_window,name:wobe_imports.action_file_registry
+#: model:ir.ui.menu,name:wobe_imports.menu_file_registry
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_form
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_tree
+msgid "File Registry"
+msgstr "File Registry"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_transfer_form
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_transfer_tree
+msgid "File Transfer"
+msgstr "File Transfer"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_filter
+msgid "File Type"
+msgstr "File Type"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_filename
+msgid "Filename"
+msgstr "Bestandsnaam"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_file_count
+msgid "Files"
+msgstr "Files"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_product_template_fixed_cost
+msgid "Fixed Cost Product"
+msgstr "Fixed Cost Product"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Force Ready"
+msgstr "Force Ready"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:633
+#, python-format
+msgid "Force assign to 'Ready' status."
+msgstr "Force assign to 'Ready' status."
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_format
+msgid "Format"
+msgstr "Format"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_glueing
+#: selection:product.template,print_category:0
+msgid "Glueing"
+msgstr "Glueing"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_gross_quantity
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_gross_quantity
+msgid "Gross Qty"
+msgstr "Gross Qty"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_filter
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_filter
+msgid "Group By"
+msgstr "Groepeer op"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_id
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_id
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_id
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_id
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_id
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product_id
+msgid "ID"
+msgstr "ID"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_file_transfer_url
+msgid "IP address of the Server / Host machine"
+msgstr "IP address of the Server / Host machine"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_transfer_form
+msgid "IP like 192.168.1.128"
+msgstr "IP like 192.168.1.128"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_file_registry_xmlfile
+msgid "Imported XML File"
+msgstr "Imported XML File"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_edition_production_stop
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_production_stop
+msgid "Info DateTime End"
+msgstr "Info DateTime End"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_edition_production_start
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_production_start
+msgid "Info DateTime Start"
+msgstr "Info DateTime Start"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_infojob_ref
+msgid "Info Job #"
+msgstr "Info Job #"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_edition_infojob_ref
+msgid "Info Job (XML4)"
+msgstr "Info Job (XML4)"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_info_product
+msgid "Info Product"
+msgstr "Info Product"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_edition_info_product
+msgid "Info product / Edition Name"
+msgstr "Info product / Edition Name"
+
+#. module: wobe_imports
+#: selection:product.template,print_category:0
+msgid "Ink KBA"
+msgstr "Ink KBA"
+
+#. module: wobe_imports
+#: selection:product.template,print_category:0
+msgid "Ink Regioman"
+msgstr "Ink Regioman"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product_name
+msgid "Internal Reference"
+msgstr "Interne referentie"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_account_invoice
+msgid "Invoice"
+msgstr "Factuur"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_sale_order_issue_date
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_issue_date
+#: model:ir.ui.view,arch_db:wobe_imports.view_order_tree
+#: model:ir.ui.view,arch_db:wobe_imports.view_sales_order_filter_wobe
+msgid "Issue Date"
+msgstr "Editiedatum"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_tree
+msgid "Job"
+msgstr "Functie"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_job_ref
+msgid "Job #"
+msgstr "Job #"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_filter
+msgid "Job Created"
+msgstr "Job Created"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_account_analytic_line_job_issue_date
+#: model:ir.model.fields,field_description:wobe_imports.field_stock_move_job_issue_date
+msgid "Job Issue Date"
+msgstr "Job Issue Date"
+
+#. module: wobe_imports
+#: model:ir.actions.act_window,help:wobe_imports.action_wobe_job
+msgid "Job Records will be created by the call of Schedular (Cron)."
+msgstr "Job Records will be created by the call of Schedular (Cron)."
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_account_analytic_line_job_id
+#: model:ir.model.fields,field_description:wobe_imports.field_sale_order_job_id
+msgid "Job Ref #"
+msgstr "Job Ref #"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_stock_move_job_id
+msgid "Job Ref#"
+msgstr "Job Ref#"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_account_analytic_line_job_title
+#: model:ir.model.fields,field_description:wobe_imports.field_stock_move_job_title
+msgid "Job Title"
+msgstr "Functietitel"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_stock_move_job_id
+msgid "Job associated to this move"
+msgstr "Job associated to this move"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_job_id
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_job_id
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_job_id
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product_job_id
+msgid "Job id"
+msgstr "Job id"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_filter
+msgid "Jobs"
+msgstr "Vacatures"
+
+#. module: wobe_imports
+#: model:ir.ui.menu,name:wobe_imports.menu_action_wobe_job
+msgid "Jobs Imported"
+msgstr "Jobs Imported"
+
+#. module: wobe_imports
+#: selection:wobe.job,job_type:0
+msgid "KBA"
+msgstr "KBA"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_kbajob_ref
+msgid "KBA Job #"
+msgstr "KBA Job #"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_edition_kbajob_ref
+msgid "KBA Job (XML3)"
+msgstr "KBA Job (XML3)"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry___last_update
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer___last_update
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet___last_update
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition___last_update
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job___last_update
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product___last_update
+msgid "Last Modified on"
+msgstr "Laatst gewijzigd op"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_write_uid
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_write_uid
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_write_uid
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_write_uid
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_write_uid
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product_write_uid
+msgid "Last Updated by"
+msgstr "Laatst bijgewerkt door"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_write_date
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_write_date
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_write_date
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_write_date
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_write_date
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product_write_date
+msgid "Last Updated on"
+msgstr "Laatst bijgewerkt op"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_login
+msgid "Login"
+msgstr "Login"
+
+#. module: wobe_imports
+#: selection:product.template,formats:0
+msgid "MP"
+msgstr "MP"
+
+#. module: wobe_imports
+#: model:res.groups,name:wobe_imports.group_wobe_user
+msgid "Manage Wobe Jobs"
+msgstr "Manage Wobe Jobs"
+
+#. module: wobe_imports
+#: model:res.groups,name:wobe_imports.group_wobe_manager
+msgid "Manage Wobe Jobs and ftp and file registry"
+msgstr "Manage Wobe Jobs and ftp and file registry"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_name
+msgid "Name"
+msgstr "Naam"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_net_quantity
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_net_quantity
+msgid "Net Qty"
+msgstr "Net Qty"
+
+#. module: wobe_imports
+#: selection:file.registry,state:0
+msgid "New/ Unpaired"
+msgstr "New/ Unpaired"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_title
+msgid "Newspaper Title"
+msgstr "Newspaper Title"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:993
+#, python-format
+msgid "Number of rolls used not possible : must be one of '1','2','3','4'"
+msgstr "Number of rolls used not possible : must be one of '1','2','3','4'"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_tree
+msgid "OdooJob #"
+msgstr "OdooJob #"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_stock_ok
+msgid "Ok to create Stock?"
+msgstr "Ok to create Stock?"
+
+#. module: wobe_imports
+#: selection:wobe.job,state:0
+msgid "Order Created"
+msgstr "Order Created"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Other/Paper Details"
+msgstr "Other/Paper Details"
+
+#. module: wobe_imports
+#: selection:wobe.job,plate_type:0
+msgid "PA"
+msgstr "PA"
+
+#. module: wobe_imports
+#: selection:wobe.job,plate_type:0
+msgid "PU"
+msgstr "PU"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_pages
+#: model:product.attribute,name:wobe_imports.variant_attribute_2
+msgid "Pages"
+msgstr "Pages"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_delivery_carrier_formats
+#: model:ir.model.fields,field_description:wobe_imports.field_product_product_formats
+#: model:ir.model.fields,field_description:wobe_imports.field_product_template_formats
+#: model:product.attribute,name:wobe_imports.variant_attribute_1
+msgid "Paper Format"
+msgstr "Papierformaat"
+
+#. module: wobe_imports
+#: selection:product.template,print_category:0
+msgid "Paper KBA"
+msgstr "Paper KBA"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_mass_1
+msgid "Paper Mass 01"
+msgstr "Paper Mass 01"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_mass_2
+msgid "Paper Mass 02"
+msgstr "Paper Mass 02"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_mass_3
+msgid "Paper Mass 03"
+msgstr "Paper Mass 03"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_mass_4
+msgid "Paper Mass 04"
+msgstr "Paper Mass 04"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_mass_5
+msgid "Paper Mass 05"
+msgstr "Paper Mass 05"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_mass_6
+msgid "Paper Mass 06"
+msgstr "Paper Mass 06"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_mass_7
+msgid "Paper Mass 07"
+msgstr "Paper Mass 07"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_product_ids
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Paper Products"
+msgstr "Paper Products"
+
+#. module: wobe_imports
+#: selection:product.template,print_category:0
+msgid "Paper Regioman"
+msgstr "Paper Regioman"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_paper_weight
+#: model:product.attribute,name:wobe_imports.variant_attribute_3
+msgid "Paper Weight"
+msgstr "Paper Weight"
+
+#. module: wobe_imports
+#: model:product.attribute,name:wobe_imports.variant_attribute_paperWidth
+msgid "Paper Width"
+msgstr "Paper Width"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_width_1
+msgid "Paper Width 01"
+msgstr "Paper Width 01"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_width_2
+msgid "Paper Width 02"
+msgstr "Paper Width 02"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_width_3
+msgid "Paper Width 03"
+msgstr "Paper Width 03"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_width_4
+msgid "Paper Width 04"
+msgstr "Paper Width 04"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_width_5
+msgid "Paper Width 05"
+msgstr "Paper Width 05"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_width_6
+msgid "Paper Width 06"
+msgstr "Paper Width 06"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_paper_width_7
+msgid "Paper Width 07"
+msgstr "Paper Width 07"
+
+#. module: wobe_imports
+#: selection:file.registry,state:0
+msgid "Partially Done"
+msgstr "Partially Done"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:485
+#, python-format
+msgid "Partner not mapped for this NewspaperTitle."
+msgstr "Partner not mapped for this NewspaperTitle."
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_password
+msgid "Password"
+msgstr "Wachtwoord"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_picking_id
+msgid "Picking"
+msgstr "Verzamelen"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_filter
+#: selection:wobe.job,state:0
+msgid "Picking Created"
+msgstr "Picking Created"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_plate_amount
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_plate_amount
+msgid "Plate Amount"
+msgstr "Plate Amount"
+
+#. module: wobe_imports
+#: selection:product.template,print_category:0
+msgid "Plate Change"
+msgstr "Plate Change"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_plate_type
+msgid "Plate Type"
+msgstr "Plate Type"
+
+#. module: wobe_imports
+#: selection:product.template,print_category:0
+msgid "Plates KBA"
+msgstr "Plates KBA"
+
+#. module: wobe_imports
+#: selection:product.template,print_category:0
+msgid "Plates Regioman"
+msgstr "Plates Regioman"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_port
+msgid "Port"
+msgstr "Poort"
+
+#. module: wobe_imports
+#: selection:product.template,print_category:0
+msgid "Press Stop"
+msgstr "Press Stop"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_delivery_carrier_print_category
+#: model:ir.model.fields,field_description:wobe_imports.field_product_product_print_category
+#: model:ir.model.fields,field_description:wobe_imports.field_product_template_print_category
+msgid "Print Category"
+msgstr "Print Category"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_file_registry_edition_count
+msgid "Print Editions"
+msgstr "Print Editions"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_delivery_carrier_print_format_template
+#: model:ir.model.fields,field_description:wobe_imports.field_product_product_print_format_template
+#: model:ir.model.fields,field_description:wobe_imports.field_product_template_print_format_template
+msgid "Print Format Template"
+msgstr "Print Format Template"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_delivery_carrier_print_category
+#: model:ir.model.fields,help:wobe_imports.field_product_product_print_category
+msgid "Print/Booklet Category"
+msgstr "Print/Booklet Category"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_edition_gross_quantity
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_gross_quantity
+msgid "Prints Gross"
+msgstr "Prints Gross"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_edition_net_quantity
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_net_quantity
+msgid "Prints Net"
+msgstr "Prints Net"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_product_product
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_paper_product_product_id
+msgid "Product"
+msgstr "Product"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_product_template
+msgid "Product Template"
+msgstr "Productsjabloon"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/product.py:71
+#, python-format
+msgid "Product for this Print Category already exists"
+msgstr "Product for this Print Category already exists"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:579
+#, python-format
+msgid "Product not found for the print-category : 'Glueing'"
+msgstr "Product not found for the print-category : 'Glueing'"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:998
+#, python-format
+msgid "Product not found for the print-category : 'Paper KBA' for these variants - %s"
+msgstr "Product not found for the print-category : 'Paper KBA' for these variants - %s"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:970
+#, python-format
+msgid "Product not found for the print-category : 'Paper Regioman' or \"applicable to regioman\""
+msgstr "Product not found for the print-category : 'Paper Regioman' or \"applicable to regioman\""
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:593
+#, python-format
+msgid "Product not found for the print-category : 'Plate Change'"
+msgstr "Product not found for the print-category : 'Plate Change'"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:597
+#, python-format
+msgid "Product not found for the print-category : 'Press Stop'"
+msgstr "Product not found for the print-category : 'Press Stop'"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:586
+#, python-format
+msgid "Product not found for the print-category : 'Stitching'"
+msgstr "Product not found for the print-category : 'Stitching'"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:533
+#, python-format
+msgid "Product not found for the print-category : 'Strook'"
+msgstr "Product not found for the print-category : 'Strook'"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:573
+#, python-format
+msgid "Product not found for this variants 'Pages: %s', 'Format: %s', 'Paper Weight: %s'!!"
+msgstr "Product not found for this variants 'Pages: %s', 'Format: %s', 'Paper Weight: %s'!!"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_product_id
+msgid "Product used for Calculation"
+msgstr "Product used for Calculation"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_planned_quantity
+msgid "Production Amount"
+msgstr "Production Amount"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_production_stop
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_production_stop
+msgid "Production End"
+msgstr "Production End"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_production_start
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_production_start
+msgid "Production Start"
+msgstr "Production Start"
+
+#. module: wobe_imports
+#: selection:wobe.job,state:0
+msgid "Ready"
+msgstr "Ready"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_filter
+msgid "Ready to Order"
+msgstr "Ready to Order"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Recompute"
+msgstr "Herbereken"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_form
+msgid "Record is duplicated, please refer the origin record"
+msgstr "Record is duplicated, please refer the origin record"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "References"
+msgstr "References"
+
+#. module: wobe_imports
+#: selection:wobe.job,job_type:0
+msgid "Regioman"
+msgstr "Regioman"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:126
+#, python-format
+msgid "Regioman cannot have more than 1 Edition Details"
+msgstr "Regioman cannot have more than 1 Edition Details"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "RegistryFiles"
+msgstr "RegistryFiles"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Reset Status"
+msgstr "Reset Status"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_roll_count
+msgid "Roll Count"
+msgstr "Roll Count"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_stock_picking_order_id
+msgid "SO Number"
+msgstr "SO Number"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_order_id
+msgid "Sale Order"
+msgstr "Verkooporder"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_filter
+msgid "SaleOrder Created"
+msgstr "SaleOrder Created"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_sale_order
+msgid "Sales Order"
+msgstr "Verkooporder"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_filter
+msgid "Search Files"
+msgstr "Search Files"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_filter
+msgid "Search Jobs"
+msgstr "Search Jobs"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_transfer_url
+msgid "Server IP"
+msgstr "Server IP"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_transfer_form
+msgid "Server's User Password"
+msgstr "Server's User Password"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_transfer_form
+msgid "Server's Username"
+msgstr "Server's Username"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_delivery_carrier_print_format_template
+#: model:ir.model.fields,help:wobe_imports.field_product_product_print_format_template
+#: model:ir.model.fields,help:wobe_imports.field_product_template_print_format_template
+msgid "Set True to assign Print Format to the Products"
+msgstr "Set True to assign Print Format to the Products"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_file_transfer_server_path
+msgid "Source/Download Directory"
+msgstr "Source/Download Directory"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_state
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_state
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_filter
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_filter
+msgid "Status"
+msgstr "Status"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_stitching
+#: selection:product.template,print_category:0
+msgid "Stitching"
+msgstr "Stitching"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_stock_move
+msgid "Stock Move"
+msgstr "Voorraadbeweging"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_strook
+#: selection:product.template,print_category:0
+msgid "Strook"
+msgstr "Strook"
+
+#. module: wobe_imports
+#: model:product.attribute.value,name:wobe_imports.variant_value_1
+#: selection:product.template,formats:0
+msgid "TB"
+msgstr "TB"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_transfer_form
+msgid "Test Connection"
+msgstr "Test verbinding"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_transfer_form
+msgid "Test server connection."
+msgstr "Test server connection."
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_order_tree
+#: model:ir.ui.view,arch_db:wobe_imports.view_sales_order_filter_wobe
+msgid "Title"
+msgstr "Titel"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_total_pages
+msgid "Total Pages"
+msgstr "Total Pages"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_stock_picking
+msgid "Transfer"
+msgstr "Verplaatsing"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_booklet_job_type
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_job_type
+msgid "Type"
+msgstr "Soort"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:860
+#: code:addons/wobe_imports/models/wobe.py:866
+#: code:addons/wobe_imports/models/wobe.py:1103
+#: code:addons/wobe_imports/models/wobe.py:1111
+#, python-format
+msgid "Unable to create Picking; Product not found for the print-category : '%s'"
+msgstr "Unable to create Picking; Product not found for the print-category : '%s'"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_filter
+msgid "Unpaired"
+msgstr "Unpaired"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_mass_1
+msgid "Used Gram01"
+msgstr "Used Gram01"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_mass_2
+msgid "Used Gram02"
+msgstr "Used Gram02"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_mass_3
+msgid "Used Gram03"
+msgstr "Used Gram03"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_mass_4
+msgid "Used Gram04"
+msgstr "Used Gram04"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_mass_5
+msgid "Used Gram05"
+msgstr "Used Gram05"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_mass_6
+msgid "Used Gram06"
+msgstr "Used Gram06"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_mass_7
+msgid "Used Gram07"
+msgstr "Used Gram07"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_width_1
+msgid "Used WebWidth01"
+msgstr "Used WebWidth01"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_width_2
+msgid "Used WebWidth02"
+msgstr "Used WebWidth02"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_width_3
+msgid "Used WebWidth03"
+msgstr "Used WebWidth03"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_width_4
+msgid "Used WebWidth04"
+msgstr "Used WebWidth04"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_width_5
+msgid "Used WebWidth05"
+msgstr "Used WebWidth05"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_width_6
+msgid "Used WebWidth06"
+msgstr "Used WebWidth06"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_paper_width_7
+msgid "Used WebWidth07"
+msgstr "Used WebWidth07"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/wobe.py:527
+#, python-format
+msgid "Variant Attributes not found for %s"
+msgstr "Variant Attributes not found for %s"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_wobe_booklet
+msgid "WOBE Booklet"
+msgstr "WOBE Booklet"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_wobe_edition
+msgid "WOBE Edition"
+msgstr "WOBE Edition"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_wobe_job
+msgid "WOBE Job"
+msgstr "WOBE Job"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_job_ref
+msgid "WOBE Job #"
+msgstr "WOBE Job #"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_wobe_paper_product
+msgid "WOBE Paper Product"
+msgstr "WOBE Paper Product"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_filter
+#: selection:wobe.job,state:0
+msgid "Waiting"
+msgstr "Wachten"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_wobe_job_form
+msgid "Waste"
+msgstr "Waste"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_waste_start
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_waste_start
+msgid "Waste Start"
+msgstr "Waste Start"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_edition_waste_total
+#: model:ir.model.fields,field_description:wobe_imports.field_wobe_job_waste_total
+msgid "Waste Total"
+msgstr "Waste Total"
+
+#. module: wobe_imports
+#: model:ir.ui.menu,name:wobe_imports.menu_wobe
+msgid "Wobe"
+msgstr "Wobe"
+
+#. module: wobe_imports
+#: model:ir.ui.menu,name:wobe_imports.menu_wobe_header
+msgid "Wobe Imports"
+msgstr "Wobe Imports"
+
+#. module: wobe_imports
+#: model:ir.actions.act_window,name:wobe_imports.action_wobe_job
+msgid "Wobe Jobs"
+msgstr "Wobe Jobs"
+
+#. module: wobe_imports
+#: model:ir.actions.act_window,help:wobe_imports.action_file_registry
+msgid "Wobe XML File Registry"
+msgstr "Wobe XML File Registry"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_form
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_registry_tree
+msgid "WobeJob #"
+msgstr "WobeJob #"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_file_registry_job_ref
+msgid "WobeJob/KBAJob/InfoJob reference"
+msgstr "WobeJob/KBAJob/InfoJob reference"
+
+#. module: wobe_imports
+#: model:ir.model.fields,field_description:wobe_imports.field_file_registry_xmlfile
+msgid "XML File"
+msgstr "XML File"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_file_registry
+msgid "XML File Registry"
+msgstr "XML File Registry"
+
+#. module: wobe_imports
+#: model:ir.model.fields,help:wobe_imports.field_wobe_booklet_booklet_ref
+#: model:ir.model.fields,help:wobe_imports.field_wobe_job_job_ref
+msgid "XML reference"
+msgstr "XML reference"
+
+#. module: wobe_imports
+#: selection:file.registry,part:0
+msgid "Xml1"
+msgstr "Xml1"
+
+#. module: wobe_imports
+#: selection:file.registry,part:0
+msgid "Xml3"
+msgstr "Xml3"
+
+#. module: wobe_imports
+#: selection:file.registry,part:0
+msgid "Xml4"
+msgstr "Xml4"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/ftp.py:70
+#, python-format
+msgid "You can't create more than one active connection for same company"
+msgstr "You can't create more than one active connection for same company"
+
+#. module: wobe_imports
+#: code:addons/wobe_imports/models/ftp.py:51
+#, python-format
+msgid "You can't create more than one active connection same company"
+msgstr "You can't create more than one active connection same company"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_transfer_form
+msgid "default port number is 22"
+msgstr "default port number is 22"
+
+#. module: wobe_imports
+#: model:ir.model,name:wobe_imports.model_file_transfer
+msgid "file.transfer"
+msgstr "file.transfer"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_transfer_form
+msgid "path like = /home/user/ftpdir/"
+msgstr "path like = /home/user/ftpdir/"
+
+#. module: wobe_imports
+#: model:ir.ui.view,arch_db:wobe_imports.view_file_transfer_form
+msgid "path like = /home/user/shared/"
+msgstr "path like = /home/user/shared/"
+

@@ -7,7 +7,7 @@
     </record>
 
     <record id="wobe_imports.group_wobe_manager" model="res.groups">
-        <field name="name">Manage Wobe Jobs and ftp and fi;e registry</field>
+        <field name="name">Manage Wobe Jobs and ftp and file registry</field>
         <field name="implied_ids" eval="[(4, ref('wobe_imports.group_wobe_user'))]"/>
         <field name="category_id" ref="base.module_category_hidden"/>
     </record>
