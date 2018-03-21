@@ -112,6 +112,7 @@
                         <group>
                             <field name="bduorder_ref"/>
                             <field name="job_ref" string="WobeJob #"/>
+                            <field name="generated_by" attrs="{'invisible': [('generated_by','=',False)]}"/>
                             <field name="company_id"/>
                         </group>
                     </group>
