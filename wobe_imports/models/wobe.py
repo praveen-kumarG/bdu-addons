@@ -317,6 +317,11 @@ class Job(models.Model):
                 res[y] = val.get(y)
 
             if found:
+                #edition found sum up of values
+                elnvals['gross_quantity'] += found.gross_quantity
+                elnvals['net_quantity'] += found.net_quantity
+                elnvals['waste_start'] += found.waste_start
+                elnvals['waste_total'] += found.waste_total
                 edlines.append((1, found.id, elnvals))
             else:
                 edlines.append((0,0, elnvals))
