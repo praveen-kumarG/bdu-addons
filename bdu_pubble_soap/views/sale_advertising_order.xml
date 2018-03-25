@@ -67,9 +67,14 @@
                                     </tree>
                                 </field>
                             </page>
-                            <page name="json_msg" string="JSON Message">
+                            <page name="json_msg" string="XML Message">
                                 <group>
                                     <field name="json_message"/>
+                                </group>
+                            </page>
+                            <page name="reply_msg" string="Reply Message">
+                                <group>
+                                    <field name="reply_message"/>
                                 </group>
                             </page>
                         </notebook>
