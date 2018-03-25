@@ -28,6 +28,9 @@ from odoo.addons.queue_job.job import job, related_action
 from odoo.addons.queue_job.exception import FailedJobError
 from unidecode import unidecode
 import datetime
+import logging
+
+logging.getLogger('suds.client').setLevel(logging.DEBUG)
 
 
 class SaleOrder(models.Model):
