@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+
+        <record id="account_invoice_confirm_view" model="ir.ui.view">
+            <field name="name">account.invoice.confirm.form</field>
+            <field name="model">account.invoice.confirm</field>
+            <field name="inherit_id" ref="account.account_invoice_confirm_view"/>
+            <field name="arch" type="xml">
+                <p position="before" >
+                    <group>
+                        <field name="job_queue" string="Via Job Queue"/>
+                        <field name="chunk_size" string="Chunk Size Job Queue"
+                               attrs="{'required':[('job_queue','=',True)],
+                                       'invisible': [('job_queue','!=', True)]}"/>
+                    </group>
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
