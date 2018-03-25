@@ -28,6 +28,22 @@ from odoo.addons.queue_job.job import job, related_action
 from odoo.addons.queue_job.exception import FailedJobError
 from unidecode import unidecode
 import datetime
+from suds.plugin import MessagePlugin
+from lxml import etree
+
+def xmlpprint(xml):
+    return etree.tostring(etree.fromstring(xml), pretty_print=True)
+
+class LogPlugin(MessagePlugin):
+    def __init__(self):
+        self.last_sent_raw = None
+        self.last_received_raw = None
+
+    def sending(self, context):
+        self.last_sent_raw = str(context.envelope)
+
+    def received(self, context):
+        self.last_received_raw = str(context.reply)
 
 
 class SaleOrder(models.Model):
@@ -198,6 +214,14 @@ class SaleOrderLine(models.Model):
     pubble_sent = fields.Boolean('Order Line sent to Pubble')
     line_pubble_allow = fields.Boolean(compute='_compute_allowed', string='Pubble Allowed', store=False)
 
+    @api.multi
+    def unlink(self):
+        if self.filtered('pubble_sent'):
+            raise UserError(
+                _('You can not remove a sale order line after it has been sent to Pubble.\n'
+                  'Discard changes and try setting the quantity to 0.'))
+        return super(SaleOrderLine, self).unlink()
+
 
 class SofromOdootoPubble(models.Model):
     _name = 'sofrom.odooto.pubble'
@@ -207,11 +231,13 @@ class SofromOdootoPubble(models.Model):
     def get_next_ref(self):
         return self.env['ir.sequence'].next_by_code('pubble.itf')
 
+
     transmission_id = fields.Char(string='Transmission ID', store=True, size=16, readonly=True)
     pubble_so_line = fields.One2many('soline.from.odooto.pubble', 'order_id', string='Order Lines', copy=True)
     pubble_response = fields.Text('Pubble Response')
     pubble_environment = fields.Char('Pubble Environment')
-    json_message = fields.Text('JSON message')
+    json_message = fields.Text('XML message')
+    reply_message = fields.Text('Reply message')
     sale_order_id = fields.Many2one('sale.order',string='Sale Order')
     salesorder_extorderid = fields.Char(string='Sale Order ID')
     salesorder_reference = fields.Char(string='Opportunity Subject', size=64)
@@ -238,10 +264,11 @@ class SofromOdootoPubble(models.Model):
     @job
     def call_wsdl(self):
         self.ensure_one()
+        plugin = LogPlugin()
         if self.pubble_response and self.pubble_response == 'True':
             raise UserError(_('This Sale Order already has been succesfully sent to Pubble.'))
         transmissionID = int(float(self.transmission_id))
-        client = Client("https://ws.pubble.nl/Sales.svc?singleWsdl")
+        client = Client("https://ws.pubble.nl/Sales.svc?singleWsdl", plugins=[plugin])
         SalesOrder = client.factory.create('ns1:salesOrder')
         publisher = "nhbdudata"
         apiKey = "9tituo3t2qo4zk7emvlb"
@@ -294,10 +321,14 @@ class SofromOdootoPubble(models.Model):
             ad.materialChecksum = str(line.ad_materialChecksum)
 
             SalesOrder.orderLine_Ads.adPlacement.append(ad)
-        self.write({'json_message': str(SalesOrder)})
-        self._cr.commit()
-        response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
-        self.write({'pubble_response': response,'pubble_environment': publisher})
+        try:
+            response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
+            self.write({'pubble_response': response, 'pubble_environment': publisher})
+        finally:
+            xml_msg = xmlpprint(plugin.last_sent_raw)
+            reply = xmlpprint(plugin.last_received_raw)
+            self.write({'json_message': xml_msg,'reply_message': reply})
+            self._cr.commit()
         if response == True:
             self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).with_context(pubble_call=True).write(
                                                     {'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
