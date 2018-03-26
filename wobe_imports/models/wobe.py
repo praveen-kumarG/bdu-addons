@@ -980,7 +980,7 @@ class Job(models.Model):
         msg, stockOk = '', True
 
         # Products: Paper Regioman
-        if not MassWidth or self.job_type == 'regioman' or self.generated_by == 'MAN':
+        if not MassWidth or self.job_type == 'regioman':
             prods = product_obj.search(domain)
             for p in prods:
                 lines.append({'product_id': p.id})
@@ -991,7 +991,10 @@ class Job(models.Model):
 
         RollX = []
         # Products: Paper KBA
-        if self.job_type == 'kba' and self.generated_by != 'MAN':
+        if self.job_type == 'kba':
+            print_category = 'paper_kba'
+            if self.generated_by == 'MAN':
+                print_category = 'paper_regioman'
             for x, cnt in MassWidth.items():
                 M, W = x[0], x[1]
 
@@ -1002,7 +1005,7 @@ class Job(models.Model):
                 v2 = variant_obj.search([('name','=', str(W)), ('attribute_id','=', pWidth.id)])
                 product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
                                               ('attribute_value_ids', 'in', v2.ids),
-                                              ('print_category','=', 'paper_kba')]
+                                              ('print_category','=', print_category)]
                                              , order='id desc', limit=1)
                 if not product:
                     msg += '(%s, %s); '%(m1, W)
