@@ -325,9 +325,14 @@ class SofromOdootoPubble(models.Model):
         try:
             response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
             self.write({'pubble_response': response, 'pubble_environment': publisher})
+        except Exception, e:
+            raise FailedJobError(_("The details of the error:'%s' regarding '%s'") % unicode(e))
         finally:
             xml_msg = xmlpprint(plugin.last_sent_raw)
-            reply = xmlpprint(plugin.last_received_raw)
+            try:
+                reply = xmlpprint(plugin.last_received_raw)
+            except Exception, e:
+                reply = plugin.last_received_raw
             self.write({'json_message': xml_msg,'reply_message': reply})
             self._cr.commit()
         if response == True:
