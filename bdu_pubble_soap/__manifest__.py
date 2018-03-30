@@ -135,7 +135,6 @@ To contribute to this module, please visit https://odoo-community.org.
     'js': [],
     'css': [],
     'qweb': [],
-
     'installable': True,
     # Install this module automatically if all dependency have been previously
     # and independently installed.  Used for synergetic or glue modules.
