@@ -1,0 +1,30 @@
+<odoo>
+    <data>
+
+        <record id="sale_order_to_pubble_view" model="ir.ui.view">
+            <field name="name">sale.order.pubble.form</field>
+            <field name="model">sale.order.pubble</field>
+            <field name="groups_id" eval="[(4, ref('sale_advertising_order.group_traffic_user'))]"/>
+            <field name="arch" type="xml">
+                <form string="Update Sale Orders to Pubble">
+                    <p class="oe_grey">
+                        Selected Sales Orders will be sent to Pubble if order_pubble_allowed and/or pubble_sent are True.
+                    </p>
+                    <footer>
+                        <button string="Update Orders Pubble" name="sale_order_update_pubble" type="object" default_focus="1" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="action_sale_order_pubble"
+            multi="True"
+            key2="client_action_multi" name="Sale Orders to Pubble"
+            res_model="sale.order.pubble" src_model="sale.order"
+            view_mode="form" target="new" view_type="form"
+            groups="sale_advertising_order.group_traffic_user"/>
+
+
+    </data>
+</odoo>
