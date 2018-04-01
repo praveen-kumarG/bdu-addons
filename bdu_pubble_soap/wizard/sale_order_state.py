@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo import models, api, _
 from odoo.exceptions import UserError
-
+from odoo.addons.queue_job.job import job, related_action
+from odoo.addons.queue_job.exception import FailedJobError
 
 class SaleOrderPubble(models.TransientModel):
     """
@@ -13,6 +14,11 @@ class SaleOrderPubble(models.TransientModel):
 
     @api.multi
     def sale_order_update_pubble(self):
+        self.with_delay().sale_order_update_pubble_jq()
+
+    @job
+    @api.multi
+    def sale_order_update_pubble_jq(self):
         context = dict(self._context or {})
         active_ids = context.get('active_ids', []) or []
         for record in self.env['sale.order'].browse(active_ids):
