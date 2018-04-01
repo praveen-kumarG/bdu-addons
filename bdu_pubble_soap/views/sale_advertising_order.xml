@@ -161,7 +161,7 @@
             <field name="inherit_id" ref="bdu_pubble_soap.view_order_form_advertising_pubble"/>
             <field name="groups_id" eval="[(4, ref('sale_advertising_order.group_traffic_user'))]"/>
             <field name="arch" type="xml">
-                <button name="action_pubble_update" position="after">
+                <button name="action_pubble_no_xml" position="after">
                     <button name="action_pubble_xml" type="object" string="Update Pubble with XML"
                             attrs="{'invisible': ['|',('order_pubble_allow','!=', True),('state','!=','sale')]}"/>
                 </button>
