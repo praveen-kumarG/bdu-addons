@@ -25,7 +25,7 @@ class SaleOrderPubble(models.TransientModel):
             if record.state not in ('sale', 'done') or not record.advertising:
                 raise UserError(_("Selected order(s) cannot be updated to Pubble as they are not in 'Sale', or 'Done' state"
                                   " or they are not Advertising Orders."))
-            record.action_pubble_update()
+            record.action_pubble_no_xml()
         return {'type': 'ir.actions.act_window_close'}
 
 
