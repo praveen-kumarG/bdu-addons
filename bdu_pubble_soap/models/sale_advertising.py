@@ -88,59 +88,43 @@ class SaleOrder(models.Model):
     pubble_sent = fields.Boolean(compute=_pubble_sent, string='Order to Pubble', default=False, store=True)
     publog_id = fields.Many2one('sofrom.odooto.pubble', )
 
-
-
-    def send_to_pubble(self, res, xml=False):
-        res.with_delay(description=res.salesorder_reference).call_wsdl(xml=xml)
-
+    @job
+    @api.multi
     def action_pubble(self, arg, xml=False):
-        self.ensure_one()
-        res = self.transfer_order_to_pubble(arg)
-        if self.order_pubble_allow:
-            self.send_to_pubble(res, xml=xml)
-            self.pubble_trans_id = res.transmission_id
+        for order in self.filtered(lambda s: s.state == 'sale' and s.advertising):
+            res = order.transfer_order_to_pubble(arg)
+            if order.order_pubble_allow:
+                order.with_context(no_checks=True).write({'pubble_trans_id': res.transmission_id, 'pubble_tbu': True})
+                res.with_delay(description=res.salesorder_reference).call_wsdl(xml=xml)
         return True
 
     @api.multi
-    def action_pubble_update(self, xml=False):
-        for order in self.filtered('advertising'):
-            if order.order_pubble_allow:
-                order.with_context(no_checks=True).write({'pubble_tbu': True })
-            order.action_pubble('update', xml=xml)
-
-    @api.multi
     def action_pubble_xml(self):
-        self.action_pubble_update(True)
+        self.action_pubble('update', True)
 
     @api.multi
     def action_pubble_no_xml(self):
-        self.action_pubble_update(False)
+        self.action_pubble('update', False)
 
     @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
-        self.action_pubble_update(False)
+        self.action_pubble('update', False)
         return res
 
     @api.multi
     def write(self, vals):
-        for order in self.filtered(lambda s: s.advertising and s.order_pubble_allow and s.state == 'sale'):
+        res = super(SaleOrder, self).write(vals)
+        for order in self.filtered(lambda s: s.advertising and s.state == 'sale'):
             if ('published_customer' in vals) or ('partner_id' in vals) or ('customer_contact' in vals) or ('advertising_agency'in vals) \
                                               or ('opportunity_subject' in vals) or ('order_line' in vals):
                 order.action_pubble('update', False)
-                vals['pubble_tbu'] = True
-        return super(SaleOrder, self).write(vals)
+        return res
 
     @api.multi
     def action_cancel(self):
-        for order in self.filtered(lambda s: s.state == 'sale' and s.advertising):
-            order.pubble_delete()
-        return super(SaleOrder, self).action_cancel()
-
-    @api.multi
-    def pubble_delete(self):
-        self.ensure_one()
         self.action_pubble('delete', False)
+        return super(SaleOrder, self).action_cancel()
 
     @api.multi
     def transfer_order_to_pubble(self, arg):
@@ -184,7 +168,7 @@ class SaleOrder(models.Model):
                 del_param = True
                 if not (line.line_pubble_allow or line.pubble_sent):
                     continue
-                elif (not line.line_pubble_allow and line.pubble_sent) or int(line.product_uom_qty) == 0 or arg == 'delete':
+                elif int(line.product_uom_qty) == 0 or arg == 'delete' or (line.pubble_sent and not line.line_pubble_allow):
                     del_param = False
                 lvals = {
                         'order_id': res.id,
@@ -227,8 +211,7 @@ class SaleOrderLine(models.Model):
     def _compute_allowed(self):
         for line in self.filtered('advertising'):
             res = False
-            if line.ad_class.pubble and line.adv_issue.medium.pubble and \
-                    fields.Date.from_string(line.issue_date) >= datetime.date.today():
+            if line.ad_class.pubble and line.adv_issue.medium.pubble:
                 res = True
             line.line_pubble_allow = res
 
