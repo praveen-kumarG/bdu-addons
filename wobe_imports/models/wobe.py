@@ -141,6 +141,7 @@ class Job(models.Model):
 
         groupedFiles = defaultdict(lambda: {'Rfile1': False, 'Rfile3N4': {}, 'Rfile3':[]})
         part1, part3, part4 = {}, {}, {}
+        merge_XML4_withJob_id, merge_XML4_withoutJob_id = {}, {}
 
         # ----------------------------
         # Registry Files: Search
@@ -161,6 +162,17 @@ class Job(models.Model):
         for x4 in Reg.search([('state','!=','done'), ('part','=', 'xml4')]
                 , order='run_date, file_create_date, is_duplicate'):
             part4[x4.job_ref] = x4
+
+            if x4.duplicate_ref:
+                # Collect XML4 Files to update later
+                if x4.duplicate_ref.part != 'xml1':
+                    merge_XML4_withJob_id.update({x4:x4.duplicate_ref}) #dict:{Registry_Original_XML4:Registry_Duplicated_XML4}
+                elif x4.duplicate_ref and x4.duplicate_ref.part == 'xml1':
+                    # dict:{Registry_XML1:[Registry_XML4's]}
+                    if x4.duplicate_ref in merge_XML4_withoutJob_id:
+                        merge_XML4_withoutJob_id[x4.duplicate_ref].append(x4)
+                    else:
+                        merge_XML4_withoutJob_id[x4.duplicate_ref] = [x4]
 
         # ---------------------------------------
         # Files are linked & grouped: <Xml1>
@@ -264,7 +276,7 @@ class Job(models.Model):
 
                 for rf in fv['Rfile3']:
                     _update_RegStatus(rf, rPending)
-
+                job.merge_registry_xml4(merge_XML4_withJob_id, merge_XML4_withoutJob_id)
             except:
                 pass
 
@@ -969,7 +981,7 @@ class Job(models.Model):
 
             if not M or not W: continue
             M = 6500 if M == 7000 else M  # In case of value 70, the paper roll with width 65 is selected
-            W = 1444 if W == 1445 else W #In case of value 1555, the paper roll with width 1445 is selected
+            W = 1444 if W == 1445 else W #In case of value 1445, the paper roll with width 1444 is selected
             key = (M, W,)
             if not key in MassWidth:
                 MassWidth[key] = {'counter': 0}
@@ -1178,6 +1190,56 @@ class Job(models.Model):
                              })
                 AnalyticLines.create(line)
             case.write({'state': 'cost_created'})
+
+    @api.multi
+    def merge_registry_xml4(self, merge_XML4_Job_id, merge_XML4_noJob_id):
+        for dupXMl4, OrigXML4 in merge_XML4_Job_id.iteritems():
+            if dupXMl4.job_id and dupXMl4.job_id.id == self.id:
+                self.update_job_edition(OrigXML4)
+        for XMl1, listXML4 in merge_XML4_noJob_id.iteritems():
+            if XMl1.job_id and XMl1.job_id.id == self.id:
+                for XML4 in listXML4:
+                    if not XML4.job_id:
+                        self.update_job_edition(XML4)
+        return True
+
+    @api.multi
+    def update_job_edition(self, registry):
+        for Job in self:
+            edlines = []
+            if Job and not Job.order_id and Job.state in ('waiting', 'ready', 'exception'):
+                File4 = base64.decodestring(registry.xmlfile)
+                data4 = ET.fromstring(File4)
+                edData = Job._extract_EditionData({}, False, {}, RegFile4=registry, data4=data4)
+
+                for key, elnvals in edData.iteritems():
+
+                    found = Job.edition_ids.filtered(lambda x: x.name == key)
+                    if not found and key.isalpha():
+                        found = Job.edition_ids.filtered(lambda x: x.name == elnvals.get('infojob_ref'))
+
+                    if found:
+                        # Multiple XML4 adding the values
+                        for edition in found:
+                            elnvals['gross_quantity'] += edition.gross_quantity
+                            elnvals['net_quantity'] += edition.net_quantity
+                            elnvals['waste_start'] += edition.waste_start
+                            elnvals['waste_total'] += edition.waste_total
+                        edlines.append((1, found.id, elnvals))
+                    else:
+                        elnvals.update({'name': key, 'kbajob_ref': registry.job_ref})
+                        edlines.append((0, 0, elnvals))
+                Job.write({'edition_ids': edlines})
+
+                #check updated edition condition & update Registry Xml1 to Done, If pending
+                EditionCheck = len(Job.edition_ids) == Job.edition_count and all(l.net_quantity for l in Job.edition_ids)
+                if EditionCheck:
+                    Reg1 = self.env['file.registry'].search([('state','=','pending'),('part','=','xml1'),('job_id','=',Job.id)])
+                    if Reg1:
+                        Reg1.write({'state':'done'})
+
+                registry.write({'job_id': Job.id, 'is_duplicate': False, 'state': 'done'})
+        return True
 
 
 
