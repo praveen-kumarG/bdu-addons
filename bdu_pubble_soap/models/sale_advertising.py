@@ -325,7 +325,7 @@ class SofromOdootoPubble(models.Model):
             response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
             self.write({'pubble_response': response, 'pubble_environment': publisher})
         except Exception, e:
-            raise FailedJobError(_("The details of the error:'%s'") % unicode(e))
+            raise FailedJobError(_("The details of the error:'%s' regarding '%s'") % unicode(e))
         finally:
             xml_msg = xmlpprint(plugin.last_sent_raw)
             try:
