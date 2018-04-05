@@ -22,17 +22,17 @@ class Job(models.Model):
     _description = 'WOBE Job'
 
     @api.one
-    @api.depends('edition_ids','booklet_ids','job_type')
+    @api.depends('edition_ids')
     def _compute_all(self):
         self.waste_start = sum(line.waste_start for line in self.edition_ids)
         self.waste_total = sum(line.waste_total for line in self.edition_ids)
-        # self.plate_amount = sum(line.plate_amount for line in self.edition_ids)
+        self.plate_amount = sum(line.plate_amount for line in self.edition_ids)
         self.gross_quantity = sum(line.gross_quantity for line in self.edition_ids)
         self.net_quantity = sum(line.net_quantity for line in self.edition_ids)
-        if self.job_type == 'kba':
-            self.plate_amount = sum(line.calculated_plates for line in self.booklet_ids)
-        elif self.job_type == 'regioman':
-            self.plate_amount = sum(line.plate_amount for line in self.edition_ids)
+        # if self.job_type == 'kba':
+        #     self.plate_amount = sum(line.calculated_plates for line in self.booklet_ids)
+        # elif self.job_type == 'regioman':
+        #     self.plate_amount = sum(line.plate_amount for line in self.edition_ids)
         prodStart = self.edition_ids and min(line.production_start for line in self.edition_ids) or False
         prodEnd = self.edition_ids and max(line.production_stop for line in self.edition_ids) or False
 
@@ -249,6 +249,10 @@ class Job(models.Model):
                     vals = self._prepare_job_data(data1, edData, Job=job)
                     vals['generated_by'] = generated_by
                     job.write(vals)
+                    for Reg3, Reg4 in fv['Rfile3N4'].iteritems():
+                        #Job created without XML4 update paper roll
+                        if Reg3.job_id and not Reg4.job_id:
+                            job.update_paper_roll(Reg4)
                 else:
                     continue
 
@@ -1001,6 +1005,9 @@ class Job(models.Model):
                 self.message_post(body=_("Product not found for the print-category : 'Paper Regioman' or \"applicable to regioman\""))
                 stockOk = False
 
+            if self.job_type == 'kba' and not MassWidth:
+                self.message_post(body=_("No paper products found (XML4 missing?)"))
+
         RollX = []
         # Products: Paper KBA
         if self.job_type == 'kba':
@@ -1203,17 +1210,42 @@ class Job(models.Model):
                         self.update_job_edition(XML4)
         return True
 
+    #update Paper roll whenever new XML4 comes
+    @api.multi
+    def update_paper_roll(self, registry):
+        self.ensure_one()
+        self.write({'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids])})
+
+        # re-create from new XML4
+        self.fetch_paperProducts()
+
+        msg_body = _(
+            "Paper products updated from XML4: <a href=# data-oe-model=file.registry data-oe-id=%d>%s</a>") % (
+                       registry.id, registry.name)
+        self.message_post(body=msg_body)
+
+        return True
+
+
     @api.multi
     def update_job_edition(self, registry):
+        self.ensure_one()
         for Job in self:
             edlines = []
+            res = {}
             if Job and not Job.order_id and Job.state in ('waiting', 'ready', 'exception'):
                 File4 = base64.decodestring(registry.xmlfile)
                 data4 = ET.fromstring(File4)
                 edData = Job._extract_EditionData({}, False, {}, RegFile4=registry, data4=data4)
 
                 for key, elnvals in edData.iteritems():
-
+                    for idx in range(1, 8):
+                        res.update({
+                            'paper_mass_' + str(idx): elnvals['paper_mass_' + str(idx)],
+                            'paper_width_' + str(idx): elnvals['paper_width_' + str(idx)],
+                        })
+                        elnvals.pop('paper_mass_' + str(idx))
+                        elnvals.pop('paper_width_' + str(idx))
                     found = Job.edition_ids.filtered(lambda x: x.name == key)
                     if not found and key.isalpha():
                         found = Job.edition_ids.filtered(lambda x: x.name == elnvals.get('infojob_ref'))
@@ -1229,7 +1261,11 @@ class Job(models.Model):
                     else:
                         elnvals.update({'name': key, 'kbajob_ref': registry.job_ref})
                         edlines.append((0, 0, elnvals))
-                Job.write({'edition_ids': edlines})
+                res.update({'edition_ids':edlines})
+
+                Job.write(res)
+
+                Job.update_paper_roll(registry)
 
                 #check updated edition condition & update Registry Xml1 to Done, If pending
                 EditionCheck = len(Job.edition_ids) == Job.edition_count and all(l.net_quantity for l in Job.edition_ids)
