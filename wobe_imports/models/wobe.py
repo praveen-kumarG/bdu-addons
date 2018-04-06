@@ -1365,7 +1365,7 @@ class Edition(models.Model):
     job_id = fields.Many2one('wobe.job', required=True, ondelete='cascade', index=True, copy=False)
     name = fields.Char('Edition', help='Edition Name', required=True, copy=False)
 
-    plate_amount = fields.Integer('Plate Amount', store=True, compute='_compute_all')
+    plate_amount = fields.Integer('Plate Amount', store=True)
     net_quantity = fields.Integer('Net Qty', help='Prints Net')
 
     gross_quantity = fields.Integer('Gross Qty', help='Prints Gross')
@@ -1386,10 +1386,10 @@ class Edition(models.Model):
         # self.plate_amount = sum(line.calculated_plates if int(line.pages) > 48 else line.calculated_plates / 2 for line in self.job_id.booklet_ids)
         self.net_quantity = self.job_id.planned_quantity
 
-    @api.depends('name','job_id.job_type','job_id.booklet_ids')
-    def _compute_all(self):
-        for edition in self:
-            edition.plate_amount = sum(line.calculated_plates for line in edition.job_id.booklet_ids) if edition.job_id.job_type == 'regioman' else sum(line.calculated_plates if int(line.pages) > 48 else line.calculated_plates / 2 for line in edition.job_id.booklet_ids)
+    # @api.depends('name','job_id.job_type','job_id.booklet_ids')
+    # def _compute_all(self):
+    #     for edition in self:
+    #         edition.plate_amount = sum(line.calculated_plates for line in edition.job_id.booklet_ids) if edition.job_id.job_type == 'regioman' else sum(line.calculated_plates if int(line.pages) > 48 else line.calculated_plates / 2 for line in edition.job_id.booklet_ids)
 
     @api.onchange('gross_quantity')
     def waste_compute(self):
