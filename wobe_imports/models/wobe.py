@@ -5,6 +5,7 @@ import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError, ValidationError
 import logging
 from datetime import datetime
+from pytz import timezone
 import os
 import base64
 import xml.etree.ElementTree as ET
@@ -418,8 +419,8 @@ class Job(models.Model):
                 'infojob_ref' : RegFile4.job_ref,
                 'info_product': data4.find('info_product').text,
 
-                'production_start' : data4.find('info_datetime_start').text,
-                'production_stop'  : data4.find('info_datetime_end').text,
+                'production_start' : self.convert_TZ_UTC(data4.find('info_datetime_start').text),
+                'production_stop'  : self.convert_TZ_UTC(data4.find('info_datetime_end').text),
                 'gross_quantity'   : int(data4.find('prints_gross').text or 0),
                 'net_quantity'     : int(data4.find('prints_net').text or 0),
 
@@ -1276,6 +1277,18 @@ class Job(models.Model):
 
                 registry.write({'job_id': Job.id, 'is_duplicate': False, 'state': 'done'})
         return True
+
+    def convert_TZ_UTC(self, TZ_datetime):
+        fmt = "%Y-%m-%d %H:%M:%S"
+        # Current time in UTC
+        now_utc = datetime.now(timezone('UTC'))
+        # Convert to current user time zone
+        now_timezone = now_utc.astimezone(timezone(self.env.user.tz))
+        UTC_OFFSET_TIMEDELTA = datetime.strptime(now_utc.strftime(fmt), fmt) - datetime.strptime(now_timezone.strftime(fmt), fmt)
+        local_datetime = datetime.strptime(TZ_datetime, fmt)
+        result_utc_datetime = local_datetime + UTC_OFFSET_TIMEDELTA
+        return result_utc_datetime.strftime(fmt)
+
 
 
 
