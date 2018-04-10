@@ -143,6 +143,7 @@ class Job(models.Model):
         groupedFiles = defaultdict(lambda: {'Rfile1': False, 'Rfile3N4': {}, 'Rfile3':[]})
         part1, part3, part4 = {}, {}, {}
         merge_XML4_withJob_id, merge_XML4_withoutJob_id = {}, {}
+        unmappedXML4 = []
 
         # ----------------------------
         # Registry Files: Search
@@ -166,14 +167,19 @@ class Job(models.Model):
 
             if x4.duplicate_ref:
                 # Collect XML4 Files to update later
-                if x4.duplicate_ref.part != 'xml1':
-                    merge_XML4_withJob_id.update({x4:x4.duplicate_ref}) #dict:{Registry_Original_XML4:Registry_Duplicated_XML4}
+                if x4.duplicate_ref.part == 'xml4':
+                    if x4.duplicate_ref in merge_XML4_withJob_id:
+                        merge_XML4_withJob_id[x4.duplicate_ref].append(x4)
+                    else:
+                        merge_XML4_withJob_id.update({x4.duplicate_ref: [x4]})#dict:{Registry_Duplicated_XML4:[Registry_Original_XML4]}
                 elif x4.duplicate_ref and x4.duplicate_ref.part == 'xml1':
                     # dict:{Registry_XML1:[Registry_XML4's]}
                     if x4.duplicate_ref in merge_XML4_withoutJob_id:
                         merge_XML4_withoutJob_id[x4.duplicate_ref].append(x4)
                     else:
                         merge_XML4_withoutJob_id[x4.duplicate_ref] = [x4]
+            else:
+                unmappedXML4.append(x4)
 
         # ---------------------------------------
         # Files are linked & grouped: <Xml1>
@@ -281,7 +287,7 @@ class Job(models.Model):
 
                 for rf in fv['Rfile3']:
                     _update_RegStatus(rf, rPending)
-                job.merge_registry_xml4(merge_XML4_withJob_id, merge_XML4_withoutJob_id)
+                job.merge_registry_xml4(merge_XML4_withJob_id, merge_XML4_withoutJob_id, unmappedXML4)
             except:
                 pass
 
@@ -1200,15 +1206,38 @@ class Job(models.Model):
             case.write({'state': 'cost_created'})
 
     @api.multi
-    def merge_registry_xml4(self, merge_XML4_Job_id, merge_XML4_noJob_id):
-        for dupXMl4, OrigXML4 in merge_XML4_Job_id.iteritems():
-            if dupXMl4.job_id and dupXMl4.job_id.id == self.id:
-                self.update_job_edition(OrigXML4)
+    def merge_registry_xml4(self, merge_XML4_Job_id, merge_XML4_noJob_id, unmappedXMl4):
+        for firstXMl4, listXML4 in merge_XML4_Job_id.iteritems():
+            if firstXMl4.job_id and firstXMl4.job_id.id == self.id:
+                for XMl4 in listXML4:
+                    if not XMl4.job_id:
+                        self.update_job_edition(XMl4)
+            else:
+                unmappedXMl4 = list(set([firstXMl4]+listXML4+unmappedXMl4))
         for XMl1, listXML4 in merge_XML4_noJob_id.iteritems():
             if XMl1.job_id and XMl1.job_id.id == self.id:
                 for XML4 in listXML4:
                     if not XML4.job_id:
                         self.update_job_edition(XML4)
+            else:
+                unmappedXMl4 = list(set(listXML4 + unmappedXMl4))
+        # re-check with XML3 and XML4 during Job creates
+        for XML4 in unmappedXMl4:
+            if XML4.job_id:
+                continue
+            Registry = self.env['file.registry']
+            Job = XML4.duplicate_ref.job_id if XML4.duplicate_ref and XML4.duplicate_ref.part == 'xml1' and XML4.duplicate_ref.job_id else False
+            if not Job:
+                checkWithXMl3 = Registry.search([('part', '=', 'xml3'), ('job_ref', '=', XML4.job_ref)])
+                if checkWithXMl3:
+                    Job = checkWithXMl3.job_id
+                elif not checkWithXMl3:
+                    xml1Reg = Registry.search([('part', '=', 'xml1'), ('issue_date', '=', XML4.issue_date),('info_issue', '=', XML4.info_issue)], limit=1)
+                    if xml1Reg:
+                        XML4.duplicate_ref = xml1Reg.id  # non matching JOBID for XML4 add reference of XML1 registry
+                        Job = xml1Reg.job_id
+            if Job:
+                Job.update_job_edition(XML4)
         return True
 
     #update Paper roll whenever new XML4 comes

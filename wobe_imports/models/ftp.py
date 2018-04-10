@@ -182,7 +182,6 @@ class Registry(models.Model):
             Job = False
 
             if registry.duplicate_ref and registry.is_duplicate:
-
                 Job = registry.duplicate_ref.job_id
             elif not registry.duplicate_ref and not registry.is_duplicate:
                 # XML4 Job reference doesn't matches with any XML3 consider compare with XML1
@@ -207,7 +206,7 @@ class Registry(models.Model):
         elif vals.get('part') == 'xml4':
             condition = [('part', '=', 'xml4'), ('job_ref', '=', vals['job_ref'])]
         if condition:
-            reg_obj = self.search(condition, limit=1)
+            reg_obj = self.search(condition, limit=1,order='file_create_date')
             if reg_obj:
                 vals['is_duplicate'] = True
                 vals['duplicate_ref'] = reg_obj.id
