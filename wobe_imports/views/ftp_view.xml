@@ -108,10 +108,13 @@
                             <field name="part"/>
                             <field name="name" invisible="1"/>
                             <field name="xmlfile" filename="name"/>
+                            <field name="issue_date" attrs="{'invisible': [('part','=','xml3')]}"/>
                         </group>
                         <group>
                             <field name="bduorder_ref"/>
                             <field name="job_ref" string="WobeJob #"/>
+                            <field name="generated_by" attrs="{'invisible': [('generated_by','=',False)]}"/>
+                            <field name="info_issue" attrs="{'invisible': [('part','=','xml3')]}"/>
                             <field name="company_id"/>
                         </group>
                     </group>
