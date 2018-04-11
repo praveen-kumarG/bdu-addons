@@ -23,7 +23,6 @@
             <field name="arch" type="xml">
                 <field name="company_id" position="after">
                     <field name="sale_line_ids" />
-                    <field name="origin" />
                 </field>
             </field>
         </record>
