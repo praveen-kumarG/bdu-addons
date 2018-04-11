@@ -105,9 +105,10 @@
             <field name="model">sofrom.odooto.pubble</field>
             <field name="arch" type="xml">
                 <search string="Search Pubble Updates">
+                    <field name="salesorder_extorderid" />
                     <field name="salesorder_debtor_name" />
                     <field name="salesorder_reference"/>
-                    <filter name="success" string="Success" domain="[('pubble_response','=','true')]"/>
+                    <filter name="success" string="Success" domain="[('pubble_response','=',True)]"/>
                     <separator/>
                     <group expand="0" string="Group By">
                         <filter name="create_date" string="Date" context="{'group_by':'create_date'}"/>
@@ -123,13 +124,6 @@
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="view_sofrom_odooto_pubble_filter"/>
             <field name="context">{'search_default_exceptions':1}</field>
-            <!--field name="help" type="html">
-              <p>
-                Job Records will be created by the call of Schedular (Cron).
-              </p><p>
-                Enable the schedular "FTP &amp; Import WOBE Jobs", to create records.
-              </p>
-            </field-->
         </record>
 
         <menuitem id="menu_action_staged_pubble" name="Staged Pubble" parent="menu_pubble" action="action_staged_pubble"
@@ -155,9 +149,54 @@
                     </group>
                 </group>
                 <button name="action_cancel" position="before">
-                    <button name="action_pubble_update" type="object" string="Update Pubble"
+                    <button name="action_pubble_no_xml" type="object" string="Update Pubble"
                             attrs="{'invisible': ['|',('order_pubble_allow','!=', True),('state','!=','sale')]}"/>
                 </button>
+            </field>
+        </record>
+
+        <record id="view_order_form_advertising_pubble_xml" model="ir.ui.view">
+            <field name="name">sale.order.form.advertising.pubble.xml</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="bdu_pubble_soap.view_order_form_advertising_pubble"/>
+            <field name="groups_id" eval="[(4, ref('sale_advertising_order.group_traffic_user'))]"/>
+            <field name="arch" type="xml">
+                <button name="action_pubble_no_xml" position="after">
+                    <button name="action_pubble_xml" type="object" string="Update Pubble with XML"
+                            attrs="{'invisible': ['|',('order_pubble_allow','!=', True),('state','!=','sale')]}"/>
+                </button>
+            </field>
+        </record>
+
+        <record id="view_order_advertising_tree_pubble" model="ir.ui.view">
+            <field name="name">sale.order.advertising.tree.pubble</field>
+            <field name="model">sale.order</field>
+            <field name="priority">20</field>
+            <field name="inherit_id" ref="sale_advertising_order.view_order_advertising_tree"/>
+            <field name="arch" type="xml">
+                <tree position="attributes" >
+                    <attribute name="decoration-danger" >pubble_tbu==True</attribute>
+                </tree>
+                <field name="message_needaction" position="after">
+                    <field name="pubble_tbu" invisible="1"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="advertising_order_view_search_pubble" model="ir.ui.view">
+            <field name="name">advertising.sale.order.search.pubble</field>
+            <field name="model">sale.order</field>
+            <!--field name="mode">primary</field-->
+            <field name="inherit_id" ref="sale_advertising_order.advertising_order_view_search_inherit_sale"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='approved1']" position="after">
+                    <separator/>
+                    <filter string="Pubble to be updated" name="pubble_tbu" domain="[('pubble_tbu','=',True)]"/>
+                    <filter string="Allow to Pubble" name="pubble_allow" domain="[('order_pubble_allow','=',True)]"/>
+                    <filter string="Not to Pubble" name="pubble_not" domain="[('order_pubble_allow','=',False)]"/>
+                    <filter string="Sent to Pubble" name="pubble_sent" domain="[('pubble_sent','=',True)]"/>
+                    <separator/>
+                </xpath>
             </field>
         </record>
 

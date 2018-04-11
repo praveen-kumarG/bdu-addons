@@ -46,7 +46,6 @@ class LogPlugin(MessagePlugin):
         self.last_received_raw = str(context.reply)
 
 
-
 class SaleOrder(models.Model):
     _inherit = ["sale.order"]
 
@@ -60,6 +59,12 @@ class SaleOrder(models.Model):
                     order.order_pubble_allow = True
                     break
 
+    @api.depends('date_sent_pubble', 'write_date')
+    @api.multi
+    def _pubble_write_after_sent(self):
+        for order in self:
+            if order.date_sent_pubble:
+                order.pubble_write_after_sent = order.date_sent_pubble < order.write_date
 
     @api.depends('order_line.pubble_sent')
     @api.multi
@@ -72,54 +77,54 @@ class SaleOrder(models.Model):
                     break
 
 
-    order_pubble_allow = fields.Boolean(compute=_pubble_allow, string='Allow to Pubble', default=False, store=False)
-    date_sent_pubble = fields.Date('Date Sent to Pubble', index=True,
-                                    help="Date on which sales order is sent to Pubble.")
+    order_pubble_allow = fields.Boolean(compute=_pubble_allow, default=False, store=True,
+                                        string='Allow to Pubble')
+    date_sent_pubble = fields.Datetime('Datetime Sent to Pubble', index=True,
+                                    help="Datetime on which sales order is sent to Pubble.")
+    pubble_write_after_sent = fields.Boolean(compute=_pubble_write_after_sent, search='_pubble_write_after_sent_search',
+                                        string='Written after transferred to Pubble', default=False, store=True)
+    pubble_trans_id = fields.Char(string='Transmission ID', size=16, readonly=True)
+    pubble_tbu = fields.Boolean(string='Pubble to be updated', default=False)
     pubble_sent = fields.Boolean(compute=_pubble_sent, string='Order to Pubble', default=False, store=True)
     publog_id = fields.Many2one('sofrom.odooto.pubble', )
 
-
-
-    def send_to_pubble(self, res):
-        res.with_delay(description=res.salesorder_reference).call_wsdl()
-
-    def action_pubble(self, arg):
-        self.ensure_one()
-        res = self.transfer_order_to_pubble(arg)
-        if self.order_pubble_allow:
-            self.send_to_pubble(res)
+    @job
+    @api.multi
+    def action_pubble(self, arg, xml=False):
+        for order in self.filtered(lambda s: s.state == 'sale' and s.advertising):
+            res = order.transfer_order_to_pubble(arg)
+            if order.order_pubble_allow:
+                order.with_context(no_checks=True).write({'pubble_trans_id': res.transmission_id, 'pubble_tbu': True})
+                res.with_delay(description=res.salesorder_reference).call_wsdl(xml=xml)
         return True
 
     @api.multi
-    def action_pubble_update(self):
-        for order in self.filtered('advertising'):
-            order.action_pubble('update')
+    def action_pubble_xml(self):
+        self.action_pubble('update', True)
+
+    @api.multi
+    def action_pubble_no_xml(self):
+        self.action_pubble('update', False)
 
     @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
-        self.action_pubble_update()
+        self.action_pubble('update', False)
         return res
 
     @api.multi
     def write(self, vals):
         res = super(SaleOrder, self).write(vals)
-        for order in self.filtered(lambda s: s.advertising and s.order_pubble_allow and s.state == 'sale'):
+        for order in self.filtered(lambda s: s.advertising and s.state == 'sale'):
             if ('published_customer' in vals) or ('partner_id' in vals) or ('customer_contact' in vals) or ('advertising_agency'in vals) \
                                               or ('opportunity_subject' in vals) or ('order_line' in vals):
-                order.action_pubble('update')
+                order.action_pubble('update', False)
         return res
 
     @api.multi
     def action_cancel(self):
-        for order in self.filtered(lambda s: s.state == 'sale' and s.advertising):
-            order.pubble_delete()
+        self.action_pubble('delete', False)
         return super(SaleOrder, self).action_cancel()
-
-    @api.multi
-    def pubble_delete(self):
-        self.ensure_one()
-        self.action_pubble('delete')
 
     @api.multi
     def transfer_order_to_pubble(self, arg):
@@ -161,41 +166,41 @@ class SaleOrder(models.Model):
             res = self.env['sofrom.odooto.pubble'].sudo().create(vals)
             for line in self.order_line:
                 del_param = True
-                if line.line_pubble_allow :
-                    if int(line.product_uom_qty) == 0 or arg == 'delete':
-                        del_param = False
-                    lvals = {
-                            'order_id': res.id,
-                            'odoo_order_line': line.id,
-                            'ad_adsize_adtypename': line.ad_class.name,
-                            'ad_adsize_extadsizeid': line.product_template_id.default_code,
-                            'ad_adsize_height': line.product_uom_qty if line.product_uom.name == 'mm' else line.product_template_id.height,
-                            'ad_adsize_name': line.product_id.name or '',
-                            'ad_adsize_width': line.product_template_id.width,
-                            'ad_edition_editiondate': line.issue_date,
-                            'ad_edition_extpublicationid': line.title.name if line.ad_class.name != 'Webvertorial' else line.adv_issue.name,
-                            'ad_extplacementid': line.id,
-                            'ad_price': 0,
-                            'ad_productiondetail_classifiedCategory': line.analytic_tag_ids.name or '' if line.ad_class.name == 'Regiotreffers' else False,
-                            'ad_productiondetail_color': True,
-                            'ad_productiondetail_isclassified': True if line.ad_class.name == 'Regiotreffers' else False,
-                            'ad_productiondetail_dtpcomments': 'Externe Referentie:' + unidecode(line.ad_number or '') + '\n' +
-                                                                                       unidecode(line.layout_remark or ''),
-                            'ad_productiondetail_placementcomments': unidecode(line.page_reference or '') + '\n' +
-                                                                     unidecode(line.name or '') + '\n' +
-                                                                     unidecode(self.opportunity_subject or ''),
-                            'ad_productiondetail_pageType': line.analytic_tag_ids.name or ('Advertentiepagina' if line.ad_class.name == 'GA' else
-                                                                                           'Redactiepagina' if line.ad_class.name == 'IM' else
-                                                                                           'Familiebericht' if line.ad_class.name == 'FAM' else
-                                                                                           'Voorpagina' if line.ad_class.name == 'VP' else
-                                                                                           'Advertentiepagina') if line.ad_class.name != 'Regiotreffers' else 'Regiotreffers',
-                            'ad_status': del_param,
-                            'ad_materialid': 0,
-                            'ad_materialUrl': line.url_to_material or False,
-                            'ad_materialChecksum': False,
-                    }
-                    self.env['soline.from.odooto.pubble'].sudo().create(lvals)
-
+                if not (line.line_pubble_allow or line.pubble_sent):
+                    continue
+                elif int(line.product_uom_qty) == 0 or arg == 'delete' or (line.pubble_sent and not line.line_pubble_allow):
+                    del_param = False
+                lvals = {
+                        'order_id': res.id,
+                        'odoo_order_line': line.id,
+                        'ad_adsize_adtypename': line.ad_class.name,
+                        'ad_adsize_extadsizeid': line.product_template_id.default_code,
+                        'ad_adsize_height': line.product_uom_qty if line.product_uom.name == 'mm' else line.product_template_id.height,
+                        'ad_adsize_name': line.product_id.name or '',
+                        'ad_adsize_width': line.product_template_id.width,
+                        'ad_edition_editiondate': line.issue_date,
+                        'ad_edition_extpublicationid': line.title.name if line.ad_class.name != 'Webvertorial' else line.adv_issue.name,
+                        'ad_extplacementid': line.id,
+                        'ad_price': 0,
+                        'ad_productiondetail_classifiedCategory': line.analytic_tag_ids.name or '' if line.ad_class.name == 'Regiotreffers' else False,
+                        'ad_productiondetail_color': True,
+                        'ad_productiondetail_isclassified': True if line.ad_class.name == 'Regiotreffers' else False,
+                        'ad_productiondetail_dtpcomments': 'Externe Referentie:' + unidecode(line.ad_number or '') + '\n' +
+                                                                                   unidecode(line.layout_remark or ''),
+                        'ad_productiondetail_placementcomments': unidecode(line.page_reference or '') + '\n' +
+                                                                 unidecode(line.name or '') + '\n' +
+                                                                 unidecode(self.opportunity_subject or ''),
+                        'ad_productiondetail_pageType': line.analytic_tag_ids.name or ('Advertentiepagina' if line.ad_class.name == 'GA' else
+                                                                                       'Redactiepagina' if line.ad_class.name == 'IM' else
+                                                                                       'Familiebericht' if line.ad_class.name == 'FAM' else
+                                                                                       'Voorpagina' if line.ad_class.name == 'VP' else
+                                                                                       'Advertentiepagina') if line.ad_class.name != 'Regiotreffers' else 'Regiotreffers',
+                        'ad_status': del_param,
+                        'ad_materialid': 0,
+                        'ad_materialUrl': line.url_to_material or False,
+                        'ad_materialChecksum': False,
+                }
+                self.env['soline.from.odooto.pubble'].sudo().create(lvals)
         return res
 
 class SaleOrderLine(models.Model):
@@ -206,14 +211,21 @@ class SaleOrderLine(models.Model):
     def _compute_allowed(self):
         for line in self.filtered('advertising'):
             res = False
-            if line.ad_class.pubble and line.adv_issue.medium.pubble and \
-                    (fields.Date.from_string(line.issue_date) >= datetime.date.today() or line.pubble_sent):
+            if line.ad_class.pubble and line.adv_issue.medium.pubble:
                 res = True
             line.line_pubble_allow = res
 
 
     pubble_sent = fields.Boolean('Order Line sent to Pubble')
-    line_pubble_allow = fields.Boolean(compute='_compute_allowed', string='Pubble Allowed', store=False)
+    line_pubble_allow = fields.Boolean(compute='_compute_allowed', string='Pubble Allowed', store=True)
+
+    @api.multi
+    def unlink(self):
+        if self.filtered('pubble_sent'):
+            raise UserError(
+                _('You can not remove a sale order line after it has been sent to Pubble.\n'
+                  'Discard changes and try setting the quantity to 0.'))
+        return super(SaleOrderLine, self).unlink()
 
     @api.multi
     def unlink(self):
@@ -263,7 +275,7 @@ class SofromOdootoPubble(models.Model):
     salesorder_agency_postalcode = fields.Char(string='Agency Zip Code', size=32)
 
     @job
-    def call_wsdl(self):
+    def call_wsdl(self, xml=False):
         self.ensure_one()
         plugin = LogPlugin()
         if self.pubble_response and self.pubble_response == 'True':
@@ -326,13 +338,21 @@ class SofromOdootoPubble(models.Model):
             response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
             self.write({'pubble_response': response, 'pubble_environment': publisher})
         finally:
-            xml_msg = xmlpprint(plugin.last_sent_raw)
-            reply = xmlpprint(plugin.last_received_raw)
-            self.write({'json_message': xml_msg,'reply_message': reply})
-            self._cr.commit()
+            if xml:
+                xml_msg = xmlpprint(plugin.last_sent_raw)
+                reply = xmlpprint(plugin.last_received_raw)
+                self.write({'json_message': xml_msg,'reply_message': reply})
+                self._cr.commit()
         if response == True:
-            self.env['sale.order'].search([('id','=',self.sale_order_id.id)]).with_context(pubble_call=True).write(
-                                                    {'date_sent_pubble': datetime.datetime.now(),'publog_id': self.id})
+            so = self.env['sale.order'].search([('id','=',self.sale_order_id.id)])
+            sovals = {'date_sent_pubble': datetime.datetime.now(),
+                      'publog_id': self.id
+                     }
+            if self.transmission_id >= so.pubble_trans_id:
+                sovals['pubble_tbu'] = False
+            else:
+                sovals['pubble_tbu'] = True
+            so.with_context(no_checks=True).write(sovals)
             for line in self.pubble_so_line:
                 self.env['sale.order.line'].search([('id', '=', line.ad_extplacementid)]).write({'pubble_sent': True})
 

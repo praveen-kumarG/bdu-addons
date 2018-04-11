@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
+import datetime
 
 
 class AccountInvoice(models.Model):
@@ -19,6 +20,10 @@ class AccountInvoice(models.Model):
         self.sent = True
         return self.env['report'].get_action(self, 'account.report_invoice')
 
+    def _get_refund_common_fields(self):
+        res = super(AccountInvoice, self)._get_refund_common_fields()
+        return res+['published_customer']
+
 class AccountInvoiceLine(models.Model):
     _inherit = ["account.invoice.line"]
 
@@ -35,6 +40,21 @@ class AccountInvoiceLine(models.Model):
                     if description:
                         line_obj.write({'name':description})
         return line_obj
+
+    @api.multi
+    def _get_advertising_details_for_credit(self):
+        self.ensure_one()
+        res = []
+        if self.invoice_id.refund_invoice_id and self.product_id:
+            line_obj = self.search([('invoice_id','=',self.invoice_id.refund_invoice_id.id),('product_id','=',self.product_id.id)])
+            if line_obj.sale_line_ids:
+                #If issue_date else original invoice date
+                date = line_obj.sale_line_ids.issue_date or self.invoice_id.refund_invoice_id.date_invoice
+                date =  datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%m/%d/%Y')
+                note = line_obj.sale_line_ids.adv_issue.default_note if line_obj.sale_line_ids.adv_issue else ''
+                ad_reference = line_obj.sale_line_ids.ad_number
+                res.append({'issue_date':date,'issue_note':note,'ad_number':ad_reference})
+        return res
 
 
 #    so_number = fields.Char(string='Order Number')

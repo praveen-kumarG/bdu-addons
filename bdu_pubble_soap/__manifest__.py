@@ -126,7 +126,8 @@ To contribute to this module, please visit https://odoo-community.org.
     'data': ['data/transmission_sequence.xml',
              'security/ir.model.access.csv',
              'views/sale_advertising_order.xml',
-             'views/product_view.xml'
+             'views/product_view.xml',
+             'wizard/sale_order_state_view.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
@@ -135,7 +136,6 @@ To contribute to this module, please visit https://odoo-community.org.
     'js': [],
     'css': [],
     'qweb': [],
-
     'installable': True,
     # Install this module automatically if all dependency have been previously
     # and independently installed.  Used for synergetic or glue modules.

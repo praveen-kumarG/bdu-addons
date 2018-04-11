@@ -126,6 +126,7 @@
                                     <field name="company_id" readonly="True"/>
                                     <field name="job_type" invisible="1"/>
                                     <field name="convert_ok" invisible="1"/>
+                                    <field name="generated_by" attrs="{'invisible': [('generated_by','=',False)]}" readonly="True"/>
                                 </group>
                             </page>
                         </notebook>
