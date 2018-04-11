@@ -52,7 +52,8 @@ class AccountInvoiceLine(models.Model):
                 date = line_obj.sale_line_ids.issue_date or self.invoice_id.refund_invoice_id.date_invoice
                 date =  datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%m/%d/%Y')
                 note = line_obj.sale_line_ids.adv_issue.default_note if line_obj.sale_line_ids.adv_issue else ''
-                res.append({'issue_date':date,'issue_note':note})
+                ad_reference = line_obj.sale_line_ids.ad_number
+                res.append({'issue_date':date,'issue_note':note,'ad_number':ad_reference})
         return res
 
 
