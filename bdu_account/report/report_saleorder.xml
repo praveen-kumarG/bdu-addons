@@ -213,7 +213,7 @@
                 <p t-field="doc.note" class='text-center' style="padding-left:75px;padding-right:70px;padding-top:30px;"/>
             </strong>
 
-            <p t-if="doc.payment_term_id.note" class='text-center' style="padding-left:70px;padding-right:70px;padding-top:30px;">
+            <p t-if="doc.state not in ['draft','sale'] and doc.payment_term_id.note" class='text-center' style="padding-left:70px;padding-right:70px;padding-top:30px;">
                 <span t-field="doc.payment_term_id.note"/>
             </p>
 
@@ -223,8 +223,14 @@
 
             <p/>
             <p/>
-            <p style="padding-left:75px;padding-right:15px;">
-                We would like to thank you for your request and see your response as soon as possible.
+            <!--<p style="padding-left:75px;padding-right:15px;">-->
+                <!--We would like to thank you for your request and see your response as soon as possible.-->
+            <!--</p>-->
+            <p t-if="doc.state in ['draft','sent']" style="padding-left:75px;padding-right:15px;">
+                We would like to thank you for your request. We are looking forward to receiving your response as soon as possible.
+            </p>
+            <p t-if="doc.state not in ['draft','sent']" style="padding-left:75px;padding-right:15px;">
+                We would like to thank you and take good care of your order placement.
             </p>
             <br/>
             <div class="row" style="padding-left:75px;page-break-inside:avoid;">
