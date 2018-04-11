@@ -785,6 +785,7 @@ class Job(models.Model):
             'location_id': picking_type.default_location_src_id.id,
             'company_id': self.company_id.id,
             'order_id': self.order_id.id,
+            'move_type':'one',
         }
 
     def _prepare_stock_moves(self, line,  picking):
@@ -955,19 +956,22 @@ class Job(models.Model):
                 try:
                     picking.action_confirm()
                     picking.action_assign()
-                    # update done qty from demand qty
-                    autoConfirm = True
-                    for pack in picking.pack_operation_ids:
-                        if pack.product_qty > 0:
-                            pack.write({'qty_done': pack.product_qty})
+                    msg = "Picking: 'Partially Avilable'"
+                    if picking.state == 'assigned':
+                        # update done qty from demand qty
+                        autoConfirm = True if picking.pack_operation_ids else False
+                        for pack in picking.pack_operation_ids:
+                            if pack.product_qty > 0:
+                                pack.write({'qty_done': pack.product_qty})
+                            else:
+                                autoConfirm = False
+                                # pack.unlink()
+                        if autoConfirm:
+                            picking.do_transfer()
+                            msg = "Picking : 'Auto Confirmed'"
                         else:
-                            autoConfirm = False
-                            # pack.unlink()
-                    if autoConfirm:
-                        picking.do_transfer()
-                        self.message_post(body=_("Picking : 'Auto Confirmed'"))
-                    else:
-                        self.message_post(body=_("Picking : 'Some product with zero qunatity'"))
+                            msg = "Picking : 'Some product(s) with zero quantity'"
+                    self.message_post(body=_(msg))
                 except Exception, e:
                     body = _("Unable to auto confirm Picking; '%s'" % str(e))
                     self.message_post(body=body)
