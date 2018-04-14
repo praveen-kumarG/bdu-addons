@@ -31,22 +31,6 @@ import datetime
 from suds.plugin import MessagePlugin
 from lxml import etree
 
-def xmlpprint(xml):
-    return etree.tostring(etree.fromstring(xml), pretty_print=True)
-
-class LogPlugin(MessagePlugin):
-    def __init__(self):
-        self.last_sent_raw = None
-        self.last_received_raw = None
-
-    def sending(self, context):
-        self.last_sent_raw = str(context.envelope)
-
-    def received(self, context):
-        self.last_received_raw = str(context.reply)
-
-from suds.plugin import MessagePlugin
-from lxml import etree
 
 def xmlpprint(xml):
     return etree.tostring(etree.fromstring(xml), pretty_print=True)
@@ -346,12 +330,14 @@ class SofromOdootoPubble(models.Model):
         try:
             response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
             self.write({'pubble_response': response, 'pubble_environment': publisher})
+        except Exception as e:
+            raise FailedJobError(
+                _('Error wsdl call: %s') % (e))
         finally:
             if xml:
                 xml_msg = xmlpprint(plugin.last_sent_raw)
-                reply = xmlpprint(plugin.last_received_raw)
+                reply = xmlpprint(plugin.last_received_raw) if plugin.last_received_raw else False
                 self.write({'json_message': xml_msg,'reply_message': reply})
-                self._cr.commit()
         if response == True:
             so = self.env['sale.order'].search([('id','=',self.sale_order_id.id)])
             sovals = {'date_sent_pubble': datetime.datetime.now(),
