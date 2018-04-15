@@ -327,17 +327,23 @@ class SofromOdootoPubble(models.Model):
             ad.materialChecksum = str(line.ad_materialChecksum)
 
             SalesOrder.orderLine_Ads.adPlacement.append(ad)
+#        import pdb; pdb.set_trace()
         try:
             response = client.service.processOrder(SalesOrder, transmissionID, publisher, apiKey)
             self.write({'pubble_response': response, 'pubble_environment': publisher})
         except Exception as e:
-            raise FailedJobError(
-                _('Error wsdl call: %s') % (e))
-        finally:
             if xml:
                 xml_msg = xmlpprint(plugin.last_sent_raw)
                 reply = xmlpprint(plugin.last_received_raw) if plugin.last_received_raw else False
                 self.write({'json_message': xml_msg,'reply_message': reply})
+                self.env.cr.commit()
+            raise FailedJobError(
+                _('Error wsdl call: %s') % (e))
+#        finally:
+        if xml:
+            xml_msg = xmlpprint(plugin.last_sent_raw)
+            reply = xmlpprint(plugin.last_received_raw) if plugin.last_received_raw else False
+            self.write({'json_message': xml_msg, 'reply_message': reply})
         if response == True:
             so = self.env['sale.order'].search([('id','=',self.sale_order_id.id)])
             sovals = {'date_sent_pubble': datetime.datetime.now(),
