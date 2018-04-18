@@ -33,19 +33,14 @@ class FileTransfer(models.Model):
 
     path_ids = fields.One2many('file.path','transfer_id', 'Paths', copy=False)
 
-    # @api.onchange('server_path', 'local_path')
-    # def onchange_details(self):
-    #     if self.server_path and not self.server_path.endswith('/'):
-    #         self.server_path = self.server_path + '/'
-    #
-    #     if self.server_path and not self.server_path.startswith('/'):
-    #         self.server_path = '/' + self.server_path
-    #
-    #     if self.local_path and not self.local_path.endswith('/'):
-    #         self.local_path = self.local_path + '/'
-    #
-    #     if self.local_path and not self.local_path.startswith('/'):
-    #         self.local_path = '/' + self.local_path
+    @api.onchange('local_path')
+    def onchange_details(self):
+
+        if self.local_path and not self.local_path.endswith('/'):
+            self.local_path = self.local_path + '/'
+
+        if self.local_path and not self.local_path.startswith('/'):
+            self.local_path = '/' + self.local_path
 
     @api.model
     def create(self, vals):
@@ -159,19 +154,13 @@ class FilePath(models.Model):
     # local_path = fields.Char(string="Destination Path", copy=False, help="Destination/Copy Directory")
     transfer_id = fields.Many2one('file.transfer', 'File Transfer')
 
-    @api.onchange('server_path', 'local_path')
+    @api.onchange('server_path')
     def onchange_details(self):
         if self.server_path and not self.server_path.endswith('/'):
             self.server_path = self.server_path + '/'
 
         if self.server_path and not self.server_path.startswith('/'):
             self.server_path = '/' + self.server_path
-
-        if self.local_path and not self.local_path.endswith('/'):
-            self.local_path = self.local_path + '/'
-
-        if self.local_path and not self.local_path.startswith('/'):
-            self.local_path = '/' + self.local_path
 
 
 class Registry(models.Model):
