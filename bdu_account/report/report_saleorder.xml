@@ -89,6 +89,8 @@
                                 <t t-if="not doc.company_id.use_bduprint"><th width="10%">Advertising Issue</th></t>
                                 <t t-if="not doc.company_id.use_bduprint"><th width="10%">Reference</th></t>
                                 <th width="10%">Product</th>
+                                <th width="5%">Width</th>
+                                <th width="5%">Height</th>
                                 <th width="10%" class="text-right">Volume</th>
                                 <th width="10%" t-if="doc.company_id.use_bduprint" class="text-right">Unit Price</th>
                                 <th width="10%" t-if="doc.partner_id.is_ad_agency and not doc.company_id.use_bduprint " class="text-right">Subtotal Before Commission</th>
@@ -118,6 +120,8 @@
                                         <t t-if="not doc.company_id.use_bduprint"><td><span t-if="l.adv_issue" t-field="l.adv_issue.default_note"/></td></t>
                                         <t t-if="not doc.company_id.use_bduprint"><td><span t-field="l.ad_number"/></td></t>
                                         <td><span t-if="l.product_id" t-field="l.product_id.name"/></td>
+                                        <td><span t-if="l.medium.name == 'Newspapers/Specials'" t-field="l.product_id.width"></span></td>
+                                        <td><span t-if="l.medium.name == 'Newspapers/Specials'" t-field="l.product_id.height"></span></td>
                                         <td class="text-right">
                                             <span t-field="l.product_uom_qty"/>
                                             <span t-field="l.product_uom" groups="product.group_uom"/>
