@@ -44,16 +44,9 @@ class AccountInvoiceLine(models.Model):
     @api.multi
     def _get_advertising_details_for_credit(self):
         self.ensure_one()
-        res = []
         if self.invoice_id.refund_invoice_id and self.product_id:
             line_obj = self.search([('invoice_id','=',self.invoice_id.refund_invoice_id.id),('product_id','=',self.product_id.id)])
-            if line_obj.sale_line_ids:
-                #If issue_date else original invoice date
-                date = line_obj.sale_line_ids.issue_date or self.invoice_id.refund_invoice_id.date_invoice
-                date =  datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%m/%d/%Y')
-                note = line_obj.sale_line_ids.adv_issue.default_note if line_obj.sale_line_ids.adv_issue else ''
-                res.append({'issue_date':date,'issue_note':note})
-        return res
+            return line_obj.sale_line_ids
 
 
 #    so_number = fields.Char(string='Order Number')
