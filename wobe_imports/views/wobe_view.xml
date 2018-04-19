@@ -104,8 +104,7 @@
                                 </field>
                             </page>
                             <page string="Editions" autofocus="">
-                                <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree"
-                                        attrs="{'readonly': [('job_type','=','kba')]}">
+                                <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree">
                                     <tree string="Edition Details" editable="bottom">
                                         <field name="name" />
                                         <field name="plate_amount"/>
