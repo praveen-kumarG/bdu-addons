@@ -88,6 +88,19 @@
                      <span t-if="o.partner_id.vat">TIN: <span t-field="o.partner_id.vat"/></span>
                  </div>
 
+                 <t t-if="o.type == 'out_refund'">
+                     <div class="col-xs-7" style="padding:0px;">
+                         <div class="col-xs-3" style="padding:0px;">
+                             <strong>Reference</strong>
+                         </div>
+                         <div class="col-xs-1" style="padding:0px;">
+                             <span><strong>:</strong></span>
+                         </div>
+                         <div class="col-xs-8" style="padding:0px;">
+                             <span t-field="o.refund_invoice_id"/>
+                         </div>
+                     </div>
+                 </t>
                  <br/><br/>
                  <t t-if="not o.company_id.use_bduprint">
                      <div class="col-xs-7" style="padding:0px;">
@@ -123,6 +136,7 @@
                             <th width="10%">Product</th>
                             <th width="10%" class="text-right">Volume</th>
                             <t t-if="o.partner_id.is_ad_agency"><th width="10%" class="text-right">Unit Price</th></t>
+                            <th width="10%" t-if="display_discount" class="text-right">Subtotal Before Commission</th>
                             <th width="10%" t-if="display_discount" class="text-right">Disc(%)</th>
                             <th width="10%" class="text-right">Tax Excluded Price</th>
                         </tr>
@@ -148,19 +162,26 @@
                                 <td><span t-field="sale_order_line.adv_issue.default_note"/></td>
                             </t>
                             <t t-if="o.type == 'out_refund'">
-                                <t  t-foreach="l._get_advertising_details_for_credit()" t-as="adverting_details">
-                                    <td><span t-esc="adverting_details['issue_date']"/></td>
-                                    <td><span t-esc="adverting_details['issue_note']"/></td>
+                                <td t-if="sale_order_line.date_type not in ['validity','issue_date']"><span t-field="o.refund_invoice_id.date_invoice"/></td>
+                                <t t-if="sale_order_line.date_type == 'validity'">
+                                    <td t-if="not sale_order_line.from_date"><span t-esc="sale_order_line.dateperiods[0].from_date" t-options='{"widget": "date"}'/>
+                                                                                   <span > - </span>
+                                                                                   <span t-esc="sale_order_line.dateperiods[0].to_date" t-options='{"widget": "date"}'/></td>
+                                    <td t-if="sale_order_line.from_date"><span t-esc="sale_order_line.from_date"/>
+                                                                                   <span > - </span>
+                                                                                   <span t-esc="sale_order_line.to_date" t-options='{"widget": "date"}'/></td>
                                 </t>
+                                <t t-if="sale_order_line.date_type == 'issue_date'">
+                                        <td><span t-esc="sale_order_line.issue_date" t-options='{"widget": "date"}'/></td>
+
+                                </t>
+                                <td><span t-field="sale_order_line.adv_issue.default_note"/></td>
                             </t>
                             <t t-if="o.type != 'out_refund'">
                                 <td><span t-field="sale_order_line.order_id.opportunity_subject"/></td>
                             </t>
                             <t t-if="o.type == 'out_refund'">
-                                <td>Creditnote for invoice
-                                    <t t-if="o.refund_invoice_id"><span t-field="o.refund_invoice_id.number"/></t>
-                                    <t t-if="not o.refund_invoice_id"><span t-field="o.origin"/></t>
-                                </td>
+                                <td><span t-esc="sale_order_line.order_id.opportunity_subject"/></td>
                             </t>
                             <t t-if="o.type != 'out_refund'">
                                 <td><span t-field="sale_order_line.ad_number"/></td>
@@ -175,7 +196,7 @@
                             </td>
                             <t t-if="o.partner_id.is_ad_agency">
                                 <td class="text-right">
-                                    <span t-field="l.price_unit"/>
+                                    <span t-field="l.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>
                             </t>
                             <td t-if="display_discount" class="text-right">
@@ -196,7 +217,6 @@
                                 <t t-esc="discount_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 (<t t-if="o.type != 'out_refund'"><span t-field="sale_order_line.discount"/></t><t t-if="o.type == 'out_refund'"><span t-esc="sale_order_line.discount"/></t>%)
                             </td>
-
                             <td class="text-right">
                                 <span t-if="o.type == 'out_refund'">-</span><span t-field="l.price_subtotal"
                                     t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
