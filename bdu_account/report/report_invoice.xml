@@ -129,15 +129,20 @@
                         <tr t-foreach="o.invoice_line_ids" t-as="l">
                             <t t-set="tot_Cdiscount" t-value="tot_Cdiscount + l.sale_line_ids.computed_discount"/>
                             <t t-if="o.type != 'out_refund'">
-                                <t t-if="l.sale_line_ids.date_type == 'validity'">
-                                        <td t-if="not l.sale_line_ids.from_date"><span t-field="l.sale_line_ids.dateperiods[0].from_date"/>
-                                                                                       <span > - </span>
-                                                                                       <span t-field="l.sale_line_ids.dateperiods[0].to_date"/></td>
-                                        <td t-if="l.sale_line_ids.from_date"><span t-field="l.sale_line_ids.from_date"/>
-                                                                                       <span > - </span>
-                                                                                       <span t-field="l.sale_line_ids.to_date"/></td>
+                                <t t-if="l.product_id.categ_id.name == 'Online'">
+                                    <td t-if="l.sale_line_ids.from_date">
+                                        <span t-field="l.sale_line_ids.from_date"/>
+                                        <span> - </span>
+                                        <span t-field="l.sale_line_ids.to_date"/>
+                                    </td>
+                                    <td t-if="not l.sale_line_ids.from_date and l.sale_line_ids.dateperiods">
+                                        <span t-field="l.sale_line_ids.dateperiods[0].from_date"/>
+                                        <span> - </span>
+                                        <span t-field="l.sale_line_ids.dateperiods[0].to_date"/>
+                                    </td>
+                                    <td t-if="not l.sale_line_ids.from_date and not l.sale_line_ids.dateperiods"></td>
                                 </t>
-                                <td t-if="l.sale_line_ids.date_type == 'issue_date'"><span t-field="l.sale_line_ids.issue_date"/></td>
+                                <td t-if="not l.product_id.categ_id.name == 'Online'"><span t-field="l.sale_line_ids.issue_date"/></td>
                                 <td><span t-field="l.sale_line_ids.adv_issue.default_note"/></td>
                             </t>
                             <t t-if="o.type == 'out_refund'">
