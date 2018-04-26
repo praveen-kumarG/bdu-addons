@@ -156,9 +156,12 @@ class Job(models.Model):
                 , order='run_date, file_create_date, is_duplicate'):
             BDUOrder = x3.bduorder_ref
             KBAJobId = x3.job_ref
-            XML1_ref =  Reg.search([('job_id','!=',False),('state','=','done'),('part','=', 'xml1'),('bduorder_ref','=',BDUOrder)])
-            # must have XML4 before merging XML3
-            if XML1_ref and Reg.search([('job_id', '=', XML1_ref.job_id.id), ('part', '=', 'xml4')]):
+            #look for XML4 same wobe ref# already added for job just update edition plate amount and job plate type from xml3
+            regF4Ref = Reg.search([('part', '=', 'xml4'), ('job_ref', '=', KBAJobId), ('job_id', '!=', False)])
+            XML1_ref = False
+            if regF4Ref:
+                XML1_ref = Reg.search([('job_id', '=', regF4Ref.job_id.id), ('part', '=', 'xml1')])
+            if XML1_ref:
                 if not XML1_ref in merge_xml3:
                     merge_xml3[XML1_ref] = [x3]
                 else:
