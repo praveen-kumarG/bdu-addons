@@ -27,6 +27,8 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = ["account.invoice.line"]
 
+    refund_orig_line_id = fields.Many2one('account.invoice.line', 'Relation from Refund Line to original Invoice Line')
+
     @api.model
     def create(self, vals):
         ctx = self.env.context.copy()
@@ -41,11 +43,23 @@ class AccountInvoiceLine(models.Model):
                         line_obj.write({'name':description})
         return line_obj
 
+    @api.model
+    def _refund_cleanup_lines(self, lines):
+        """ Convert records to dict of values suitable for one2many line creation
+
+            :param recordset lines: records to convert
+            :return: list of command tuple for one2many line creation [(0, 0, dict of valueis), ...]
+        """
+        result = super(AccountInvoiceLine, self)._refund_cleanup_lines(lines)
+        for i in xrange(0, len(lines)):
+            result[i][2]['refund_orig_line_id'] = lines[i].id
+        return result
+
     @api.multi
     def _get_advertising_details_for_credit(self):
         self.ensure_one()
-        if self.invoice_id.refund_invoice_id and self.product_id:
-            line_obj = self.search([('invoice_id','=',self.invoice_id.refund_invoice_id.id),('product_id','=',self.product_id.id)])
+        if self.refund_orig_line_id:
+            line_obj = self.search([('id','=',self.refund_orig_line_id.id)])
             return line_obj.sale_line_ids
 
 
