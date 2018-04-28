@@ -39,7 +39,7 @@ This module adds customization as per BDU Media
     'author'  : 'Magnus - Willem Hulshof',
     'website' : 'http://www.magnus.nl',
     'depends' : ['account', 'sale_advertising_order',
-                 'partner_contact_gender','purchase',
+                 'partner_contact_gender','purchase', 'account_invoice_refund_link',
                  'partner_sector','base_partner_sequence','account_credit_control',
     ],
     'data' : [
