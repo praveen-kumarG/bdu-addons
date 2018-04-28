@@ -118,11 +118,11 @@
             </div>
 
             <!-- Is there a discount on at least one line? -->
-            <t t-set="display_discount" t-value="any([l.sale_line_ids.discount for l in o.invoice_line_ids])"/>
-            <!--<t t-set="display_Cdiscount" t-value="any([l.sale_line_ids.computed_discount for l in o.invoice_line_ids])"/>-->
+            <t t-set="display_discount" t-value="any([l.so_line_id.discount or l.sale_line_ids.discount for l in o.invoice_line_ids])"/>
+            <!--<t t-set="display_Cdiscount" t-value="any([l.so_line_id.computed_discount for l in o.invoice_line_ids])"/>-->
             <t t-set="tot_Cdiscount" t-value="0"/>
             <t t-if="o.type == 'out_refund' and o.refund_invoice_id">
-                <t t-set="display_discount" t-value="any([l.sale_line_ids.discount for l in o.refund_invoice_id.invoice_line_ids])"/>
+                <t t-set="display_discount" t-value="any([l.so_line_id.discount or l.sale_line_ids.discount for l in o.refund_invoice_id.invoice_line_ids])"/>
             </t>
 
             <div t-if="not o.company_id.use_bduprint" class="row" style="padding-left:85px;padding-right:15px;">
@@ -144,22 +144,23 @@
                     </thead>
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l">
-                            <t t-set="tot_Cdiscount" t-value="tot_Cdiscount + l.sale_line_ids.computed_discount"/>
+                            <t t-set="tot_Cdiscount" t-value="tot_Cdiscount + l.so_line_id.computed_discount or l.sale_line_ids.computed_discount"/>
                             <t t-if="o.type == 'out_refund'">
-                                <t t-set="sale_order_line" t-value="l._get_advertising_details_for_credit()"/>
+                                <t t-set="sale_order_line" t-value="l.so_line_id or l.sale_line_ids"/>
                             </t>
                             <t t-if="o.type != 'out_refund'">
-                                <td t-if="l.sale_line_ids.date_type not in ['validity','issue_date']"><span t-field="o.date_invoice"/></td>
-                                <t t-if="l.sale_line_ids.date_type == 'validity'">
-                                        <td t-if="not l.sale_line_ids.from_date"><span t-field="l.sale_line_ids.dateperiods[0].from_date"/>
+                                <t t-set="sale_order_line" t-value="l.so_line_id or l.sale_line_ids"/>
+                                <td t-if="sale_order_line.date_type not in ['validity','issue_date']"><span t-field="o.date_invoice"/></td>
+                                <t t-if="sale_order_line.date_type == 'validity'">
+                                        <td t-if="not sale_order_line.from_date"><span t-field="sale_order_line.dateperiods[0].from_date"/>
                                                                                        <span > - </span>
-                                                                                       <span t-field="l.sale_line_ids.dateperiods[0].to_date"/></td>
-                                        <td t-if="l.sale_line_ids.from_date"><span t-field="l.sale_line_ids.from_date"/>
+                                                                                       <span t-field="sale_order_line.dateperiods[0].to_date"/></td>
+                                        <td t-if="sale_order_line.from_date"><span t-field="sale_order_line.from_date"/>
                                                                                        <span > - </span>
-                                                                                       <span t-field="l.sale_line_ids.to_date"/></td>
+                                                                                       <span t-field="sale_order_line.to_date"/></td>
                                 </t>
-                                <td t-if="l.sale_line_ids.date_type == 'issue_date'"><span t-field="l.sale_line_ids.issue_date"/></td>
-                                <td><span t-field="l.sale_line_ids.adv_issue.default_note"/></td>
+                                <td t-if="sale_order_line.date_type == 'issue_date'"><span t-field="sale_order_line.issue_date"/></td>
+                                <td><span t-field="sale_order_line.adv_issue.default_note"/></td>
                             </t>
                             <t t-if="o.type == 'out_refund'">
                                 <td t-if="sale_order_line.date_type not in ['validity','issue_date']"><span t-field="o.refund_invoice_id.date_invoice"/></td>
@@ -183,7 +184,7 @@
                             </t>
                             <!--<td><span t-field="l.name"/></td>-->
                             <t t-if="o.type != 'out_refund'">
-                                <td><span t-field="l.sale_line_ids.order_id.opportunity_subject"/></td>
+                                <td><span t-field="sale_order_line.order_id.opportunity_subject"/></td>
                             </t>
                             <t t-if="o.type == 'out_refund'">
                                 <td><span t-esc="sale_order_line.order_id.opportunity_subject"/></td>
@@ -192,9 +193,9 @@
                                     <!--<t t-if="not o.refund_invoice_id"><span t-field="o.origin"/></t>-->
                                 <!--</td>-->
                             </t>
-                            <!--<td><span t-field="l.sale_line_ids.title"/></td>-->
+                            <!--<td><span t-field="sale_order_line.title"/></td>-->
                             <t t-if="o.type != 'out_refund'">
-                                <td><span t-field="l.sale_line_ids.ad_number"/></td>
+                                <td><span t-field="sale_order_line.ad_number"/></td>
                             </t>
                             <t t-if="o.type == 'out_refund'">
                                 <td><span t-esc="sale_order_line.ad_number"/></td>
@@ -214,7 +215,7 @@
                             </t>
                             <td t-if="display_discount" class="text-right">
                                 <t t-if="o.type != 'out_refund'">
-                                    <span t-field="l.sale_line_ids.subtotal_before_agency_disc"/>
+                                    <span t-field="sale_order_line.subtotal_before_agency_disc"/>
                                 </t>
                                 <t t-if="o.type == 'out_refund'">
                                     <span t-esc="sale_order_line.subtotal_before_agency_disc" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
@@ -222,16 +223,16 @@
                             </td>
                             <td t-if="display_discount" class="text-center">
                                 <t t-if="o.type != 'out_refund'">
-                                    <t t-set="discount_amount" t-value="l.sale_line_ids.subtotal_before_agency_disc - l.price_subtotal"/>
+                                    <t t-set="discount_amount" t-value="sale_order_line.subtotal_before_agency_disc - l.price_subtotal"/>
                                 </t>
                                 <t t-if="o.type == 'out_refund'">
                                     <t t-set="discount_amount" t-value="sale_order_line.subtotal_before_agency_disc - l.price_subtotal"/>
                                 </t>
                                 <t t-esc="discount_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                (<t t-if="o.type != 'out_refund'"><span t-field="l.sale_line_ids.discount"/></t><t t-if="o.type == 'out_refund'"><span t-esc="sale_order_line.discount"/></t>%)
+                                (<t t-if="o.type != 'out_refund'"><span t-field="sale_order_line.discount"/></t><t t-if="o.type == 'out_refund'"><span t-esc="sale_order_line.discount"/></t>%)
                             </td>
                             <!--<td t-if="display_Cdiscount" class="text-right">-->
-                                <!--<span t-field="l.sale_line_ids.computed_discount"/>-->
+                                <!--<span t-field="sale_order_line.computed_discount"/>-->
                             <!--</td>-->
                             <td class="text-right">
                                 <span t-if="o.type == 'out_refund'">-</span><span t-field="l.price_subtotal"
