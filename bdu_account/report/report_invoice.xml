@@ -38,7 +38,6 @@
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
 
         <div class="page" style="font-family: 'Titillium Web', sans-serif;page-break-after:always;">
-            <!--br/><br/-->
             <div class="row" style="padding-left:85px;">
                 <div name="invoice_title" class="col-xs-5 col-xs-offset-7" style="padding:0px;">
                     <h3>
@@ -118,7 +117,6 @@
             </div>
 
             <!-- Is there a discount on at least one line? -->
-
             <t t-set="display_discount" t-value="any([l.so_line_id.discount or l.sale_line_ids.discount for l in o.invoice_line_ids])"/>
             <t t-set="tot_Cdiscount" t-value="0"/>
             <t t-if="o.type == 'out_refund' and o.refund_invoice_id">
@@ -173,7 +171,6 @@
                                 </t>
                                 <t t-if="sale_order_line.date_type == 'issue_date'">
                                         <td><span t-esc="sale_order_line.issue_date" t-options='{"widget": "date"}'/></td>
-
                                 </t>
                                 <td><span t-field="sale_order_line.adv_issue.default_note"/></td>
                             </t>
@@ -187,7 +184,7 @@
                                 <td><span t-field="sale_order_line.ad_number"/></td>
                             </t>
                             <t t-if="o.type == 'out_refund'">
-                                <td><span t-field="l.name"/></td>
+                                <td><span t-esc="sale_order_line.ad_number"/></td>
                             </t>
                             <td><span t-if="l.product_id" t-field="l.product_id.name"/></td>
                             <td class="text-right">
