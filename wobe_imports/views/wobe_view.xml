@@ -55,23 +55,27 @@
                         </h1>
                         <group>
                             <group>
-                                <field name="title" readonly="True"/>
-                                <field name="total_pages" readonly="True"/>
-                                <field name="plate_type" readonly="True"/>
+                                <field name="title" />
+                                <field name="total_pages" />
+                                <field name="plate_type" />
                                 <field name="plate_amount"/>
                                 <field name="production_start"/>
                                 <field name="production_stop"/>
                             </group>
                             <group>
-                                <field name="issue_date" readonly="True"/>
-                                <field name="strook" readonly="True"/>
-                                <field name="planned_quantity" readonly="True"/>
-                                <field name="gross_quantity" readonly="True"/>
-                                <field name="net_quantity" readonly="True"/>
+                                <field name="issue_date" />
+                                <field name="strook" />
+                                <field name="planned_quantity" />
+                                <field name="gross_quantity" />
+                                <field name="net_quantity" />
                             </group>
                             <group string="Waste">
-                                <field name="waste_start" readonly="True"/>
-                                <field name="waste_total" readonly="True"/>
+                                <field name="waste_start" />
+                                <field name="waste_total" />
+                            </group>
+                            <group string="Waste">
+                                <field name="total_mass" />
+                                <field name="perc_waste" />
                             </group>
                         </group>
 
@@ -148,8 +152,40 @@
                     <field name="title"/>
                     <field name="create_date" string="Creation Date"/>
                     <field name="issue_date"/>
+                    <field name="total_pages" />
+                    <field name="plate_type" />
+                    <field name="plate_amount"/>
+                    <field name="production_start"/>
+                    <field name="production_stop"/>
+                    <field name="strook" />
+                    <field name="planned_quantity" />
+                    <field name="gross_quantity" />
+                    <field name="net_quantity" />
+                    <field name="waste_start" />
+                    <field name="waste_total" />
+                    <field name="total_mass" />
+                    <field name="perc_waste" />
                     <field name="state"/>
                 </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_wobe_job_pivot">
+            <field name="name">view.wobe.job.pivot</field>
+            <field name="model">wobe.job</field>
+            <field name="arch" type="xml">
+                <pivot string="Wobe Jobs" display_quantity="true">
+                    <field name="title" type="row"/>
+                    <field name="total_pages" />
+                    <field name="plate_amount"/>
+                    <field name="planned_quantity" type="measure"/>
+                    <field name="gross_quantity" type="measure"/>
+                    <field name="net_quantity" type="measure"/>
+                    <field name="waste_start" type="measure"/>
+                    <field name="waste_total" type="measure"/>
+                    <field name="total_mass" type="measure"/>
+                    <field name="perc_waste" type="measure"/>
+                </pivot>
             </field>
         </record>
 
@@ -181,7 +217,7 @@
             <field name="name">Wobe Jobs</field>
             <field name="res_model">wobe.job</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,pivot</field>
             <field name="search_view_id" ref="view_wobe_job_filter"/>
             <field name="context">{'search_default_exceptions':1}</field>
             <field name="help" type="html">
