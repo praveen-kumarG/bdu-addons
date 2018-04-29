@@ -30,16 +30,26 @@
                             <field name="port" placeholder="default port number is 22" required="1"/>
                             <field name="login" placeholder="Server's Username" required="1"/>
                             <field name="password" password="True" placeholder="Server's User Password" required="1"/>
+                            <field name="local_path" placeholder="path like = /home/user/shared/" required="1"/>
                         </group>
                         <group>
                             <field name="active"/>
                             <field name="company_id" required="1"/>
                         </group>
                     </group>
-                    <group>
-                        <field name="server_path" placeholder="path like = /home/user/shared/" required="1"/>
-                        <field name="local_path" placeholder="path like = /home/user/ftpdir/" required="1"/>
-                    </group>
+                    <div>
+                        <field name="path_ids" nolabel="1" widget="one2many_list" mode="tree">
+                            <tree editable="bottom">
+                                <field name="name"/>
+                                <field name="server_path" placeholder="path like = /home/user/shared/" required="1"/>
+                                <!--<field name="local_path" placeholder="path like = /home/user/shared/" required="1"/>-->
+                            </tree>
+                        </field>
+                    </div>
+                    <!--<group>-->
+                        <!--<field name="server_path" placeholder="path like = /home/user/shared/" required="1"/>-->
+                        <!--<field name="local_path" placeholder="path like = /home/user/ftpdir/" required="1"/>-->
+                    <!--</group>-->
                     <!--<group>-->
                         <!--<field name="note" readonly="1" nolabel="1"/>-->
                     <!--</group>-->

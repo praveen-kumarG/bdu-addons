@@ -52,6 +52,7 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = ["account.invoice.line"]
 
+
     @api.model
     def create(self, vals):
         ctx = self.env.context.copy()
