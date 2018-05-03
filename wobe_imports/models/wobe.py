@@ -158,8 +158,9 @@ class Job(models.Model):
             BDUOrder = x3.bduorder_ref
             KBAJobId = x3.job_ref
 
-            XML1_ref =  Reg.search([('job_id','!=',False), ('part','=', 'xml1'),('bduorder_ref','=',BDUOrder)])
-            if XML1_ref:
+            XML1_ref =  Reg.search([('job_id','!=',False),('state','=','done'),('part','=', 'xml1'),('bduorder_ref','=',BDUOrder)])
+            # must have XML4 before merging XML3
+            if XML1_ref and Reg.search([('job_id', '=', XML1_ref.job_id.id), ('part', '=', 'xml4')]):
                 if not XML1_ref in merge_xml3:
                     merge_xml3[XML1_ref] = [x3]
                 else:
