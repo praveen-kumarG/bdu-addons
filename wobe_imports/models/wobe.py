@@ -157,15 +157,7 @@ class Job(models.Model):
                 , order='run_date, file_create_date, is_duplicate'):
             BDUOrder = x3.bduorder_ref
             KBAJobId = x3.job_ref
-
-            XML1_ref =  Reg.search([('job_id','!=',False),('state','=','done'),('part','=', 'xml1'),('bduorder_ref','=',BDUOrder)])
-            # must have XML4 before merging XML3
-            if XML1_ref and Reg.search([('job_id', '=', XML1_ref.job_id.id), ('part', '=', 'xml4')]):
-                if not XML1_ref in merge_xml3:
-                    merge_xml3[XML1_ref] = [x3]
-                else:
-                    merge_xml3[XML1_ref].append(x3)
-            elif not BDUOrder in part3:
+            if not BDUOrder in part3:
                 part3[BDUOrder] = {KBAJobId: x3}
             else:
                 part3[BDUOrder].update({KBAJobId: x3})
@@ -189,14 +181,6 @@ class Job(models.Model):
                         merge_XML4_withoutJob_id[x4.duplicate_ref] = [x4]
             else:
                 unmappedXML4.append(x4)
-
-        # ---------------------------------------
-        # Registry Merge XML3 if job exists
-        # ---------------------------------------
-        for RegistryXML1, listXML3 in merge_xml3.iteritems():
-            # no picking exists and must have XML4 before merging XML3
-            if not RegistryXML1.job_id.picking_id and self.env['file.registry'].search([('job_id', '=', RegistryXML1.job_id.id), ('part', '=', 'xml4')]):
-                RegistryXML1.job_id.job_update_xml3(listXML3)
 
         # ---------------------------------------
         # Files are linked & grouped: <Xml1>
