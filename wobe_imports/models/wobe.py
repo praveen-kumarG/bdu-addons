@@ -143,7 +143,7 @@ class Job(models.Model):
 
         groupedFiles = defaultdict(lambda: {'Rfile1': False, 'Rfile3N4': {}, 'Rfile3':[]})
         part1, part3, part4 = {}, {}, {}
-        merge_XML4_withJob_id, merge_XML4_withoutJob_id = {}, {}
+        merge_XML4_withJob_id, merge_XML4_withoutJob_id, merge_xml3  = {}, {}, {}
         unmappedXML4 = []
 
         # ----------------------------
@@ -157,7 +157,17 @@ class Job(models.Model):
                 , order='run_date, file_create_date, is_duplicate'):
             BDUOrder = x3.bduorder_ref
             KBAJobId = x3.job_ref
-            if not BDUOrder in part3:
+            #look for XML4 same wobe ref# already added for job just update edition plate amount and job plate type from xml3
+            regF4Ref = Reg.search([('part', '=', 'xml4'), ('job_ref', '=', KBAJobId), ('job_id', '!=', False)])
+            XML1_ref = False
+            if regF4Ref:
+                XML1_ref = Reg.search([('job_id', '=', regF4Ref.job_id.id), ('part', '=', 'xml1')])
+            if XML1_ref:
+                if not XML1_ref in merge_xml3:
+                    merge_xml3[XML1_ref] = [x3]
+                else:
+                    merge_xml3[XML1_ref].append(x3)
+            elif not BDUOrder in part3:
                 part3[BDUOrder] = {KBAJobId: x3}
             else:
                 part3[BDUOrder].update({KBAJobId: x3})
@@ -181,6 +191,14 @@ class Job(models.Model):
                         merge_XML4_withoutJob_id[x4.duplicate_ref] = [x4]
             else:
                 unmappedXML4.append(x4)
+
+        # ---------------------------------------
+        # Registry Merge XML3 if job exists
+        # ---------------------------------------
+        for RegistryXML1, listXML3 in merge_xml3.iteritems():
+            # no picking exists
+            if not RegistryXML1.job_id.picking_id :
+                RegistryXML1.job_id.job_update_xml3(listXML3)
 
         # ---------------------------------------
         # Files are linked & grouped: <Xml1>
@@ -932,6 +950,9 @@ class Job(models.Model):
             Jobs = self.search([('state','=','order_created'),('picking_id','=',False),('stock_ok','=',True)])
 
         for case in Jobs:
+            if not self.env['file.registry'].search([('job_id', '=', case.id),('part','=','xml3')]):
+                self.message_post(body=_('XML3 Missing?'))
+                continue
             if case.state <> 'order_created' or case.picking_id \
                 or not case.stock_ok:
                 continue
@@ -1266,6 +1287,27 @@ class Job(models.Model):
 
         return True
 
+    @api.multi
+    def job_update_xml3(self, registryobj):
+        self.ensure_one()
+        edlines = []
+        res = {}
+        for Job in self:
+            for registry in registryobj:
+                File3 = base64.decodestring(registry.xmlfile)
+                tree3 = ET.fromstring(File3)
+                data3 = tree3.find('Newspaper')
+                edData = Job._extract_EditionData({}, registry, data3)
+                for key, elnvals in edData.iteritems():
+                    if elnvals['plate_type']:
+                        res.update({'plate_type': elnvals['plate_type']})
+                    found = Job.edition_ids.filtered(lambda x: x.kbajob_ref == elnvals['kbajob_ref'])
+                    if found:
+                        edlines.append((1, found.id, {'plate_amount':elnvals['plate_amount']}))
+                registry.write({'job_id': Job.id, 'state': 'done'})
+            res.update({'edition_ids': edlines})
+            Job.write(res)
+        return True
 
     @api.multi
     def update_job_edition(self, registry):
