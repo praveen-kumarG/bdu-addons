@@ -31,19 +31,22 @@ class FileTransfer(models.Model):
     company_id = fields.Many2one('res.company', 'Company', help='Company, to which records needs to be imported',
                                  default=lambda self: self.env['res.company']._company_default_get('sale.order'))
 
-    @api.onchange('server_path', 'local_path')
-    def onchange_details(self):
-        if self.server_path and not self.server_path.endswith('/'):
-            self.server_path = self.server_path + '/'
 
-        if self.server_path and not self.server_path.startswith('/'):
-            self.server_path = '/' + self.server_path
 
-        if self.local_path and not self.local_path.endswith('/'):
-            self.local_path = self.local_path + '/'
+    # @api.onchange('server_path', 'local_path')
+    # def onchange_details(self):
+    #     if self.server_path and not self.server_path.endswith('/'):
+    #         self.server_path = self.server_path + '/'
+    #
+    #     if self.server_path and not self.server_path.startswith('/'):
+    #         self.server_path = '/' + self.server_path
+    #
+    #     if self.local_path and not self.local_path.endswith('/'):
+    #         self.local_path = self.local_path + '/'
+    #
+    #     if self.local_path and not self.local_path.startswith('/'):
+    #         self.local_path = '/' + self.local_path
 
-        if self.local_path and not self.local_path.startswith('/'):
-            self.local_path = '/' + self.local_path
 
     @api.model
     def create(self, vals):
@@ -145,6 +148,8 @@ class FileTransfer(models.Model):
 
         # Call: Costing Creation
 #        Job.action_create_costing()
+
+
 
 
 class Registry(models.Model):
