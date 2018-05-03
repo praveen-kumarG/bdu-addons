@@ -22,7 +22,7 @@ class FileTransfer(models.Model):
     login = fields.Char(string="Login", copy=False)
     password = fields.Char(string="Password", copy=False)
 
-    # server_path = fields.Char(string="Download Path", copy=False, help="Source/Download Directory")
+    server_path = fields.Char(string="Download Path", copy=False, help="Source/Download Directory")
     local_path = fields.Char(string="Destination Path", copy=False, help="Destination/Copy Directory")
 
     msg = fields.Char(string="Connection Message", copy=False)
@@ -31,10 +31,14 @@ class FileTransfer(models.Model):
     company_id = fields.Many2one('res.company', 'Company', help='Company, to which records needs to be imported',
                                  default=lambda self: self.env['res.company']._company_default_get('sale.order'))
 
-    path_ids = fields.One2many('file.path','transfer_id', 'Paths', copy=False)
 
-    @api.onchange('local_path')
+    @api.onchange('server_path', 'local_path')
     def onchange_details(self):
+        if self.server_path and not self.server_path.endswith('/'):
+            self.server_path = self.server_path + '/'
+
+        if self.server_path and not self.server_path.startswith('/'):
+            self.server_path = '/' + self.server_path
 
         if self.local_path and not self.local_path.endswith('/'):
             self.local_path = self.local_path + '/'
@@ -102,17 +106,16 @@ class FileTransfer(models.Model):
             response = connection.test_connection()
             if response[0]:
                 ftp  = response[2]
-                for path in connection.path_ids:
-                    # to get all files at server path
-                    server_files = []
-                    for i in ftp.listdir(path.server_path):
-                        if ftp.path.isfile(path.server_path+i) and i.lower().endswith('.xml'):
-                            server_files.append(i)
-                    for sfile in server_files:
-                        src_path  = str(path.server_path + sfile)
-                        dest_path = str(connection.local_path + sfile)
-                        ftp.download(src_path, dest_path)# download files from server
-                        ftp.remove(src_path)  # remove server file
+                # to get all files at server path
+                server_files = []
+                for i in ftp.listdir(connection.server_path):
+                    if ftp.path.isfile(connection.server_path+i) and i.lower().endswith('.xml'):
+                        server_files.append(i)
+                for sfile in server_files:
+                    src_path  = str(connection.server_path + sfile)
+                    dest_path = str(connection.local_path + sfile)
+                    ftp.download(src_path, dest_path)# download files from server
+                    ftp.remove(src_path)  # remove server file
                 ftp.close()
         except Exception:
             _logger.exception("Failed processing file transfer")
@@ -144,23 +147,6 @@ class FileTransfer(models.Model):
         # Call: Costing Creation
 #        Job.action_create_costing()
 
-
-class FilePath(models.Model):
-    _name = 'file.path'
-    _rec_name = 'name'
-
-    name = fields.Char(string="Name", copy=False)
-    server_path = fields.Char(string="Download Path", copy=False, help="Source/Download Directory")
-    # local_path = fields.Char(string="Destination Path", copy=False, help="Destination/Copy Directory")
-    transfer_id = fields.Many2one('file.transfer', 'File Transfer')
-
-    @api.onchange('server_path')
-    def onchange_details(self):
-        if self.server_path and not self.server_path.endswith('/'):
-            self.server_path = self.server_path + '/'
-
-        if self.server_path and not self.server_path.startswith('/'):
-            self.server_path = '/' + self.server_path
 
 
 class Registry(models.Model):
