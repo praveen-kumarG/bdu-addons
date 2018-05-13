@@ -40,10 +40,10 @@ This module adds enhancement to project issue module
     'website' : 'http://www.magnus.nl',
     'depends' : ['sale_advertising_order','bdu_account','project_issue'
     ],
-    'data' : [
-         "security/ir.model.access.csv",
-         "views/project_issue_view.xml",
-         "views/project_view.xml",
+    'data' : ["security/crm_sector_security.xml",
+              "security/ir.model.access.csv",
+              "views/project_issue_view.xml",
+              "views/project_view.xml",
     ],
     'demo' : [],
     'installable': True
