@@ -67,3 +67,5 @@ class AccountInvoiceLine(models.Model):
                         line_obj.write({'name':description})
         return line_obj
 
+
+

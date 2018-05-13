@@ -3,8 +3,6 @@ access_wobe_job,wobe_job,model_wobe_job,wobe_imports.group_wobe_user,1,1,1,0
 access_wobe_booklet,wobe_booklet,model_wobe_booklet,wobe_imports.group_wobe_user,1,1,1,1
 access_file_transfer,file_transfer,model_file_transfer,wobe_imports.group_wobe_user,1,1,1,0
 access_file_transfer_system,file_transfer_system,model_file_transfer,base.group_system,1,1,1,1
-access_file_path,file_path,model_file_path,wobe_imports.group_wobe_user,1,1,1,0
-access_file_path_system,file_path_system,model_file_path,base.group_system,1,1,1,1
 access_wobe_edition,wobe_edition,model_wobe_edition,wobe_imports.group_wobe_user,1,1,1,1
 access_file_register,file_registry,model_file_registry,wobe_imports.group_wobe_user,1,0,0,0
 access_file_register_manager,file_registry,model_file_registry,wobe_imports.group_wobe_user,1,1,1,0
