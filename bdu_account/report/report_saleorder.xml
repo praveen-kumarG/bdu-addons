@@ -219,9 +219,9 @@
                 <p t-field="doc.note" class='text-center' style="padding-left:75px;padding-right:70px;padding-top:30px;"/>
             </strong>
 
-            <p t-if="doc.state not in ['draft','sale'] and doc.payment_term_id.note" class='text-center' style="padding-left:70px;padding-right:70px;padding-top:30px;">
+            <!--p t-if="doc.state not in ['draft','sale'] and doc.payment_term_id.note" class='text-center' style="padding-left:70px;padding-right:70px;padding-top:30px;">
                 <span t-field="doc.payment_term_id.note"/>
-            </p>
+            </p-->
 
             <strong t-if="doc.company_id.use_bduprint">
                 <p t-field="doc.note" class='text-center' style="font-size:8pt;padding-left:75px;padding-right:70px;padding-top:30px;"/>
