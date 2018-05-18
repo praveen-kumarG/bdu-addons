@@ -17,7 +17,6 @@ class CamtParser(models.AbstractModel):
     def parse_transaction_details(self, ns, node, transaction):
         """Parse TxDtls node."""
         super(CamtParser, self).parse_transaction_details(ns, node, transaction)
-        import pdb; pdb.set_trace()
         name = transaction.get('name')
         transaction['name'] = transaction.get('note')
         transaction['note'] = name
