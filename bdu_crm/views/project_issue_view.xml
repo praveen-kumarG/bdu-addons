@@ -91,13 +91,33 @@
                 <field name="tag_ids" position="after">
                     <field name="source" widget="selection"/>
                     <field name="issue_type" widget="selection"/>
+                    <field name="title_id" domain="[('parent_id', '=', False)]" />
+                    <field name="title_name" readonly="1"/>
                 </field>
                 <field name="task_id" position="after">
                     <field name="deadline"/>
+                    <field name="edition_date"/>
+                    <field name="edition_id" domain="[('parent_id', '=', title_id), ('issue_date', '=', edition_date)]"/>
                 </field>
                 <xpath expr="//notebook/page[1]" position="after">
                     <page string="Solution">
                         <field name="solution" nolabel="1"/>
+                    </page>
+                    <page string="Delivery Details">
+                        <group>
+                            <group>
+                                <label for="partner_name" string="Address"/>
+                                <div>
+                                    <field name="partner_name" placeholder="Contact name"/>
+                                    <field name="street_number" placeholder="Street number"/>
+                                    <field name="street_name" placeholder="Street name"/>
+                                    <field name="city" placeholder="City" />
+                                    <field name="zip" placeholder="ZIP" />
+                                </div>
+                            </group>
+                            <group>
+                            </group>
+                        </group>
                     </page>
                 </xpath>
             </field>
