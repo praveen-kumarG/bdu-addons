@@ -22,6 +22,6 @@ class MailMassMailingContact(models.Model):
     def _compute_contact(self):
         for contact in self:
             if contact.partner_id.child_ids:
-                c = self.env['res.partner'].search([('id','in', contact.partner_id.commercial_partner_id.child_ids),('type','=','contact')])
+                c = self.env['res.partner'].search([('id','in', contact.partner_id.commercial_partner_id.child_ids.ids),('type','=','contact')])
                 contact.contact_id = c[0].id
 
