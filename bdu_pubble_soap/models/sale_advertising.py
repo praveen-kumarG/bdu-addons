@@ -180,7 +180,7 @@ class SaleOrder(models.Model):
                         'ad_adsize_name': line.product_id.name or '',
                         'ad_adsize_width': line.product_template_id.width,
                         'ad_edition_editiondate': line.issue_date,
-                        'ad_edition_extpublicationid': line.title.name if line.ad_class.name != 'Webvertorial' else line.adv_issue.name,
+                        'ad_edition_extpublicationid': line.title.code if line.ad_class.name != 'Webvertorial' else line.adv_issue.code,
                         'ad_extplacementid': line.id,
                         'ad_price': 0,
                         'ad_productiondetail_classifiedCategory': line.analytic_tag_ids.name or '' if line.ad_class.name == 'Regiotreffers' else False,
