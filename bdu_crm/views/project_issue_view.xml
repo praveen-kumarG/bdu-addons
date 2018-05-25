@@ -98,6 +98,7 @@
                     <field name="deadline"/>
                     <field name="edition_date"/>
                     <field name="edition_id" domain="[('parent_id', '=', title_id), ('issue_date', '=', edition_date)]"/>
+                    <field name="solution_id"/>
                 </field>
                 <xpath expr="//notebook/page[1]" position="after">
                     <page string="Solution">
@@ -120,6 +121,18 @@
                         </group>
                     </page>
                 </xpath>
+            </field>
+        </record>
+
+        <record id="project_solution_form_view" model="ir.ui.view">
+            <field name="name">project.solution.form.view</field>
+            <field name="model">project.solution</field>
+            <field name="arch" type="xml">
+                <form string="Project Solution">
+                    <group>
+                        <field name="name" required="1"/>
+                    </group>
+                </form>
             </field>
         </record>
 

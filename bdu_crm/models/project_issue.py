@@ -47,6 +47,7 @@ class ProjectIssue(models.Model):
     city = fields.Char(string='City')
     street_name = fields.Char(string='Street Name')
     street_number = fields.Char(string='Street Number')
+    solution_id = fields.Many2one('project.solution', string="Solution")
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -75,3 +76,8 @@ class ProjectIssue(models.Model):
     @api.onchange('title_id', 'edition_date')
     def onchange_title_id(self):
         self.edition_id = False
+
+class ProjectSolution(models.Model):
+    _name = 'project.solution'
+
+    name = fields.Char(string="Name")
