@@ -12,8 +12,8 @@ class MailMassMailingContact(models.Model):
     _inherit = 'mail.mass_mailing.contact'
 
     user_id = fields.Many2one(related='partner_id.user_id', comodel_name='res.users',string="Client Owner", store=True)
-    category_id = fields.Many2many(related='partner_id.category_id', comodel_name='res.partner.category', column1='partner_id',
-                                    column2='category_id', string="Customer Labels", store=True)
+#    category_id = fields.Many2many(related='partner_id.category_id', relation='res.partner.category', column1='partner_id',
+#                                    column2='category_id', string="Customer Labels", store=True)
     contact_id = fields.Many2one(compute='_compute_contact', comodel_name='res.partner',string="Contact Person", store=True)
     sector_id = fields.Many2one(related='partner_id.sector_id', comodel_name='res.partner.sector',string="Main Sector", store=True)
 
