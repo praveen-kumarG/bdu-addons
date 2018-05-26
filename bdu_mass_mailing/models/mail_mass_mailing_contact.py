@@ -11,17 +11,16 @@ from odoo import _, api, fields, models
 class MailMassMailingContact(models.Model):
     _inherit = 'mail.mass_mailing.contact'
 
-    partner_id = fields.Many2one(comodel_name='res.partner', string="Partner",
-                                 domain=[('email', '!=', False)])
-    user_id = fields.Many2one(related='partner_id.user_id', string="Client Owner", store=True)
-    category_id = fields.Many2many(related='partner_id.category_id', string="Customer Labels", store=True)
+    user_id = fields.Many2one(related='partner_id.user_id', comodel_name='res.users',string="Client Owner", store=True)
+    category_id = fields.Many2many(related='partner_id.category_id', comodel_name='res.partner.category', column1='partner_id',
+                                    column2='category_id', string="Customer Labels", store=True)
     contact_id = fields.Many2one(compute='_compute_contact', comodel_name='res.partner',string="Contact Person", store=True)
-    sector_id = fields.Many2one(related='partner_id.sector_id', string="Main Sector", store=True)
+    sector_id = fields.Many2one(related='partner_id.sector_id', comodel_name='res.partner.sector',string="Main Sector", store=True)
 
     @api.depends('partner_id')
     def _compute_contact(self):
         for contact in self:
             if contact.partner_id.child_ids:
-                c = self.env['res.partner'].search([('id','in', contact.partner_id.commercial_partner_id.child_ids.ids),('type','=','contact')])
+                c = self.env['res.partner'].search([('id','in', contact.partner_id.child_ids),('type','=','contact')])
                 contact.contact_id = c[0].id
 
