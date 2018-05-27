@@ -38,7 +38,7 @@ This module adds enhancement to project issue module
     """,
     'author'  : 'Magnus - Willem Hulshof',
     'website' : 'http://www.magnus.nl',
-    'depends' : ['sale_advertising_order','bdu_account','project_issue'
+    'depends' : ['sale_advertising_order','bdu_account','project_issue','l10n_nl_postcodeapi'
     ],
     'data' : ["security/crm_sector_security.xml",
               "security/ir.model.access.csv",
