@@ -12,8 +12,7 @@ class MailMassMailingContact(models.Model):
     _inherit = 'mail.mass_mailing.contact'
 
     user_id = fields.Many2one(related='partner_id.user_id', comodel_name='res.users',string="Client Owner", store=True)
-#    category_id = fields.Many2many(related='partner_id.category_id', relation='res.partner.category', column1='partner_id',
-#                                    column2='category_id', string="Customer Labels", store=True)
+    category_id = fields.Many2many(related='partner_id.category_id', relation='res.partner.category', string="Customer Labels", store=False)
     contact_id = fields.Many2one(compute='_compute_contact', comodel_name='res.partner',string="Contact Person", store=True)
     sector_id = fields.Many2one(related='partner_id.sector_id', comodel_name='res.partner.sector',string="Main Sector", store=True)
 
@@ -21,6 +20,6 @@ class MailMassMailingContact(models.Model):
     def _compute_contact(self):
         for contact in self:
             if contact.partner_id.child_ids:
-                c = self.env['res.partner'].search([('id','in', contact.partner_id.child_ids),('type','=','contact')])
-                contact.contact_id = c[0].id
+                c = self.env['res.partner'].search([('id','in', contact.partner_id.child_ids.ids),('type','=','contact')])
+                contact.contact_id = c[0].id if len(c) >= 1 else False
 
