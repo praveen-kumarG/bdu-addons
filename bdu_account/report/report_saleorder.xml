@@ -76,7 +76,7 @@
 
             <!-- Is there a discount on at least one line? -->
             <t t-set="display_discount" t-value="any([l.discount for l in doc.order_line])"/>
-            <t t-set="display_Cdiscount" t-value="any([l.computed_discount for l in doc.order_line])"/>
+            <t t-set="display_Cdiscount" t-value="doc.display_discount_to_customer"/>
             <t t-set="tot_Cdiscount" t-value="0"/>
 
             <div class="row" style="padding-left:85px;padding-right:15px;">
