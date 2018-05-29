@@ -20,7 +20,7 @@
                 <attribute name="attrs">{'required':[('is_company','=',True),('customer','=', True)]}</attribute>
             </field>
             <field name="email" position="attributes">
-                <attribute name="attrs">{'required':[('is_company','=',True),('customer','=', True)]}</attribute>
+                <attribute name="required">False</attribute>
             </field>
             <field name="user_id" position="attributes">
                 <attribute name="attrs">{'required':[('is_company','=',True),('customer','=', True)],
