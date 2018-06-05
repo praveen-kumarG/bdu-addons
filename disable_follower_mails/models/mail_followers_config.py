@@ -34,18 +34,16 @@ class MailFollowersConfig(models.Model):
                     raise UserError(_("Followers configuration already exists for same company"))
         return super(MailFollowersConfig, self).write(vals)
 
-
     def followers_domain(self, model, res_id):
         domain = []
         company = self.env.user.company_id.id
         cmpy_field = self.env['ir.model.fields'].search([('model_id.model','=',model),('ttype','=','many2one'),('relation','=','res.company')], limit=1)
         if cmpy_field:
             company = self.env[model].browse(res_id)[cmpy_field.name].id
-        config_obj = self.search([('company_id','=',company)])
-        if config_obj:
-            config_model_obj = config_obj.search([('model_id.model','=',model)])
+        if company:
+            config_model_obj = self.search([('model_id.model','=',model),('company_id','=',company)], limit=1)
             if not config_model_obj:
-                config_model_obj = config_obj.search([('model_id', '=', False),('id','in',config_obj.ids)])
+                config_model_obj = self.search([('model_id', '=', False),('company_id','=',company)], limit=1)
             if config_model_obj:
                 domain = [('customer', '=', config_model_obj.value)]
         return domain
