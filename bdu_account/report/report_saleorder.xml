@@ -94,6 +94,7 @@
                                 <th width="10%" t-if="doc.partner_id.is_ad_agency and not doc.company_id.use_bduprint " class="text-right">Subtotal Before Commission</th>
                                 <th width="10%" t-if="display_discount" class="text-right">Disc(%)</th>
                                 <th width="10%" t-if="doc.company_id.use_bduprint and display_Cdiscount" class="text-right">Computed Discount</th>
+                                <th width="10%" t-if="not doc.company_id.use_bduprint and doc.display_discount_to_customer" class="text-right">Computed Discount</th>
                                 <th width="10%" class="text-right">Tax Excluded Price</th>
                             </tr>
                         </thead>
@@ -137,6 +138,9 @@
                                             <span t-field="l.discount"/>
                                         </td>
                                         <td t-if="doc.company_id.use_bduprint and display_Cdiscount" class="text-right">
+                                            <span t-field="l.computed_discount"/>
+                                        </td>
+                                        <td t-if="not doc.company_id.use_bduprint and doc.display_discount_to_customer" class="text-right">
                                             <span t-field="l.computed_discount"/>
                                         </td>
                                         <td class="text-right" >

@@ -5,6 +5,11 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-info" role="alert" style="margin-bottom:0px;padding:5px;" attrs="{'invisible': [('email', '!=', False)]}">
+                    <field name="warning_msg" readonly="1"/>
+                </div>
+            </xpath>
             <field name="ref" position="replace"/>
             <!--<xpath expr="//sheet" position="before">-->
                 <!--<div class="alert alert-info" role="alert" style="margin-bottom:0px;padding:5px;" attrs="{'invisible':['|',('ref','=',False),('parent_id','!=',False)]}">-->
@@ -20,7 +25,7 @@
                 <attribute name="attrs">{'required':[('is_company','=',True),('customer','=', True)]}</attribute>
             </field>
             <field name="email" position="attributes">
-                <attribute name="attrs">{'required':[('is_company','=',True),('customer','=', True)]}</attribute>
+                <attribute name="required">False</attribute>
             </field>
             <field name="user_id" position="attributes">
                 <attribute name="attrs">{'required':[('is_company','=',True),('customer','=', True)],
