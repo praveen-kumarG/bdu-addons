@@ -19,7 +19,6 @@
 ##############################################################################
 
 from odoo import api, fields, exceptions, models, _
-from odoo.exceptions import Warning
 
 class DeliveryTerms(models.Model):
     _name = 'delivery.terms'
@@ -72,18 +71,7 @@ class Partner(models.Model):
     delievery_terms = fields.Many2one('delivery.terms','Terms of delivery')
     status = fields.Many2one('partner.status','Status')
     newsletter_opt_out = fields.Boolean('Newsletter opt-out')
-
-    @api.model
-    def create(self, vals):
-        if not vals.get('email', False):
-            raise Warning(_("Please do not forget to fill out the e-mail address"))
-        return super(Partner, self).create(vals)
-
-    @api.multi
-    def write(self, vals):
-        if ('email' in vals and not vals.get('email', False)) or ('email' not in vals and not self.email):
-            raise Warning(_("Please do not forget to fill out the e-mail address"))
-        return super(Partner, self).write(vals)
+    warning_msg = fields.Char(string='Warning Message', default="Please do not forget to fill out the e-mail address")
 
 class Users(models.Model):
     _inherit = 'res.users'
