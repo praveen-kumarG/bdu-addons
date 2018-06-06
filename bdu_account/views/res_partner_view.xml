@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="before">
                 <div class="alert alert-info" role="alert" style="margin-bottom:0px;padding:5px;" attrs="{'invisible': [('email', '!=', False)]}">
-                    <field name="warning_msg" readonly="1"/>
+                    Please do not forget to fill out the e-mail address.
                 </div>
             </xpath>
             <field name="ref" position="replace"/>
