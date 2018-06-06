@@ -71,7 +71,6 @@ class Partner(models.Model):
     delievery_terms = fields.Many2one('delivery.terms','Terms of delivery')
     status = fields.Many2one('partner.status','Status')
     newsletter_opt_out = fields.Boolean('Newsletter opt-out')
-    warning_msg = fields.Char(string='Warning Message', default="Please do not forget to fill out the e-mail address")
 
 class Users(models.Model):
     _inherit = 'res.users'
