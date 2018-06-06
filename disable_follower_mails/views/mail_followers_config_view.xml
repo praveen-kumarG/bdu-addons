@@ -10,7 +10,7 @@
                 <sheet>
                     <group>
                         <group>
-                            <label string="Is customer type to notify followers"/>
+                            <label string="Notify following customers by e-mail?"/>
                             <field name="value" nolabel="1"/>
                         </group>
                         <group>
@@ -20,7 +20,18 @@
 
                     </group>
                     <div>
-                           <strong> Note:</strong> Domain set for follower to receive mails like, If [('customer','=',True)] or [('customer','=',False)]. Also if any followers is tagged or added as recipients will be notify.
+                        <strong> Note:</strong>
+                    </div>
+                    <div>
+                        <strong>1. </strong>By setting "Notify following customers by e-mail?" to FALSE, only [('customer',=,FALSE)] will receive follower mail messages. [('customer',=,TRUE)] will be excluded from receiving follower mail messages, <strong>but</strong> when [('customer',=,TRUE)] forcely tagged or added as recipients will also be notify.
+                    </div>
+                    <br/>
+                    <div>
+                        <strong>2. </strong>By setting "Notify following customers by e-mail?" to True, only [('customer',=,True)] will receive follower mail messages. [('customer',=,False)] will be excluded from receiving follower mail messages, <strong>but</strong> when [('customer',=,False)] forcely tagged or added as recipients will also be notify.
+                    </div>
+                    <br/>
+                    <div>
+                        <strong>3. </strong>In case both [('customer',=,TRUE)] and [('customer',=,FALSE)] should receive follower mail messages when tagged or added as recipients, please do not create any configuration.
                     </div>
                 </sheet>
             </form>
