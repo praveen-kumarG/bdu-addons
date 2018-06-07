@@ -9,8 +9,8 @@
             <div class="row" style="padding-left:75px;">
                 <div name="order_title" class="col-xs-5 col-xs-offset-7" style="padding:0px;">
                     <h3>
-                        <span t-if="doc.state not in ['draft','sent']">ORDER CONFIRMATION</span>
-                        <span t-if="doc.state in ['draft','sent']">QUOTATION</span>
+                        <span t-if="doc.state in ['sale','done']">ORDER CONFIRMATION</span>
+                        <span t-if="doc.state not in ['sale','done']">QUOTATION</span>
                     </h3>
                 </div>
             </div>
@@ -18,9 +18,11 @@
             <div class="row mt32 mb32" style="padding-left:85px;">
                  <div class="col-xs-7" style="padding:0px;">
                      <div class="col-xs-4" style="padding:0px;">
-                         <span><strong>Order Date</strong></span>
+                         <span t-if="doc.state in ['sale','done']"><strong>Order Date</strong></span>
+                         <span t-if="doc.state not in ['sale','done']"><strong>Quotation Date</strong></span>
                          <br/>
-                         <span><strong>Order Number</strong></span>
+                         <span t-if="doc.state in ['sale','done']"><strong>Order Number</strong></span>
+                         <span t-if="doc.state not in ['sale','done']"><strong>Quotation Number</strong></span>
                          <br/>
                          <span><strong>Customer Code</strong></span>
                      </div>
@@ -195,7 +197,7 @@
                             </tr>
                         </t>
                         <tr>
-                            <td><span t-esc="'Taxes'"/></td>
+                            <td><strong>Taxes</strong></td>
                             <td class="text-right">
                                 <span t-esc="doc.amount_tax"
                                     t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
@@ -230,10 +232,10 @@
             <!--<p style="padding-left:75px;padding-right:15px;">-->
                 <!--We would like to thank you for your request and see your response as soon as possible.-->
             <!--</p>-->
-            <p t-if="doc.state in ['draft','sent']" style="padding-left:75px;padding-right:15px;">
+            <p t-if="doc.state not in ['sale','done']" style="padding-left:75px;padding-right:15px;">
                 We would like to thank you for your request. We are looking forward to receiving your response as soon as possible.
             </p>
-            <p t-if="doc.state not in ['draft','sent']" style="padding-left:75px;padding-right:15px;">
+            <p t-if="doc.state in ['sale','done']" style="padding-left:75px;padding-right:15px;">
                 We would like to thank you and take good care of your order placement.
             </p>
             <br/>
