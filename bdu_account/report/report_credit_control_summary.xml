@@ -12,12 +12,21 @@
                 </div>
             </div>
             <div class="row" id="address" style="padding-left:85px;">
-                <div class="col-xs-5 col-xs-offset-7" style="padding:0px;">
-                    <address t-field="doc.contact_address"
-                             t-field-options='{"widget": "contact",
-                                               "fields": ["address", "name"],
-                                               "no_marker": true}'/>
-                </div>
+                <!--<div class="col-xs-5 col-xs-offset-7" style="padding:0px;">-->
+                    <!--<address t-field="doc.contact_address"-->
+                             <!--t-field-options='{"widget": "contact",-->
+                                               <!--"fields": ["address", "name"],-->
+                                               <!--"no_marker": true}'/>-->
+                <!--</div>-->
+                <div name="address" class="col-xs-5 col-xs-offset-7" style="padding:0px;">
+                      <t t-if="doc.partner_id.zip">
+                            <address t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                      </t>
+                      <t t-if=" not doc.partner_id.zip">
+                            <address t-field="doc.partner_id.parent_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                      </t>
+                     <span t-if="doc.partner_id.vat">TIN: <span t-field="doc.partner_id.vat"/></span>
+                 </div>
                 <div class="col-xs-5 col-xs-offset-7" style="padding:0px;">
                     <span t-field="doc.report_date"/>
                 </div>
