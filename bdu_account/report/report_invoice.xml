@@ -234,7 +234,7 @@
                     </thead>
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l">
-                            <td><span t-field="l.sale_line_ids.order_id.issue_date"/>
+                            <td><span t-field="l.sale_line_ids.issue_date"/>
                             </td>
                             <td class="text-right">
                                 <t t-if="l.uom_id.uom_type == 'bigger'">
@@ -490,14 +490,22 @@
             <t t-if="o.company_id.use_bduprint">
                 <t t-call="bdu_account.report_invoice_document1" t-lang="o.partner_id.lang"/>
             </t>
-            <t t-set="advertising" t-value="any([l.sale_line_ids.advertising for l in o.invoice_line_ids])"/>
-            <!--BDUMedia - if advertising order attached-->
-            <t t-if="not o.company_id.use_bduprint and advertising">
-                <t t-call="bdu_account.report_invoice_document1" t-lang="o.partner_id.lang"/>
-            </t>
-            <!--BDUMedia - if regular order attached-->
-            <t t-if="not o.company_id.use_bduprint and not advertising">
-                <t t-call="bdu_account.report_invoice_document2" t-lang="o.partner_id.lang"/>
+            <!--BDUMedia-->
+            <t t-if="not o.company_id.use_bduprint">
+                <t t-if="o.type == 'out_invoice'">
+                    <t t-set="advertising" t-value="any([l.sale_line_ids.advertising for l in o.invoice_line_ids])"/>
+                </t>
+                <t t-if="o.type == 'out_refund'">
+                    <t t-set="advertising" t-value="any([l.sale_line_ids.advertising for l in o.refund_invoice_id.invoice_line_ids])"/>
+                </t>
+                <!--BDUMedia - if advertising order attached or if vendor bills-->
+                <t t-if="advertising or (o.type == 'in_invoice' or o.type == 'in_refund')">
+                    <t t-call="bdu_account.report_invoice_document1" t-lang="o.partner_id.lang"/>
+                </t>
+                <!--BDUMedia - if regular order attached for customer invoices-->
+                <t t-if="not advertising and (o.type == 'out_invoice' or o.type == 'out_refund')">
+                    <t t-call="bdu_account.report_invoice_document2" t-lang="o.partner_id.lang"/>
+                </t>
             </t>
         </t>
     </t>
