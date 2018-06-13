@@ -8,7 +8,7 @@ import datetime
 class AccountInvoice(models.Model):
     _inherit = ["account.invoice"]
 
-
+    free_text = fields.Html(string='Invoice body as Free Text')
 
     # TODO: check if this is needed?
     @api.multi
@@ -25,6 +25,10 @@ class AccountInvoice(models.Model):
     def _get_refund_common_fields(self):
         res = super(AccountInvoice, self)._get_refund_common_fields()
         return res+['published_customer']
+
+    def _get_refund_copy_fields(self):
+        copy_fields = ['company_id', 'user_id', 'fiscal_position_id','ad','free_text']
+        return self._get_refund_common_fields() + self._get_refund_prepare_fields() + copy_fields
 
     @api.model
     def _refund_cleanup_lines(self, lines):
