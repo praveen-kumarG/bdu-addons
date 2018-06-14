@@ -7,35 +7,36 @@ class ProjectSource(models.Model):
     _description = 'Project Source'
     _rec_name = 'name'
 
-    @api.multi
-    def name_get(self):
-        result = []
-        for source in self:
-            result.append((source.id, source.name))
-        return result[:7]
+    # @api.multi
+    # def name_get(self):
+    #     result = []
+    #     for source in self:
+    #         result.append((source.id, source.name))
+    #     return result[:7]
 
     name = fields.Char('Source')
+    project_ids = fields.Many2many('project.project', 'project_source_rel', 'source_id', 'project_id', string='Projects',)
 
 class ProjectIssueType(models.Model):
     _name = 'project.issue.type'
     _description = 'Project Issue Type'
     _rec_name = 'name'
 
-    @api.multi
-    def name_get(self):
-        result = []
-        for issue in self:
-            result.append((issue.id, issue.name))
-        return result[:7]
+    # @api.multi
+    # def name_get(self):
+    #     result = []
+    #     for issue in self:
+    #         result.append((issue.id, issue.name))
+    #     return result[:7]
 
     name = fields.Char('Issue Type')
-
+    project_ids = fields.Many2many('project.project', 'project_issue_type_rel', 'issue_id', 'project_id', string='Projects',)
 
 class ProjectIssue(models.Model):
     _inherit = 'project.issue'
 
-    source = fields.Many2one('project.source', 'Source')
-    issue_type = fields.Many2one('project.issue.type', 'Issue Type')
+    source = fields.Many2one('project.source', string='Source', copy=False, domain="[('project_ids', '=', project_id)]")
+    issue_type = fields.Many2one('project.issue.type', string='Issue Type', copy=False, domain="[('project_ids', '=', project_id)]")
     solution = fields.Html('Solution')
     deadline = fields.Datetime('Deadline')
     title_id = fields.Many2one('sale.advertising.issue', string='Title')
@@ -47,7 +48,7 @@ class ProjectIssue(models.Model):
     city = fields.Char(string='City')
     street_name = fields.Char(string='Street Name')
     street_number = fields.Char(string='Street Number')
-    solution_id = fields.Many2one('project.solution', string="Solution")
+    solution_id = fields.Many2one('project.solution', string="Solution", copy=False, domain="[('project_ids', '=', project_id)]")
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -81,3 +82,4 @@ class ProjectSolution(models.Model):
     _name = 'project.solution'
 
     name = fields.Char(string="Name")
+    project_ids = fields.Many2many('project.project', 'project_solution_rel', 'solution_id', 'project_id', string='Projects',)
