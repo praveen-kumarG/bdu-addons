@@ -327,6 +327,9 @@
                     <strong><span t-field="o.comment"/></strong>
                 </p>
             </t>
+            <div class="row" style="padding-left:85px;">
+                <span t-raw="o.free_text"/>
+            </div>
         </div>
     </t>
 </template>
