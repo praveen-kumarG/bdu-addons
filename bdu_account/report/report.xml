@@ -42,6 +42,8 @@
         file="sale.report_saleorder"
         name="sale.report_saleorder"
         paperformat="bdu_account.paperformat_bdu_layout"
+        attachment="((object.state not in ('sale','done')) and ('Quotation '+object.name.replace('SO',''))+'.pdf') or ((object.state in ('sale','done')) and ('Sale Order '+object.name.replace('SO',''))+'.pdf')"
+        attachment_use = "True"
     />
     <report
         string="Purchase Order"
