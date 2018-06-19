@@ -493,8 +493,8 @@
             </t>
             <!--BDUMedia-->
             <t t-if="not o.company_id.use_bduprint">
-                <t t-if="o.type == 'out_invoice' and o.ad">
-                    <t t-set="advertising" />
+                <t t-if="o.ad">
+                    <t t-set="advertising" t-value="true" />
                 </t>
                 <!--BDUMedia - if advertising order attached or if vendor bills-->
                 <t t-if="advertising or (o.type == 'in_invoice' or o.type == 'in_refund')">
