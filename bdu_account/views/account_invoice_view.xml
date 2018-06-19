@@ -21,7 +21,12 @@
             <field name="inherit_id" ref="account.invoice_supplier_form" />
             <field name="arch" type="xml">
                 <xpath expr="//sheet/notebook/page/field/tree/field[@name='account_analytic_id']" position="attributes" >
-                    <attribute name="attrs" >{'required': [('account_id.user_type_id', 'in', [])]}</attribute>
+                    <attribute name="attrs" >{'required': [('account_id.user_type_id', 'in',
+                                    [%(account.data_account_type_other_income)d,
+                                     %(account.data_account_type_revenue)d,
+                                     %(account.data_account_type_depreciation)d,
+                                     %(account.data_account_type_expenses)d,
+                                     %(account.data_account_type_direct_costs)d])]}</attribute>
                 </xpath>
 
             </field>
