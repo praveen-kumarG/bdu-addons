@@ -8,7 +8,7 @@ import datetime
 class AccountInvoice(models.Model):
     _inherit = ["account.invoice"]
 
-
+    free_text = fields.Html(string='Invoice body as Free Text')
 
     # TODO: check if this is needed?
     @api.multi
@@ -24,7 +24,13 @@ class AccountInvoice(models.Model):
 
     def _get_refund_common_fields(self):
         res = super(AccountInvoice, self)._get_refund_common_fields()
-        return res+['published_customer']
+        if self.ad:
+            res = res+['published_customer']
+        return res
+
+    def _get_refund_copy_fields(self):
+        copy_fields = ['company_id', 'user_id', 'fiscal_position_id', 'ad', 'free_text']
+        return self._get_refund_common_fields() + self._get_refund_prepare_fields() + copy_fields
 
     @api.model
     def _refund_cleanup_lines(self, lines):
@@ -38,6 +44,8 @@ class AccountInvoice(models.Model):
                     if name == 'sale_line_ids':
                         result[i][2][name] = [(6, 0, lines[i][name].ids)]
                         lines[i][name] = False
+                    if name == 'sale_order_id':
+                        result[i][2].pop(name, None)
         else:
             result = super(AccountInvoice, self)._refund_cleanup_lines(lines)
             for i in xrange(0, len(lines)):
@@ -45,6 +53,8 @@ class AccountInvoice(models.Model):
                     if name == 'so_line_id' and not lines[i][name]:
                         result[i][2][name] = lines[i]['sale_line_ids'].id
                         lines[i][name] = lines[i]['sale_line_ids'].id
+                    if name == 'sale_order_id':
+                        result[i][2].pop(name, None)
         return result
 
 
