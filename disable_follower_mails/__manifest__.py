@@ -27,41 +27,21 @@
 ##############################################################################
 
 {
-    'name' : 'BDU Account',
-    'version' : '0.9',
-    'category': 'accounts',
+    'name': 'Disable Follower Mails',
+    'version': '0.1',
+    'category': 'Discuss',
     'description': """
-This module adds customization as per BDU Media
-=============================================================================
-
-
+ This module prevents adding partners/customers as followers of the document while including them as recipient of a message send via "Send a message" feature in records.
     """,
-    'author'  : 'Magnus - Willem Hulshof',
-    'website' : 'http://www.magnus.nl',
-    'depends' : ['account', 'sale_advertising_order', 'account_bank_statement_import_camt',
-                 'partner_contact_gender','purchase', 'account_invoice_refund_link',
-                 'partner_sector','base_partner_sequence','account_credit_control',
+    'author': 'Magnus - Willem Hulshof',
+    'website': 'http://www.magnus.nl',
+    'depends': ['mail'],
+    'data': [
+            'security/ir.model.access.csv',
+            'views/mail_followers_config_view.xml'
     ],
-    'data' : [
-
-         "security/ir.model.access.csv",
-         "data/partner_sequence.xml",
-         "report/report_invoice.xml",
-         "report/report_saleorder.xml",
-         "report/purchase_quotation_templates.xml",
-         "report/purchase_order_templates.xml",
-         "report/report_deliveryslip.xml",
-         "report/report_credit_control_summary.xml",
-         "report/report.xml",
-         "views/account_invoice_view.xml",
-         "views/res_company_view.xml",
-         "views/res_partner_view.xml",
-         "views/product_view.xml",
-         "views/sale_advertising_view.xml",
-         "wizard/account_invoice_state_view.xml",
+    'demo': [
     ],
-    'demo' : [],
-    'installable': True
+    'installable': True,
 }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-
