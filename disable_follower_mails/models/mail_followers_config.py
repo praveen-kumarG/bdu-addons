@@ -35,7 +35,7 @@ class MailFollowersConfig(models.Model):
         return super(MailFollowersConfig, self).write(vals)
 
     def followers_domain(self, model, res_id):
-        domain = []
+        domain = [('user_ids','!=',False)]
         company = self.env.user.company_id.id
         cmpy_field = self.env['ir.model.fields'].search([('model_id.model','=',model),('ttype','=','many2one'),('relation','=','res.company')], limit=1)
         if cmpy_field:
@@ -45,7 +45,7 @@ class MailFollowersConfig(models.Model):
             if not config_model_obj:
                 config_model_obj = self.search([('model_id', '=', False),('company_id','=',company)], limit=1)
             if config_model_obj:
-                domain = [('customer', '=', config_model_obj.value)]
+                domain += [('customer', '=', config_model_obj.value)]
         return domain
 
 
