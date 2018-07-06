@@ -29,7 +29,7 @@ class AccountInvoice(models.Model):
         return res
 
     def _get_refund_copy_fields(self):
-        copy_fields = ['company_id', 'user_id', 'fiscal_position_id', 'ad', 'free_text']
+        copy_fields = ['company_id', 'user_id', 'fiscal_position_id', 'free_text']
         return self._get_refund_common_fields() + self._get_refund_prepare_fields() + copy_fields
 
     @api.model
@@ -46,6 +46,8 @@ class AccountInvoice(models.Model):
                         lines[i][name] = False
                     if name == 'sale_order_id':
                         result[i][2].pop(name, None)
+                    if name == 'ad':
+                        result[i][2].pop(name, None)
         else:
             result = super(AccountInvoice, self)._refund_cleanup_lines(lines)
             for i in xrange(0, len(lines)):
@@ -54,6 +56,8 @@ class AccountInvoice(models.Model):
                         result[i][2][name] = lines[i]['sale_line_ids'].id
                         lines[i][name] = lines[i]['sale_line_ids'].id
                     if name == 'sale_order_id':
+                        result[i][2].pop(name, None)
+                    if name == 'ad':
                         result[i][2].pop(name, None)
         return result
 
