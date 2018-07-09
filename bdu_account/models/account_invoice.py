@@ -75,7 +75,7 @@ class AccountInvoiceLine(models.Model):
             if ctx.get('active_model') in ('sale.order','sale.order.line'):
                 for sale_line_obj in line_obj.sale_line_ids:
                     description = False
-                    if sale_line_obj.company_id.use_bduprint and line_obj.product_id == sale_line_obj.product_id and sale_line_obj.product_id.product_tmpl_id.invoice_description:
+                    if sale_line_obj.order_id.operating_unit_id.use_bduprint and line_obj.product_id == sale_line_obj.product_id and sale_line_obj.product_id.product_tmpl_id.invoice_description:
                         description = sale_line_obj.name
                     if description:
                         line_obj.write({'name':description})

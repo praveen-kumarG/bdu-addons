@@ -15,7 +15,7 @@
         <t t-set="company" t-value="res_company"/>
     </t>
     <t t-if="o and o.magazine">
-        <t t-set="ou" t-value="ref('bdumedia.bdumedia_vakmedia')"/>
+        <t t-set="ou" t-value="o.env.ref('bdumedia.bdumedia_vakmedia')"/>
     </t>
     <t t-if="o and 'operating_unit_id' in o and not o.magazine">
         <t t-set="ou" t-value="o.operating_unit_id"/>
