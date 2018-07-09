@@ -116,10 +116,13 @@
                                     <t t-set="tot_Cdiscount" t-value="tot_Cdiscount + l.computed_discount"/>
 
                                     <tr>
-                                        <td t-if="l.medium.name == 'Online'">
+                                        <td t-if="l.medium in (l.env.ref('sale_advertising_order.online_advertising_category'),
+                                                               l.env.ref('sale_advertising_order.magazine.online_advertising_category')">
                                             <span t-field="l.from_date"/><span> - </span><span t-field="l.to_date"/>
                                         </td>
-                                        <td t-if="not l.medium.name == 'Online'"><span t-field="l.issue_date"/></td>
+                                        <td t-if="not l.medium.name in (l.env.ref('sale_advertising_order.online_advertising_category'),
+                                                               l.env.ref('sale_advertising_order.magazine.online_advertising_category')">
+                                            <span t-field="l.issue_date"/></td>
                                         <!--<t t-if="not doc.operating_unit_id.use_bduprint"><td><span t-if="l.title" t-field="l.title.name"/></td></t>-->
                                         <t t-if="not doc.operating_unit_id.use_bduprint"><td><span t-if="l.adv_issue" t-field="l.adv_issue.default_note"/></td></t>
                                         <t t-if="not doc.operating_unit_id.use_bduprint"><td><span t-field="l.ad_number"/></td></t>
