@@ -169,8 +169,8 @@
                                 <td t-if="sale_order_line.date_type not in ['validity','issue_date']"><span t-field="o.refund_invoice_id.date_invoice"/></td>
                                 <t t-if="sale_order_line.date_type == 'validity'">
                                     <td t-if="not sale_order_line.from_date"><span t-esc="sale_order_line.dateperiods[0].from_date" t-options='{"widget": "date"}'/>
-                                                                                   <span > - </span>
-                                                                                   <span t-esc="sale_order_line.dateperiods[0].to_date" t-options='{"widget": "date"}'/></td>
+                                                                             <span > - </span>
+                                                                             <span t-esc="sale_order_line.dateperiods[0].to_date" t-options='{"widget": "date"}'/></td>
                                     <td t-if="sale_order_line.from_date"><span t-esc="sale_order_line.from_date"/>
                                                                                    <span > - </span>
                                                                                    <span t-esc="sale_order_line.to_date" t-options='{"widget": "date"}'/></td>
