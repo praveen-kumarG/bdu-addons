@@ -49,7 +49,7 @@
                  </div>
 
                 <br/><br/>
-                 <t t-if="not doc.company_id.use_bduprint">
+                 <t t-if="not doc.operating_unit_id.use_bduprint">
                      <div class="col-xs-7" style="padding:0px;">
                          <div class="col-xs-4" style="padding:0px;">
                              <strong>Advertiser</strong>
@@ -87,16 +87,16 @@
                         <thead>
                             <tr>
                                 <th width="10%">Date</th>
-                                <!--<t t-if="not doc.company_id.use_bduprint"><th width="10%">Edition</th></t>-->
-                                <t t-if="not doc.company_id.use_bduprint"><th width="15%">Advertising Issue</th></t>
-                                <t t-if="not doc.company_id.use_bduprint"><th width="15%">Reference</th></t>
+                                <!--<t t-if="not doc.operating_unit_id.use_bduprint"><th width="10%">Edition</th></t>-->
+                                <t t-if="not doc.operating_unit_id.use_bduprint"><th width="15%">Advertising Issue</th></t>
+                                <t t-if="not doc.operating_unit_id.use_bduprint"><th width="15%">Reference</th></t>
                                 <th width="10%">Product</th>
                                 <th width="10%" class="text-right">Volume</th>
-                                <th width="10%" t-if="doc.company_id.use_bduprint" class="text-right">Unit Price</th>
-                                <th width="10%" t-if="doc.partner_id.is_ad_agency and not doc.company_id.use_bduprint " class="text-right">Subtotal Before Commission</th>
+                                <th width="10%" t-if="doc.operating_unit_id.use_bduprint" class="text-right">Unit Price</th>
+                                <th width="10%" t-if="doc.partner_id.is_ad_agency and not doc.operating_unit_id.use_bduprint " class="text-right">Subtotal Before Commission</th>
                                 <th width="10%" t-if="display_discount" class="text-right">Disc(%)</th>
-                                <th width="10%" t-if="doc.company_id.use_bduprint and display_Cdiscount" class="text-right">Computed Discount</th>
-                                <th width="10%" t-if="not doc.company_id.use_bduprint and doc.display_discount_to_customer" class="text-right">Computed Discount</th>
+                                <th width="10%" t-if="doc.operating_unit_id.use_bduprint and display_Cdiscount" class="text-right">Computed Discount</th>
+                                <th width="10%" t-if="not doc.operating_unit_id.use_bduprint and doc.display_discount_to_customer" class="text-right">Computed Discount</th>
                                 <th width="10%" class="text-right">Tax Excluded Price</th>
                             </tr>
                         </thead>
@@ -120,9 +120,9 @@
                                             <span t-field="l.from_date"/><span> - </span><span t-field="l.to_date"/>
                                         </td>
                                         <td t-if="not l.medium.name == 'Online'"><span t-field="l.issue_date"/></td>
-                                        <!--<t t-if="not doc.company_id.use_bduprint"><td><span t-if="l.title" t-field="l.title.name"/></td></t>-->
-                                        <t t-if="not doc.company_id.use_bduprint"><td><span t-if="l.adv_issue" t-field="l.adv_issue.default_note"/></td></t>
-                                        <t t-if="not doc.company_id.use_bduprint"><td><span t-field="l.ad_number"/></td></t>
+                                        <!--<t t-if="not doc.operating_unit_id.use_bduprint"><td><span t-if="l.title" t-field="l.title.name"/></td></t>-->
+                                        <t t-if="not doc.operating_unit_id.use_bduprint"><td><span t-if="l.adv_issue" t-field="l.adv_issue.default_note"/></td></t>
+                                        <t t-if="not doc.operating_unit_id.use_bduprint"><td><span t-field="l.ad_number"/></td></t>
                                         <td t-if="l.product_id" ><span t-field="l.product_id.name"/></td>
                                         <!--td t-if="l.medium.name == 'Newspapers/Specials'"><span t-field="l.product_template_id.width"/></td-->
                                         <!--td t-if="l.medium.name == 'Newspapers/Specials'"><span t-field="l.product_template_id.height"/></td-->
@@ -130,19 +130,19 @@
                                             <span t-field="l.product_uom_qty"/>
                                             <span t-field="l.product_uom" groups="product.group_uom"/>
                                         </td>
-                                        <td t-if="doc.company_id.use_bduprint" class="text-right">
+                                        <td t-if="doc.operating_unit_id.use_bduprint" class="text-right">
                                             <span t-field="l.price_unit"/>
                                         </td>
-                                        <td t-if="doc.partner_id.is_ad_agency and not doc.company_id.use_bduprint" class="text-right">
+                                        <td t-if="doc.partner_id.is_ad_agency and not doc.operating_unit_id.use_bduprint" class="text-right">
                                             <span t-field="l.subtotal_before_agency_disc"/>
                                         </td>
                                         <td t-if="display_discount" class="text-right">
                                             <span t-field="l.discount"/>
                                         </td>
-                                        <td t-if="doc.company_id.use_bduprint and display_Cdiscount" class="text-right">
+                                        <td t-if="doc.operating_unit_id.use_bduprint and display_Cdiscount" class="text-right">
                                             <span t-field="l.computed_discount"/>
                                         </td>
-                                        <td t-if="not doc.company_id.use_bduprint and doc.display_discount_to_customer" class="text-right">
+                                        <td t-if="not doc.operating_unit_id.use_bduprint and doc.display_discount_to_customer" class="text-right">
                                             <span t-field="l.computed_discount"/>
                                         </td>
                                         <td class="text-right" >
@@ -150,7 +150,7 @@
                                                 t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                                         </td>
                                     </tr>
-                                    <t t-if="doc.company_id.use_bduprint">
+                                    <t t-if="doc.operating_unit_id.use_bduprint">
                                         <tr t-if="l.name">
                                             <td></td>
                                             <td style="font-weight:bold;font-size:11px;font-style:italic;">Description/ short content :</td>
@@ -192,7 +192,7 @@
                                     t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                             </td>
                         </tr>
-                        <t t-if="doc.company_id.use_bduprint">
+                        <t t-if="doc.operating_unit_id.use_bduprint">
                             <tr>
                                 <td>Discount</td>
                                 <td class="text-right">
@@ -219,7 +219,7 @@
                 </div>
             </div>
 
-            <strong t-if="not doc.company_id.use_bduprint">
+            <strong t-if="not doc.operating_unit_id.use_bduprint">
                 <p t-field="doc.note" class='text-center' style="padding-left:75px;padding-right:70px;padding-top:30px;"/>
             </strong>
 
@@ -227,7 +227,7 @@
                 <span t-field="doc.payment_term_id.note"/>
             </p-->
 
-            <strong t-if="doc.company_id.use_bduprint">
+            <strong t-if="doc.operating_unit_id.use_bduprint">
                 <p t-field="doc.note" class='text-center' style="font-size:8pt;padding-left:75px;padding-right:70px;padding-top:30px;"/>
             </strong>
 
@@ -246,7 +246,7 @@
             <div class="row" style="padding-left:75px;page-break-inside:avoid;">
                 <div class="col-xs-5">
                     <strong><p>Sincerely,</p></strong>
-                    <span t-field="doc.company_id.name"/>
+                    <span t-field="doc.operating_unit_id.name"/>
                     <br/>
                     <span t-field="doc.user_id.name"/>
                 </div>
@@ -273,10 +273,10 @@
                 <t t-call="bdu_account.report_saleorder_document1" t-lang="doc.partner_id.lang"/>
             </t>
             <t t-if="not doc.advertising">
-                <t t-if="doc.company_id.use_bduprint">
+                <t t-if="doc.operating_unit_id.use_bduprint">
                      <t t-call="bdu_account.report_saleorder_document1" t-lang="doc.partner_id.lang"/>
                 </t>
-                <t t-if="not doc.company_id.use_bduprint">
+                <t t-if="not doc.operating_unit_id.use_bduprint">
                     <t t-call="sale.report_saleorder_document" t-lang="doc.partner_id.lang"/>
                 </t>
             </t>

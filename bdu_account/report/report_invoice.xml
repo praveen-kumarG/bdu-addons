@@ -9,10 +9,19 @@
         <t t-set="o" t-value="doc"/>
     </t>
     <t t-if="o and 'company_id' in o">
-        <t t-set="company" t-value="o.company_id"></t>
+        <t t-set="company" t-value="o.company_id"/>
     </t>
     <t t-if="not o or not 'company_id' in o">
-        <t t-set="company" t-value="res_company"></t>
+        <t t-set="company" t-value="res_company"/>
+    </t>
+    <t t-if="o and o.magazine">
+        <t t-set="ou" t-value="ref('bdumedia.bdumedia_vakmedia')"/>
+    </t>
+    <t t-if="o and 'operating_unit_id' in o and not o.magazine">
+        <t t-set="ou" t-value="o.operating_unit_id"/>
+    </t>
+    <t t-if="not o or not 'operating_unit_id' in o and not o.magazine">
+        <t t-set="ou" t-value="operating_unit"/>
     </t>
 
     <t t-call="bdu_account.external_layout_bdu_header" />
@@ -24,8 +33,7 @@
         <div class="row">
             <div class="row backgroundimage" style="position:relative;font-size:3em;
                         width:100%;height:100%;z-index:1000;padding-left:5px;">
-
-                <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.report_background_image1"
+                <img t-if="ou.logo" t-att-src="'data:image/png;base64,%s' % ou.report_background_image1"
                         style="width:100%; display: block;" height="1215"/>
             </div>
         </div>
@@ -101,7 +109,7 @@
                      </div>
                  </t>
                  <br/><br/>
-                 <t t-if="not o.company_id.use_bduprint">
+                 <t t-if="not o.operating_unit_id.use_bduprint">
                      <div class="col-xs-7" style="padding:0px;">
                          <div class="col-xs-3" style="padding:0px;">
                              <strong>Advertiser</strong>
@@ -124,7 +132,7 @@
                 <t t-set="display_discount" t-value="any([l.so_line_id.discount or l.sale_line_ids.discount for l in o.refund_invoice_id.invoice_line_ids])"/>
             </t-->
 
-            <div t-if="not o.company_id.use_bduprint" class="row" style="padding-left:85px;padding-right:15px;">
+            <div t-if="not o.operating_unit_id.use_bduprint" class="row" style="padding-left:85px;padding-right:15px;">
                 <table class="table table-condensed table-padding">
                     <thead>
                         <tr>
@@ -220,7 +228,7 @@
                     </tbody>
                 </table>
             </div>
-            <div t-if="o.company_id.use_bduprint" class="row" style="padding-left:85px;padding-right:15px;">
+            <div t-if="o.operating_unit_id.use_bduprint" class="row" style="padding-left:85px;padding-right:15px;">
                 <table class="table table-condensed table-padding">
                     <thead>
                         <tr>
@@ -284,7 +292,7 @@
                         <tr class="border-black">
                             <td><strong>Total</strong></td>
                             <td class="text-right">
-                                 <span t-if="not o.company_id.use_bduprint and o.type == 'out_refund'">-</span><span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                 <span t-if="not o.operating_unit_id.use_bduprint and o.type == 'out_refund'">-</span><span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                             </td>
                         </tr>
                     </table>
@@ -319,7 +327,7 @@
             <p t-if="o.payment_term_id and o.type != 'out_refund'" class='text-center' style="padding-left:85px;padding-right:70px;padding-top:30px;">
                 <span t-field="o.payment_term_id.note"/>
             </p>
-            <t t-if="o.company_id.use_bduprint">
+            <t t-if="o.operating_unit_id.use_bduprint">
                 <p t-if="o.comment" class='text-center' style="font-size:8pt;padding-left:75px;padding-right:70px;padding-top:30px;">
                     <strong><span t-field="o.comment"/></strong>
                 </p>
@@ -490,11 +498,11 @@
     <t t-call="report.html_container">
         <t t-foreach="docs" t-as="o">
             <!--BDUPrint-->
-            <t t-if="o.company_id.use_bduprint">
+            <t t-if="o.operating_unit_id.use_bduprint">
                 <t t-call="bdu_account.report_invoice_document1" t-lang="o.partner_id.lang"/>
             </t>
             <!--BDUMedia-->
-            <t t-if="not o.company_id.use_bduprint">
+            <t t-if="not o.operating_unit_id.use_bduprint">
                 <t t-if="o.ad">
                     <t t-set="advertising" t-value="true" />
                 </t>
