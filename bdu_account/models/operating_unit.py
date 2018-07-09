@@ -19,7 +19,7 @@
 ##############################################################################
 
 import os
-from odoo import api, fields, models, _
+from odoo import api, fields, models, tools, _
 
 
 class OperatingUnit(models.Model):
