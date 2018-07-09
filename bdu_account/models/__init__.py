@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import res_company
+import operating_unit
 import sale
 import account_invoice
 import res_partner
