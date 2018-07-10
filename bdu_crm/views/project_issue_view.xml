@@ -167,5 +167,53 @@
         <menuitem action="action_project_solution" id="menu_project_solution" parent="project.menu_project_config" sequence="14" groups="project.group_project_manager"/>
 
 
+        <record id="issue_priority_rule_form_view" model="ir.ui.view">
+            <field name="name">issue.priority.rule.form.view</field>
+            <field name="model">issue.priority.rule</field>
+            <field name="arch" type="xml">
+                <form string="Priority Rule">
+                    <group>
+                        <field name="days" required="1"/>
+                    </group>
+                    <div>
+                        <field name="rule_line_ids">
+                            <tree editable="bottom">
+                                <field name="operators" required="1"/>
+                                <field name="no_of_issues" required="1" type="char"/>
+                                <field name="priority" required="1"/>
+                            </tree>
+                        </field>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="issue_priority_rule_tree_view" model="ir.ui.view">
+            <field name="name">issue.priority.rule.tree</field>
+            <field name="model">issue.priority.rule</field>
+            <field name="arch" type="xml">
+                <tree string="Priority Rule">
+                    <field name="days" type="char"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_issue_priority_rule" model="ir.actions.act_window">
+            <field name="name">Issue Priority Rule</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">issue.priority.rule</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create Issue Priority Rule.
+                </p>
+            </field>
+        </record>
+
+        <menuitem action="action_issue_priority_rule" id="menu_issue_priority_rule" parent="project.menu_project_config" sequence="17" groups="project.group_project_manager"/>
+
+
     </data>
 </odoo>
