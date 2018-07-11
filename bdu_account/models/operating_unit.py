@@ -18,18 +18,22 @@
 #
 ##############################################################################
 
-from odoo import api, fields, models, _
+import os
+from odoo import api, fields, models, tools, _
 
 
-class Company(models.Model):
-    _inherit = 'res.company'
+class OperatingUnit(models.Model):
+    _inherit = 'operating.unit'
 
+
+    def _get_logo(self):
+        return open(os.path.join(tools.config['root_path'], 'addons', 'base', 'res', 'res_company_logo.png'), 'rb') .read().encode('base64')
+
+    logo = fields.Binary(related='partner_id.image', default=_get_logo)
     report_background_image1 = fields.Binary('Background Image for Report Frontpage',
             help='Set Background Image for Report Frontpage')
-
     report_background_image2 = fields.Binary('Background Image for Report Following Pages',
             help='Set Background Image for Report Following Pages')
-
     use_bduprint = fields.Boolean('Use BDUprint Layout?', help="Set 'True' to print the Invoice as per BDUprint layout.")
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

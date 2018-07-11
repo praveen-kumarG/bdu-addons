@@ -41,6 +41,8 @@ This module adds customization as per BDU Media
     'depends' : ['account', 'sale_advertising_order', 'account_bank_statement_import_camt',
                  'partner_contact_gender','purchase', 'account_invoice_refund_link',
                  'partner_sector','base_partner_sequence','account_credit_control',
+                 'account_analytic_required', 'account_type_inactive', 'account_type_menu',
+                 'account_type_multi_company'
     ],
     'data' : [
 
@@ -54,10 +56,9 @@ This module adds customization as per BDU Media
          "report/report_credit_control_summary.xml",
          "report/report.xml",
          "views/account_invoice_view.xml",
-         "views/res_company_view.xml",
+         "views/operating_unit_view.xml",
          "views/res_partner_view.xml",
          "views/product_view.xml",
-         "views/sale_advertising_view.xml",
          "wizard/account_invoice_state_view.xml",
     ],
     'demo' : [],
