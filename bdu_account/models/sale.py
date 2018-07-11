@@ -7,9 +7,6 @@ from itertools import groupby
 class Sale(models.Model):
     _inherit = ["sale.order"]
 
-
-    display_discount_to_customer = fields.Boolean("Display discount to customer", default=False)
-
     @api.multi
     def print_quotation(self):
 
