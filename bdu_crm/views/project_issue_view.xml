@@ -111,12 +111,12 @@
                         <group>
                             <group>
                                 <label for="partner_name" string="Address"/>
-                                <div>
-                                    <field name="partner_name" placeholder="Contact name"/>
-                                    <field name="street_number" placeholder="Street number"/>
-                                    <field name="street_name" placeholder="Street name"/>
-                                    <field name="city" placeholder="City" />
-                                    <field name="zip" placeholder="ZIP" />
+                                <div class="o_address_format">
+                                    <field name="partner_name" placeholder="Contact name" class="o_address_street"/>
+                                    <field name="street_number" placeholder="Street number" class="o_address_street"/>
+                                    <field name="street_name" placeholder="Street name" class="o_address_street"/>
+                                    <field name="city" placeholder="City" class="o_address_street"/>
+                                    <field name="zip" placeholder="ZIP" class="o_address_street"/>
                                 </div>
                             </group>
                             <group>
