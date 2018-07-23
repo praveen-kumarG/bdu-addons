@@ -13,3 +13,15 @@
 "access_task_type_group_user","task_type group_user","model_task_type","base.group_user",1,0,0,0
 "partner_sector.access_res_partner_sector_group_partner_manager","partner_sector group_partner_manager","partner_sector.model_res_partner_sector","base.group_partner_manager",1,0,0,0
 "partner_sector.access_res_partner_sector_group_partner_manager","partner_sector group_partner_manager","partner_sector.model_res_partner_sector","bdu_crm.group_partner_sector_manager",1,1,1,1
+"access_project_solution_public","project_solution group_public","model_project_solution","base.group_public",1,0,0,0
+"access_project_solution_portal","project_solution group_portal","model_project_solution","base.group_portal",1,0,0,0
+"access_project_solution_group_partner_manager","project_solution group_partner_manager","model_project_solution","base.group_partner_manager",1,1,1,1
+"access_project_solution_group_user","project_solution group_user","model_project_solution","base.group_user",1,0,0,0
+"access_issue_priority_rule_public","issue_priority_rule group_public","model_issue_priority_rule","base.group_public",1,0,0,0
+"access_issue_priority_rule_portal","issue_priority_rule group_portal","model_issue_priority_rule","base.group_portal",1,0,0,0
+"access_issue_priority_rule_group_partner_manager","issue_priority_rule group_partner_manager","model_issue_priority_rule","base.group_partner_manager",1,1,1,1
+"access_issue_priority_rule_group_user","issue_priority_rule group_user","model_issue_priority_rule","base.group_user",1,0,0,0
+"access_issue_priority_rule_line_public","issue_priority_rule_line group_public","model_issue_priority_rule_line","base.group_public",1,0,0,0
+"access_issue_priority_rule_line_portal","issue_priority_rule_line group_portal","model_issue_priority_rule_line","base.group_portal",1,0,0,0
+"access_issue_priority_rule_line_group_partner_manager","issue_priority_rule_line group_partner_manager","model_issue_priority_rule_line","base.group_partner_manager",1,1,1,1
+"access_issue_priority_rule_line_group_user","issue_priority_rule_line group_user","model_issue_priority_rule_line","base.group_user",1,0,0,0

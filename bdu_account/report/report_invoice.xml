@@ -186,11 +186,11 @@
                             <t t-if="o.type == 'out_refund'">
                                 <td><span t-esc="l.opportunity_subject"/></td>
                             </t>
-                            <t t-if="o.type != 'out_refund'">
+                            <t t-if="not o.magazine">
                                 <td><span t-field="l.ad_number"/></td>
                             </t>
-                            <t t-if="o.type == 'out_refund'">
-                                <td><span t-esc="l.ad_number"/></td>
+                            <t t-if="o.magazine">
+                                <td><span t-esc="sale_order_line.order_id.customer_contact.name"/> <span t-esc="l.ad_number"/></td>
                             </t>
                             <td><span t-if="l.product_id" t-field="l.product_id.name"/></td>
                             <td class="text-right">

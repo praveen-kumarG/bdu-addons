@@ -7,6 +7,7 @@
             <field name="arch" type="xml">
                 <tree string="Source">
                     <field name="name"/>
+                    <field name="project_ids" widget="many2many_tags" groups="base.group_no_one"/>
                 </tree>
             </field>
         </record>
@@ -19,6 +20,7 @@
                     <sheet>
                         <group>
                             <field name="name" required="1"/>
+                            <field name="project_ids" widget="many2many_tags" groups="base.group_no_one"/>
                         </group>
                     </sheet>
                 </form>
@@ -60,6 +62,7 @@
                     <sheet>
                         <group>
                             <field name="name" required="1"/>
+                            <field name="project_ids" widget="many2many_tags" groups="base.group_no_one"/>
                         </group>
                     </sheet>
                 </form>
@@ -89,8 +92,8 @@
             <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
             <field name="arch" type="xml">
                 <field name="tag_ids" position="after">
-                    <field name="source" widget="selection"/>
-                    <field name="issue_type" widget="selection"/>
+                    <field name="source" />
+                    <field name="issue_type" />
                     <field name="title_id" domain="[('parent_id', '=', False)]" />
                     <field name="title_name" readonly="1"/>
                 </field>
@@ -108,12 +111,12 @@
                         <group>
                             <group>
                                 <label for="partner_name" string="Address"/>
-                                <div>
-                                    <field name="partner_name" placeholder="Contact name"/>
-                                    <field name="street_number" placeholder="Street number"/>
-                                    <field name="street_name" placeholder="Street name"/>
-                                    <field name="city" placeholder="City" />
-                                    <field name="zip" placeholder="ZIP" />
+                                <div class="o_address_format">
+                                    <field name="partner_name" placeholder="Contact name" class="o_address_street"/>
+                                    <field name="street_number" placeholder="Street number" class="o_address_street"/>
+                                    <field name="street_name" placeholder="Street name" class="o_address_street"/>
+                                    <field name="city" placeholder="City" class="o_address_street"/>
+                                    <field name="zip" placeholder="ZIP" class="o_address_street"/>
                                 </div>
                             </group>
                             <group>
@@ -131,10 +134,86 @@
                 <form string="Project Solution">
                     <group>
                         <field name="name" required="1"/>
+                        <field name="project_ids" widget="many2many_tags" groups="base.group_no_one"/>
                     </group>
                 </form>
             </field>
         </record>
+
+        <record id="project_solution_tree_view" model="ir.ui.view">
+            <field name="name">project.solution.tree</field>
+            <field name="model">project.solution</field>
+            <field name="arch" type="xml">
+                <tree string="Solution">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_project_solution" model="ir.actions.act_window">
+            <field name="name">Solution</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">project.solution</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create Project Solution.
+                </p>
+            </field>
+        </record>
+
+        <menuitem action="action_project_solution" id="menu_project_solution" parent="project.menu_project_config" sequence="14" groups="project.group_project_manager"/>
+
+
+        <record id="issue_priority_rule_form_view" model="ir.ui.view">
+            <field name="name">issue.priority.rule.form.view</field>
+            <field name="model">issue.priority.rule</field>
+            <field name="arch" type="xml">
+                <form string="Priority Rule">
+                    <group>
+                        <field name="days" required="1"/>
+                    </group>
+                    <div>
+                        <field name="rule_line_ids">
+                            <tree editable="bottom">
+                                <field name="operators" required="1"/>
+                                <field name="no_of_issues" required="1" type="char"/>
+                                <field name="priority" required="1"/>
+                            </tree>
+                        </field>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="issue_priority_rule_tree_view" model="ir.ui.view">
+            <field name="name">issue.priority.rule.tree</field>
+            <field name="model">issue.priority.rule</field>
+            <field name="arch" type="xml">
+                <tree string="Priority Rule">
+                    <field name="days" type="char"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_issue_priority_rule" model="ir.actions.act_window">
+            <field name="name">Issue Priority Rule</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">issue.priority.rule</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create Issue Priority Rule.
+                </p>
+            </field>
+        </record>
+
+        <menuitem action="action_issue_priority_rule" id="menu_issue_priority_rule" parent="project.menu_project_config" sequence="17" groups="project.group_project_manager"/>
+
 
     </data>
 </odoo>

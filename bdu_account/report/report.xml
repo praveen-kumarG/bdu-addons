@@ -42,7 +42,14 @@
         file="sale.report_saleorder"
         name="sale.report_saleorder"
         paperformat="bdu_account.paperformat_bdu_layout"
+        attachment="((object.state not in ('sale','done')) and ('Quotation '+object.name.replace('SO',''))+'.pdf') or ((object.state in ('sale','done')) and ('Sale Order '+object.name.replace('SO',''))+'.pdf')"
+        attachment_use = "True"
     />
+
+    <record model="ir.actions.report.xml" id="sale.report_sale_order">
+        <field name="print_report_name">((object.state not in ('sale','done')) and ('Quotation '+object.name.replace('SO',''))+'.pdf') or ((object.state in ('sale','done')) and ('Sale Order '+object.name.replace('SO',''))+'.pdf')</field>
+    </record>
+
     <report
         string="Purchase Order"
         id="purchase.action_report_purchase_order"
