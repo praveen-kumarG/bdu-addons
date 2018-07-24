@@ -9,7 +9,7 @@
             <!--field name="partner_id">1</field-->
         </record>
         <record id="bdumedia_media" model="operating.unit">
-            <field name="name">BDUmedia</field>
+            <field name="name">BDUmedianogeenkeeragag</field>
             <field name="code">BDUmediaagag</field>
             <field name="active">True</field>
             <field name="partner_id">1</field>
