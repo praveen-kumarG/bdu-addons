@@ -14,14 +14,19 @@
     <t t-if="not o or not 'company_id' in o">
         <t t-set="company" t-value="res_company"/>
     </t>
-    <t t-if="o and o.magazine">
-        <t t-set="ou" t-value="o.env.ref('bdumedia.bdumedia_vakmedia')"/>
+    <t t-if="o._name in ('sale.order', 'account.invoice')">
+        <t t-if="o and o.magazine">
+            <t t-set="ou" t-value="o.env.ref('bdu_account.bdumedia_vakmedia')"/>
+        </t>
+        <t t-if="o and 'operating_unit_id' in o and not o.magazine">
+            <t t-set="ou" t-value="o.operating_unit_id"/>
+        </t>
+        <t t-if="not o or not 'operating_unit_id' in o and not o.magazine">
+            <t t-set="ou" t-value="operating_unit"/>
+        </t>
     </t>
-    <t t-if="o and 'operating_unit_id' in o and not o.magazine">
-        <t t-set="ou" t-value="o.operating_unit_id"/>
-    </t>
-    <t t-if="not o or not 'operating_unit_id' in o and not o.magazine">
-        <t t-set="ou" t-value="operating_unit"/>
+    <t t-if="o._name not in ('sale.order', 'account.invoice')">
+        <t t-set="ou" t-value="o.env.ref('bdu_account.bdumedia_vakmedia')"/>
     </t>
 
     <t t-call="bdu_account.external_layout_bdu_header" />
