@@ -3,10 +3,16 @@
     <data noupdate="1">
 
         <record id="bdumedia_vakmedia" model="operating.unit">
-            <field name="name">VAKMedia</field>
-            <field name="code">VAKM</field>
+            <field name="name">BDU Vakmedia</field>
+            <field name="code">BDU-Vakmedia</field>
             <field name="active">True</field>
-            <field name="partner_id">1</field>
+            <!--field name="partner_id">1</field-->
+        </record>
+        <record id="bdumedia_media" model="operating.unit">
+            <field name="name">BDUmedia</field>
+            <field name="code">BDUmedia</field>
+            <field name="active">True</field>
+            <!--field name="partner_id">1</field-->
         </record>
 
     </data>
