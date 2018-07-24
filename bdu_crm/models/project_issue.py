@@ -82,8 +82,8 @@ class ProjectIssue(models.Model):
             adv_issue = self.env['sale.advertising.issue']
             if adv_issue.search([('parent_id','=',self.title_id.id), ('issue_date','=',self.edition_date)]):
                 self.edition_id = adv_issue.search([('parent_id','=',self.title_id.id), ('issue_date','=',self.edition_date)], limit=1).id
-            elif adv_issue.search([('parent_id','=',self.title_id.id), ('issue_date','!=',False)]):
-                self.edition_id = adv_issue.search([('parent_id','=',self.title_id.id), ('issue_date','!=',False)], order='issue_date desc', limit=1).id
+            elif adv_issue.search([('parent_id','=',self.title_id.id), ('issue_date','<',self.edition_date)]):
+                self.edition_id = adv_issue.search([('parent_id','=',self.title_id.id), ('issue_date','<',self.edition_date)], order='issue_date desc', limit=1).id
             else:
                 self.edition_id = False
         else:
