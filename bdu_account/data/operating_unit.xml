@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="bdumedia_vakmedia" model="operating.unit">
+            <field name="name">BDU Vakmedia</field>
+            <field name="code">BDU-Vakmedia</field>
+            <field name="active">True</field>
+            <!--field name="partner_id">1</field-->
+        </record>
+        <record id="bdumedia_media" model="operating.unit">
+            <field name="name">BDUmedianogeenkeeragag</field>
+            <field name="code">BDUmediaagag</field>
+            <field name="active">True</field>
+            <field name="partner_id">1</field>
+        </record>
+
+    </data>
+</odoo>
