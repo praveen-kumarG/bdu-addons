@@ -59,7 +59,6 @@ This module adds customization as per BDU Media
             "views/operating_unit_view.xml",
             "views/res_partner_view.xml",
             "views/product_view.xml",
-            "views/sale_advertising_view.xml",
             "wizard/account_invoice_state_view.xml",
     ],
     'demo' : [],
