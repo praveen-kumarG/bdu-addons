@@ -130,7 +130,7 @@ class SaleOrder(models.Model):
     @api.multi
     def transfer_order_to_pubble(self, arg):
         self.ensure_one()
-        if not self.order_pubble_allow:
+        if not self.order_pubble_allow and not self.pubble_sent:
             vals = {
                 'sale_order_id': self.id,
                 'salesorder_extorderid': self.name,
