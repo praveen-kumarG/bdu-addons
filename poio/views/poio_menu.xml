@@ -1,0 +1,12 @@
+<?xml version="1.0"?> 
+<odoo>
+ 
+
+  <!-- POIO  menu--> 
+  <menuitem id="poio_config_menu" 
+    name="Promille interface" 
+    sequence="210"
+    parent="sales_team.menu_sale_config" 
+     /> 
+
+</odoo>
