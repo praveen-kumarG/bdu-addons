@@ -15,10 +15,9 @@
     "license": "AGPL-3",
     "category": "Marketing",
     'description': """
-    =============================================================================
-    This module Extend mail_mass_mailing_contact fields and improves performance
-    of syncing in mass_mailing_list_dynamic
-    """,
+This module Extend mail_mass_mailing_contact fields
+and improves performance of syncing in mass_mailing_list_dynamic
+""",
     "depends": [
         'mass_mailing_partner',
         'mass_mailing_list_dynamic'
