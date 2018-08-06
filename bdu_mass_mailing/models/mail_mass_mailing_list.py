@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from odoo import api, fields, models, _
-from odoo.tools import safe_eval
+from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import UserError
 
 class MassMailingList(models.Model):
@@ -8,37 +8,49 @@ class MassMailingList(models.Model):
 
     def action_sync(self):
         """Sync contacts in dynamic lists."""
-        Contact = self.env["mail.mass_mailing.contact"].with_context(
-            syncing=True,
-        )
-        Partner = self.env["res.partner"]
         # Skip non-dynamic lists
+#        import pdb;
+#        pdb.set_trace()
         dynamic = self.filtered("dynamic")
         for one in dynamic:
-            sync_domain = safe_eval(one.sync_domain) + [("email", "!=", False)]
-            desired_partners = Partner.search(sync_domain)
-            if one.sync_method == "full":
-                Contact.search([
-                    ("list_id", "=", one.id),
-                    ("partner_id", "not in", desired_partners.ids),
-                ]).unlink()
-            current_contacts = Contact.search([("list_id", "=", one.id)])
-            current_partners = current_contacts.mapped("partner_id")
-            # Add new contacts
-            currentdt = fields.Datetime.to_string(fields.datetime.now())
-            values = []
-            for partner in desired_partners - current_partners:
-                email = partner.email.encode("utf-8").replace("'", "-").replace('"', '-')
-                name = partner.name.encode("utf-8").replace("'", "-").replace('"', '-')
-                values.append((str(email), partner.id, str(name), one.id, False, self._uid, str(currentdt), self._uid, str(currentdt)))
-            if values:
-                query_prefix = "INSERT INTO mail_mass_mailing_contact (email, partner_id, name, list_id, opt_out, create_uid, create_date, write_uid, write_date) VALUES "
-                query = query_prefix + str(values)[1:-1]
-                try:
-                    self.env.cr.execute(query)
-                except:
-                    raise UserError(_("Please check the selected partners."))
+            sync_domain = safe_eval(one.sync_domain) + [("email", "!=", False),'|',
+                                                        ('company_id','=', False),('company_id','child_of', self.env.user.company_id.id)]
 
+            # Remove undesired contacts when synchronization is full
+            if one.sync_method == "full":
+                del_query = ('''DELETE FROM mail_mass_mailing_contact
+                            WHERE list_id = %s ''')
+                self.env.cr.execute(del_query, [one.id])
+            if sync_domain:
+                query = self.env['res.partner']._where_calc(sync_domain)
+                tables, where_clause, where_clause_params = query.get_sql()
+                sync_query = ('''INSERT INTO mail_mass_mailing_contact
+                                (email, partner_id, user_id, sector_id, name, list_id, opt_out, create_uid, create_date, write_uid, write_date)
+                                SELECT email as email,
+                                       id as partner_id,
+                                       user_id as user_id,
+                                       sector_id as sector_id,
+                                       name as name,
+                                       {0} as list_id,
+                                       {1} as opt_out,
+                                       {2} as create_uid,
+                                       {3} as create_date,
+                                       {2} as write_uid,
+                                       {3} as write_date
+                                FROM {4}
+                                WHERE {5}
+                                AND id not in 
+                                (SELECT partner_id
+                                FROM mail_mass_mailing_contact
+                                WHERE list_id = {0});      
+                                '''.format(
+                                one.id,
+                                False,
+                                self._uid,
+                                "'%s'" % str(fields.Datetime.to_string(fields.datetime.now())),
+                                tables,
+                                where_clause))
+                self.env.cr.execute(sync_query, where_clause_params)
             one.is_synced = True
         # Invalidate cached contact count
         self.invalidate_cache(["contact_nbr"], dynamic.ids)
