@@ -75,16 +75,7 @@ class ProjectIssue(models.Model):
 
     @api.onchange('title_id', 'edition_date')
     def onchange_title_id(self):
-        if self.title_id and self.edition_date:
-            adv_issue = self.env['sale.advertising.issue']
-            if adv_issue.search([('parent_id','=',self.title_id.id), ('issue_date','=',self.edition_date)]):
-                self.edition_id = adv_issue.search([('parent_id','=',self.title_id.id), ('issue_date','=',self.edition_date)], limit=1).id
-            elif adv_issue.search([('parent_id','=',self.title_id.id), ('issue_date','!=',False)]):
-                self.edition_id = adv_issue.search([('parent_id','=',self.title_id.id), ('issue_date','!=',False)], order='issue_date desc', limit=1).id
-            else:
-                self.edition_id = False
-        else:
-            self.edition_id = False
+        self.edition_id = False
 
 class ProjectSolution(models.Model):
     _name = 'project.solution'
