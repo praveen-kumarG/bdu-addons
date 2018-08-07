@@ -13,7 +13,7 @@ class MailMassMailingContact(models.Model):
 
     user_id = fields.Many2one(related='partner_id.user_id', comodel_name='res.users',string="Client Owner", store=True)
     category_id = fields.Many2many(related='partner_id.category_id', relation='res.partner.category', string="Customer Labels", store=False)
-    contact_id = fields.Many2one(compute='_compute_contact', comodel_name='res.partner',string="Contact Person", store=True)
+    contact_id = fields.Many2one(compute='_compute_contact', comodel_name='res.partner',string="Contact Person", store=False)
     sector_id = fields.Many2one(related='partner_id.sector_id', comodel_name='res.partner.sector',string="Main Sector", store=True)
 
     @api.depends('partner_id')
