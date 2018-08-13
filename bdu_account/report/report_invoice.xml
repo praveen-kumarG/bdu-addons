@@ -142,7 +142,7 @@
                     <thead>
                         <tr>
                             <th width="10%">Date</th>
-                            <th width="10%">Advertising Issue</th>
+                            <th width="10%">Edition</th>
                             <th width="20%">Description/ short content</th>
                             <th width="10%">Reference</th>
                             <th width="10%">Product</th>
@@ -168,7 +168,7 @@
                                                                                        <span t-field="sale_order_line.to_date"/></td>
                                 </t>
                                 <td t-if="sale_order_line.date_type == 'issue_date'"><span t-field="sale_order_line.issue_date"/></td>
-                                <td><span t-field="sale_order_line.adv_issue.default_note"/></td>
+                                <td><span t-field="l.edition_id.default_note"/></td>
                             </t>
                             <t t-if="o.type == 'out_refund'">
                                 <td t-if="sale_order_line.date_type not in ['validity','issue_date']"><span t-field="o.refund_invoice_id.date_invoice"/></td>
@@ -183,7 +183,7 @@
                                 <t t-if="sale_order_line.date_type == 'issue_date'">
                                         <td><span t-esc="sale_order_line.issue_date" t-options='{"widget": "date"}'/></td>
                                 </t>
-                                <td><span t-field="sale_order_line.adv_issue.default_note"/></td>
+                                <td><span t-field="l.edition_id.default_note"/></td>
                             </t>
                             <t t-if="o.type != 'out_refund'">
                                 <td><span t-field="l.opportunity_subject"/></td>
