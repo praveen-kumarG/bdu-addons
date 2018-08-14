@@ -12,6 +12,10 @@
                         <field name="free_text" />
                     </page>
                 </xpath>
+                <xpath expr="//sheet/notebook/page/field[@name='invoice_line_ids']/tree/field[@name='sale_order_id']" position="after">
+                    <field name="title_id" domain="[('parent_id', '=', False)]" />
+                    <field name="edition_id" domain="[('parent_id', '=', title_id)]"/>
+                </xpath>
             </field>
         </record>
 
