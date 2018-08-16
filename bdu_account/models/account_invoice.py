@@ -66,8 +66,6 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = ["account.invoice.line"]
 
-    title_id = fields.Many2one('sale.advertising.issue', string='Title')
-    edition_id = fields.Many2one('sale.advertising.issue', string='Edition')
 
     @api.model
     def create(self, vals):
