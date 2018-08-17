@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 <data>
-    
+
 <template id="external_layout_bdu">
     <!-- Multicompany -->
     <t t-if="not o and doc">
@@ -72,6 +72,7 @@
                          <span><strong>Invoice Number</strong></span>
                          <br/>
                          <span><strong>Customer Code</strong></span>
+                         <span t-if="o.type == 'out_invoice' and o.payment_mode_id.name == 'IDEAL'"><strong>Payment Ref.</strong></span>
                      </div>
                      <div class="col-xs-1" style="padding:0px;">
                          <span><strong>:</strong></span>
@@ -79,6 +80,8 @@
                          <span><strong>:</strong></span>
                          <br/>
                          <span><strong>:</strong></span>
+                         <br/>
+                         <span t-if="o.type == 'out_invoice' and o.payment_mode_id.name == 'IDEAL'"><strong>:</strong></span>
                      </div>
                      <div class="col-xs-8" style="padding:0px;">
                          <span t-field="o.date_invoice"/>
@@ -86,6 +89,9 @@
                          <span t-field="o.number"/>
                          <br/>
                          <span t-field="o.partner_id.ref"/>
+                         <br/>
+                         <span t-if="o.type == 'out_invoice' and o.payment_mode_id.name == 'IDEAL'" t-field="o.name"></span>
+                         <br/>
                      </div>
                  </div>
 
