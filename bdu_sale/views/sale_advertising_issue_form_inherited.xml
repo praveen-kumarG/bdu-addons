@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="sale_advertising_issue_form_inherited">
+            <field name="name">sale.advertisig.issue.form.inherited</field>
+            <field name="model">sale.advertising.issue</field>
+            <field name="inherit_id" ref="sale_advertising_order.sale_advertising_issue_form" />
+            <field name="priority" eval="25"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='name']" position='after'>
+                    <field name="group_id" string="Filter group"/>
+                </xpath>        
+
+            </field>                               
+        </record>
+    </data>
+</openerp>       
+ 
