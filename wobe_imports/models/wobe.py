@@ -832,7 +832,7 @@ class Job(models.Model):
         product_obj = self.env['product.product']
         lines = []
         print_category3, print_category4 = 'plates_regioman', 'ink_regioman'
-        PlateQty, InkQty = job.plate_amount, sum(bookObj.calculated_ink for bookObj in job.booklet_ids)
+        PlateQty, InkQty = job.plate_amount, sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000 / 4
 
         pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
         pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
@@ -1143,8 +1143,9 @@ class Job(models.Model):
         paperAmount = paperAmount
 
         # Paper Unit Amount : (in Kg)
-        totBookletMass = round(sum(bookObj.calculated_mass for bookObj in job.booklet_ids),4)
-        paperUnitAmt =  totBookletMass/ 1000
+        # totBookletMass = round(sum(bookObj.calculated_mass for bookObj in job.booklet_ids),4)
+        # paperUnitAmt =  totBookletMass/ 1000
+        paperUnitAmt  = sum(bookObj.calculated_mass for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
 
         totBookletHours = round(sum(bookObj.calculated_hours for bookObj in job.booklet_ids), 4)
         hoursAmount = totBookletHours * 1200
@@ -1179,7 +1180,8 @@ class Job(models.Model):
 
         # Ink Unit Amount : (in Kg)
         totBookletInk = round(sum(bookObj.calculated_ink for bookObj in job.booklet_ids),4)
-        InkUnitAmt = totBookletInk/1000
+        # InkUnitAmt = totBookletInk/1000
+        InkUnitAmt = sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
         # Ink :
         for p in Ink_prods:
             InkAmount = totBookletInk * p.standard_price
