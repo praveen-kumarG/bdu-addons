@@ -1163,7 +1163,7 @@ class Job(models.Model):
             self.message_post(body=body)
             return []
 
-        Ink_prods = product_obj.search([('print_category', '=', print_category4)], limit=1, order='id')
+        Ink_prods = product_obj.search([('print_category', '=', print_category4)])
         if not Ink_prods:
             self.write({'state': 'exception'})
             body = _("Unable to create Picking; Product not found for the print-category : '%s'" % (
@@ -1179,12 +1179,15 @@ class Job(models.Model):
             lines.append({'name': 'Pre-calculation : Plates', 'amount': platesAmount, 'unit_amount':plateUnitAmt, 'product_uom_id':uomUnits})
 
         # Ink Unit Amount : (in Kg)
-        totBookletInk = round(sum(bookObj.calculated_ink for bookObj in job.booklet_ids),4)
+        # totBookletInk = round(sum(bookObj.calculated_ink for bookObj in job.booklet_ids),4)
         # InkUnitAmt = totBookletInk/1000
         InkUnitAmt = sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
+        totBookletInk = InkUnitAmt/4
         # Ink :
+        InkAmount = 0.0
         for p in Ink_prods:
-            InkAmount = totBookletInk * p.standard_price
+            InkAmount += totBookletInk * p.standard_price
+        if Ink_prods:
             lines.append({'name': 'Pre-calculation : Ink', 'amount': InkAmount, 'unit_amount':InkUnitAmt, 'product_uom_id':uomKG})
         return lines
 
