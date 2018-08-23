@@ -1102,7 +1102,7 @@ class Job(models.Model):
 
             if mass not in ratioSum:
                 ratioSum[mass] = {'number_mass': number}
-            if width not in ratioSum:
+            if width not in ratioSum[mass]:
                 ratioSum[mass][width] = {'number_width': number}
             else:
                 ratioSum[mass]['number_mass'] += number
@@ -1137,7 +1137,7 @@ class Job(models.Model):
             WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
             WasteQty = (WasteMass * num_width / num_mass)
 
-            paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price
+            paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price / int(roll.number_rolls) if int(roll.number_rolls) else 1
 
         #get paper amount conversion
         paperAmount = paperAmount
