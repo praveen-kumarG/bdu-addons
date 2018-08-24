@@ -1094,18 +1094,29 @@ class Job(models.Model):
                 if av.attribute_id.id == pWidth.id: w = float(av.name)
             return m, w
 
+        # old Ratio-Width per PaperType
+        # ratioSum = {}
+        # for roll in job.paper_product_ids:
+        #     mass, width = _get_MassWidth(roll.product_id)
+        #     number = int(roll.number_rolls)
+        #
+        #     if mass not in ratioSum:
+        #         ratioSum[mass] = {'number_mass': number}
+        #     if width not in ratioSum[mass]:
+        #         ratioSum[mass][width] = {'number_width': number}
+        #     else:
+        #         ratioSum[mass]['number_mass'] += number
+
+
         # Ratio-Width per PaperType
         ratioSum = {}
         for roll in job.paper_product_ids:
             mass, width = _get_MassWidth(roll.product_id)
             number = int(roll.number_rolls)
-
             if mass not in ratioSum:
-                ratioSum[mass] = {'number_mass': number}
-            if width not in ratioSum[mass]:
-                ratioSum[mass][width] = {'number_width': number}
+                ratioSum[mass] = {'width_mass_total': width * number}
             else:
-                ratioSum[mass]['number_mass'] += number
+                ratioSum[mass]['width_mass_total'] += width * number
 
 
         # Total Mass per PaperMass
@@ -1123,21 +1134,26 @@ class Job(models.Model):
         # Paper Rolls
 
         for roll in job.paper_product_ids:
+            # mass, width = _get_MassWidth(roll.product_id)
+            # num_mass = ratioSum[mass]['number_mass'] if mass else mass
+            # num_width = ratioSum[mass][width]['number_width'] if width else width
+
             mass, width = _get_MassWidth(roll.product_id)
-            num_mass = ratioSum[mass]['number_mass'] if mass else mass
-            num_width = ratioSum[mass][width]['number_width'] if width else width
+            num_mass = ratioSum[mass]['width_mass_total']
+            num_width = width * int(roll.number_rolls)
 
             # Net Production: (in Kg)
             NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
             num_mass = num_mass if num_mass > 0 else 1
-            NetQty = (NetMass * num_width / num_mass)
-
+            # NetQty = (NetMass * num_width / num_mass)
+            NetQty = (NetMass/ num_mass * num_width)
 
             # Waste Production: (in Kg)
             WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
-            WasteQty = (WasteMass * num_width / num_mass)
+            # WasteQty = (WasteMass * num_width / num_mass)
+            WasteQty = (WasteMass / num_mass * num_width)
 
-            paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price / int(roll.number_rolls) if int(roll.number_rolls) else 1
+            paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price
 
         #get paper amount conversion
         paperAmount = paperAmount
