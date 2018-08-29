@@ -60,7 +60,7 @@
           <field name="page_nr"/>
           <field name="page_type"/>
 
-          <filter string="Spreads" domain="[('is_spread','=', True)]"  help="Sales Order Lines ready to be invoiced"/>
+          <filter string="Spreads" domain="[('is_spread','=', True)]"  />
           <separator/>
 
           <group expand="0" string="Group By">

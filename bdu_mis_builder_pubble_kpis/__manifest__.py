@@ -26,8 +26,7 @@
     'data': [
         # 'security/ir.model.access.csv',
         'views/pubble_config.xml',
-        'views/pubble_kpis.xml'
-        #'views/templates.xml',
+        'views/pubble_kpis.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
