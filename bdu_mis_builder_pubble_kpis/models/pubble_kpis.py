@@ -22,7 +22,6 @@ class mis_pubble_kpi(models.Model):
 	company_id            = fields.Many2one('res.company',              string='Company')
 	analytic_account_id   = fields.Many2one('account.analytic.account', string='Analytic account')
 
-	#"""todo:
 	@api.model
 	def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True) :
 		if 'page_nr' in fields :

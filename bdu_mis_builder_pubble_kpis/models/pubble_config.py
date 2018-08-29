@@ -118,7 +118,6 @@ class PubbleConfig(models.Model):
             #flatten json and write every page to new or existing records
             for title_summary in json_anwser :
                 d['title']      = title_summary['titel']
-                _logger.debug("title : " + d['title'])
 
                 #keep track of latest updated issue
                 issue_date = self.ms_datetime_to_python_date(title_summary['datum'])
@@ -144,7 +143,6 @@ class PubbleConfig(models.Model):
 
                 for page in pages :
                     d['page_nr']      = int(page['paginaNummer'])
-                    _logger.debug("page : "+str(d['page_nr']))
 
                     d['page_type']=page.get('paginaType', 'n.a.') 
                     if d['page_type'] is None :

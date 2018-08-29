@@ -74,6 +74,11 @@ msgstr "Handmatig ophalen"
 
 #. module: bdu_mis_builder_pubble_kpis
 #: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Please provide begin and end date"
+msgstr "Voer begin- en einddatum in voor het ophalen van gegevens"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
 msgid "Enter dates and press \"Collect\" to collect records for given period."
 msgstr "Voer begin- en einddatum in en druk op \"Ophalen\" voor ophalen van betreffende periode."
 
