@@ -115,10 +115,10 @@
                                         <field name="gross_quantity"/>
                                         <field name="alternating_pages"/>
                                         <field name="waste_total" invisible="True"/>
-                                        <field name="production_start" attrs="{'required':[('kbajob_ref','=',False)]}"/>
-                                        <field name="production_stop" attrs="{'required':[('kbajob_ref','=',False)]}"/>
+                                        <field name="production_start" />
+                                        <field name="production_stop" />
                                         <field name="planned_quantity" />
-                                        <field name="kbajob_ref" invisible="0"/>
+                                        <!--<field name="kbajob_ref" invisible="0"/>-->
                                     </tree>
                                     <form>
                                         <group colspan="4">
@@ -128,14 +128,14 @@
                                             <field name="gross_quantity"/>
                                             <field name="alternating_pages"/>
                                             <field name="waste_total" invisible="True"/>
-                                            <field name="production_start" attrs="{'required':[('kbajob_ref','=',False)]}"/>
-                                            <field name="production_stop" attrs="{'required':[('kbajob_ref','=',False)]}"/>
+                                            <field name="production_start" />
+                                            <field name="production_stop" />
                                             <field name="planned_quantity" />
-                                            <field name="kbajob_ref" invisible="0"/>
+                                            <!--<field name="kbajob_ref" invisible="0"/>-->
                                         </group>
                                         <div>
-                                            <!--<button name="button_recompute" type="object" string="" help="Recompute"-->
-                                                <!--states="ready,waiting" class="oe_stat_button oe_right" icon="fa-refresh"/>-->
+                                            <button name="button_recompute" type="object" string="" help="Recompute"
+                                                states="ready,waiting" class="oe_stat_button oe_right" icon="fa-refresh"/>
                                             <field name="booklet_ids" nolabel="1" widget="one2many_list" mode="tree" readonly="True">
                                                 <tree string="Booklet Details" >
                                                     <field name="format"/>

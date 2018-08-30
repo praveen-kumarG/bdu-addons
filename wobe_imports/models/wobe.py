@@ -944,25 +944,28 @@ class Job(models.Model):
         #     lnvals = _get_linevals(strook)
         #     lines.append(lnvals)
 
-        booklet_processed_ids = []
-        for booklet in self.booklet_ids:
-            # if booklet.glueing: glueCnt += 1
-            # if booklet.stitching: stitchCnt += 1
 
-            if booklet.id not in booklet_processed_ids:
-                pFormat = 'MP' if booklet.format == 'MAG' else booklet.format
-                #search for record in booklet with same format & page weight
-                search_format = [booklet.format]
-                if booklet.format == 'MAG':
-                    search_format = ['MAG', 'MP']
-                dup_booklet_ids = (self.booklet_ids.filtered(lambda r: (r.format in search_format and r.paper_weight == booklet.paper_weight)))
-                pages = 0
-                for booklet_obj in dup_booklet_ids:
-                    booklet_processed_ids.append(booklet_obj.id)
-                    pages += int(booklet_obj.pages)
-                ###################
-                v1 = variant_obj.search([('name','=', str(pages)), ('attribute_id','=', pPages.id)])
-                paper_weight = float(booklet.paper_weight)
+        if self.edition_ids:
+            list_query = ("""
+                SELECT
+                  format, array_agg(pages), paper_weight, array_agg(id)
+                FROM
+                  wobe_booklet 
+                WHERE 
+                  edition_id in {0} 
+                GROUP BY 
+                  format, paper_weight
+            """.format(
+                tuple(self.edition_ids.ids)
+            ))
+            self.env.cr.execute(list_query)
+            result = self.env.cr.fetchall()
+            for data in result:
+                pFormat = str(data[0])
+                pages = sum(int(p) for p in data[1])
+                paper_weight = float(data[2])
+
+                v1 = variant_obj.search([('name', '=', str(pages)), ('attribute_id', '=', pPages.id)])
                 paper_weight = int(paper_weight) if paper_weight % 1 == 0 else paper_weight
                 v2 = variant_obj.search([('name','=', str(paper_weight)), ('attribute_id','=', pWeight.id)])
                 product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
@@ -978,9 +981,48 @@ class Job(models.Model):
                             lines.append(_get_linevals(p.id))
                 else:
                     body = _("Product not found for this variants 'Pages: %s', 'Format: %s', 'Paper Weight: %s'!!"
-                              %(str(pages), pFormat, booklet.paper_weight))
+                              %(str(pages), pFormat, str(paper_weight)))
                     self.message_post(body=body)
                     return {}
+                
+
+        # booklet_processed_ids = []
+        # for booklet in self.booklet_ids:
+        #     # if booklet.glueing: glueCnt += 1
+        #     # if booklet.stitching: stitchCnt += 1
+        #
+        #     if booklet.id not in booklet_processed_ids:
+        #         pFormat = 'MP' if booklet.format == 'MAG' else booklet.format
+        #         #search for record in booklet with same format & page weight
+        #         search_format = [booklet.format]
+        #         if booklet.format == 'MAG':
+        #             search_format = ['MAG', 'MP']
+        #         dup_booklet_ids = (self.booklet_ids.filtered(lambda r: (r.format in search_format and r.paper_weight == booklet.paper_weight)))
+        #         pages = 0
+        #         for booklet_obj in dup_booklet_ids:
+        #             booklet_processed_ids.append(booklet_obj.id)
+        #             pages += int(booklet_obj.pages)
+        #         ###################
+        #         v1 = variant_obj.search([('name','=', str(pages)), ('attribute_id','=', pPages.id)])
+        #         paper_weight = float(booklet.paper_weight)
+        #         paper_weight = int(paper_weight) if paper_weight % 1 == 0 else paper_weight
+        #         v2 = variant_obj.search([('name','=', str(paper_weight)), ('attribute_id','=', pWeight.id)])
+        #         product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
+        #                                       ('attribute_value_ids', 'in', v2.ids),
+        #                                       ('print_format_template','=', True),
+        #                                       ('formats','=', pFormat),], order='id desc', limit=2)
+        #         # Booklet-Product
+        #         if product:
+        #             for p in product:
+        #                 if p.fixed_cost:
+        #                     lines.append(_get_linevals(p.id, forceQty=1 ))
+        #                 else:
+        #                     lines.append(_get_linevals(p.id))
+        #         else:
+        #             body = _("Product not found for this variants 'Pages: %s', 'Format: %s', 'Paper Weight: %s'!!"
+        #                       %(str(pages), pFormat, booklet.paper_weight))
+        #             self.message_post(body=body)
+        #             return {}
         # Glueing:
         # if glueCnt:
         #     if not glueing:
