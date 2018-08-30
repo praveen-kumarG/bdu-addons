@@ -114,7 +114,8 @@
                             <field name="bduorder_ref"/>
                             <field name="job_ref" string="WobeJob #"/>
                             <field name="generated_by" attrs="{'invisible': [('generated_by','=',False)]}"/>
-                            <field name="info_issue" attrs="{'invisible': [('part','=','xml3')]}"/>
+                            <!--<field name="info_issue" attrs="{'invisible': [('part','=','xml3')]}"/>-->
+                            <field name="edition_name" attrs="{'invisible': [('part','not in',('xml1a','xml1b'))]}"/>
                             <field name="company_id"/>
                         </group>
                     </group>

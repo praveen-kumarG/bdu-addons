@@ -88,8 +88,8 @@
                                         <field name="format"/>
                                         <field name="pages"/>
                                         <field name="paper_weight"/>
-                                        <field name="stitching"/>
-                                        <field name="glueing"/>
+                                        <!--<field name="stitching"/>-->
+                                        <!--<field name="glueing"/>-->
                                         <field name="calculated_plates"/>
                                         <field name="calculated_mass"/>
                                         <field name="calculated_ink"/>
@@ -110,15 +110,48 @@
                                 <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree">
                                     <tree string="Edition Details" editable="bottom">
                                         <field name="name" />
-                                        <field name="plate_amount"/>
+                                        <!--<field name="plate_amount"/>-->
                                         <field name="net_quantity"/>
                                         <field name="gross_quantity"/>
                                         <field name="alternating_pages"/>
                                         <field name="waste_total" invisible="True"/>
                                         <field name="production_start" attrs="{'required':[('kbajob_ref','=',False)]}"/>
                                         <field name="production_stop" attrs="{'required':[('kbajob_ref','=',False)]}"/>
+                                        <field name="planned_quantity" />
                                         <field name="kbajob_ref" invisible="0"/>
                                     </tree>
+                                    <form>
+                                        <group colspan="4">
+                                            <field name="name" />
+                                            <!--<field name="plate_amount"/>-->
+                                            <field name="net_quantity"/>
+                                            <field name="gross_quantity"/>
+                                            <field name="alternating_pages"/>
+                                            <field name="waste_total" invisible="True"/>
+                                            <field name="production_start" attrs="{'required':[('kbajob_ref','=',False)]}"/>
+                                            <field name="production_stop" attrs="{'required':[('kbajob_ref','=',False)]}"/>
+                                            <field name="planned_quantity" />
+                                            <field name="kbajob_ref" invisible="0"/>
+                                        </group>
+                                        <div>
+                                            <!--<button name="button_recompute" type="object" string="" help="Recompute"-->
+                                                <!--states="ready,waiting" class="oe_stat_button oe_right" icon="fa-refresh"/>-->
+                                            <field name="booklet_ids" nolabel="1" widget="one2many_list" mode="tree" readonly="True">
+                                                <tree string="Booklet Details" >
+                                                    <field name="format"/>
+                                                    <field name="pages"/>
+                                                    <field name="paper_weight"/>
+                                                    <!--<field name="stitching"/>-->
+                                                    <!--<field name="glueing"/>-->
+                                                    <field name="calculated_plates"/>
+                                                    <field name="calculated_mass"/>
+                                                    <field name="calculated_ink"/>
+                                                    <field name="calculated_hours"/>
+                                                    <field name="product_id"/>
+                                                </tree>
+                                            </field>
+                                        </div>
+                                    </form>
                                 </field>
                             </page>
                             <page string="References">
