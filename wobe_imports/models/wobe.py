@@ -26,13 +26,15 @@ class Job(models.Model):
     @api.depends('edition_ids', 'booklet_ids')
     def _compute_all(self):
         eds = self.edition_ids
-        blts = self.booklet_ids
+        # blts = self.booklet_ids
         self.waste_start = sum(line.waste_start for line in eds)
         wt = sum(line.waste_total for line in eds)
-        self.plate_amount = sum(line.plate_amount for line in eds)
+        # self.plate_amount = sum(line.plate_amount for line in eds)
         gq = sum(line.gross_quantity for line in eds)
         nq = sum(line.net_quantity for line in eds)
-        self.total_mass = sum(booklet.calculated_mass for booklet in blts) * gq / 1000
+
+        # self.total_mass = sum(booklet.calculated_mass for booklet in blts) * gq / 1000
+
         self.perc_waste = int(float(wt) / float(gq) * 100) if gq > 0 else False
         self.production_start = eds and min(line.production_start for line in eds) or False
         self.production_stop = eds and max(line.production_stop for line in eds) or False
@@ -40,7 +42,19 @@ class Job(models.Model):
         self.net_quantity = nq
         self.waste_total = wt
 
-    job_ref = fields.Char('WOBE Job #', help='XML reference', required=True, index=True)
+        total_mass = 0.0
+        # planned_quantity = 0.0
+        for ed in eds:
+            book_sum = 0.0
+            for booklet in ed.booklet_ids:
+                book_sum += booklet.calculated_mass
+            total_mass += book_sum * ed.gross_quantity / 1000
+        self.total_mass = total_mass
+
+        self.planned_quantity = sum(line.planned_quantity for line in eds)
+
+
+    job_ref = fields.Char('WOBE Job #', help='XML reference', index=True)
     bduorder_ref = fields.Char('BDUOrder #', help='BDUOrder reference', required=True, index=True)
     name = fields.Char('Name', help='BDUOrder reference', required=True, index=True)
 
@@ -49,12 +63,13 @@ class Job(models.Model):
     total_pages = fields.Integer('Total Pages')
     strook = fields.Char('Strook')
     plate_type = fields.Selection([('PA', 'PA'), ('PU', 'PU')], string='Plate Type')
-    plate_amount = fields.Integer(compute=_compute_all, string='Plate Amount', store=True)
+    plate_amount = fields.Integer(string='Plate Amount', store=True)
+    # plate_amount = fields.Integer(compute=_compute_all, string='Plate Amount', store=True)
 
     production_start = fields.Char(compute=_compute_all, string='Production Start', help='Info DateTime Start', store=True)
     production_stop = fields.Char(compute=_compute_all, string='Production End', help='Info DateTime End', store=True)
 
-    planned_quantity = fields.Integer('Production Amount')
+    planned_quantity = fields.Integer(compute=_compute_all, string='Production Amount', store=True)
     gross_quantity = fields.Integer(compute=_compute_all, string='Gross Qty', help='Prints Gross', store=True)
     net_quantity = fields.Integer(compute=_compute_all, string='Net Qty', help='Prints Net', store=True)
 
@@ -138,162 +153,266 @@ class Job(models.Model):
             Extract data from XML-data stored in File-Registry
             & Create Job records
         '''
+
         Job_obj = self.env['wobe.job']
         Reg = self.env['file.registry']
 
-        groupedFiles = defaultdict(lambda: {'Rfile1': False, 'Rfile3N4': {}, 'Rfile3':[]})
-        part1, part3, part4 = {}, {}, {}
-        merge_XML4_withJob_id, merge_XML4_withoutJob_id = {}, {}
-        unmappedXML4 = []
+        list_query = (""" 
+                    SELECT bduorder_ref, array_agg(id)
+                    FROM file_registry
+                    WHERE state != 'done'
+                    GROUP BY bduorder_ref
+                """)
+        self.env.cr.execute(list_query)
+        groupedFiles = self.env.cr.fetchall()
 
-        # ----------------------------
-        # Registry Files: Search
-        # ----------------------------
-        for x1 in Reg.search([('state','!=','done'), ('part','=', 'xml1')]
-                , order='run_date, file_create_date, is_duplicate'):
-            part1[x1.bduorder_ref] = [x1, x1.edition_count]
+        for grp in groupedFiles:
+            edData = {}
+            bduOrderId = str(grp[0])
+            regIds = grp[1]
+            generated_by = False
+            # try:
+            if True:
+                jobData = {}
+                job = Job_obj.search([('bduorder_ref', '=', bduOrderId)], limit=1)
+                if job:
+                    # Pairing not allowed for Regioman Jobs
+                    if job.job_type == 'regioman':
+                        continue
+                    Reg1 = Reg.search([('job_id', '=', job.id), ('part', '=', 'xml1')])
+                else:
+                    Reg1 = Reg.search([('id', 'in', regIds),('part','=','xml1')])
+                if Reg1:
+                    File1 = base64.decodestring(Reg1.xmlfile)
+                    tree1 = ET.fromstring(File1)
+                    data1 = tree1.find('Newspaper')
 
-        for x3 in Reg.search([('state','!=','done'), ('part','=', 'xml3')]
-                , order='run_date, file_create_date, is_duplicate'):
-            BDUOrder = x3.bduorder_ref
-            KBAJobId = x3.job_ref
-            if not BDUOrder in part3:
-                part3[BDUOrder] = {KBAJobId: x3}
-            else:
-                part3[BDUOrder].update({KBAJobId: x3})
-
-        for x4 in Reg.search([('state','!=','done'), ('part','=', 'xml4')]
-                , order='run_date, file_create_date, is_duplicate'):
-            part4[x4.job_ref] = x4
-
-            if x4.duplicate_ref:
-                # Collect XML4 Files to update later
-                if x4.duplicate_ref.part == 'xml4':
-                    if x4.duplicate_ref in merge_XML4_withJob_id:
-                        merge_XML4_withJob_id[x4.duplicate_ref].append(x4)
-                    else:
-                        merge_XML4_withJob_id.update({x4.duplicate_ref: [x4]})#dict:{Registry_Duplicated_XML4:[Registry_Original_XML4]}
-                elif x4.duplicate_ref and x4.duplicate_ref.part == 'xml1':
-                    # dict:{Registry_XML1:[Registry_XML4's]}
-                    if x4.duplicate_ref in merge_XML4_withoutJob_id:
-                        merge_XML4_withoutJob_id[x4.duplicate_ref].append(x4)
-                    else:
-                        merge_XML4_withoutJob_id[x4.duplicate_ref] = [x4]
-            else:
-                unmappedXML4.append(x4)
-
-        # ---------------------------------------
-        # Files are linked & grouped: <Xml1>
-        # ---------------------------------------
-        for key in part1.keys():
-            Rfile1 = part1[key][0]
-            groupedFiles[key] = {'Rfile1': Rfile1, 'Rfile3N4': {}, 'Rfile3':[]}
-
-        # ---------------------------------------------------------------
-        # Files are linked & grouped: <Xml1> => <Xml3> => [<Xml4>]
-        # ---------------------------------------------------------------
-        for key in set(part1).intersection(set(part3)):
-
-            map3N4, unmap3 = {}, []
-            for y in set(part3[key]).intersection(set(part4)):
-                f3, f4 = part3[key][y], part4[y]
-                map3N4[f3] = f4
-
-            for z in set(part3[key]) - set(part3[key]).intersection(set(part4)):
-                regF3 = part3[key][z]
-                if regF3.state == 'new':
-                    unmap3.append(regF3)
-
-            groupedFiles[key].update({'Rfile3N4': map3N4, 'Rfile3': unmap3})
-
-        # --------------------------
-        # Extract Data & Create job
-        # --------------------------
-        for key, fv in groupedFiles.iteritems():
-            Reg1 = fv['Rfile1']
-
-            File1 = base64.decodestring(Reg1.xmlfile)
-            job = Job_obj.search([('bduorder_ref', '=', key)], limit=1)
-            if job:
-                # Pairing not allowed for Regioman Jobs
-                if job.job_type == 'regioman':
+                if not Reg1:
                     continue
 
-            try:
-                tree1 = ET.fromstring(File1)
-                data1 = tree1.find('Newspaper')
+                Reg1FileAB = Reg.search([('id', 'in', regIds),('part','in',('xml1a','xml1b'))], order='part, run_date, file_create_date')
+                Reg3Files = Reg.search([('id', 'in', regIds),('part','=','xml3')], order='part, run_date, file_create_date')
+                Reg4Files = Reg.search([('id', 'in', regIds), ('part', '=', 'xml4')], order='part, run_date, file_create_date')
 
-                edData = {}
-                generated_by = False
-                # Mapped files: <Xml3> && <Xml4>
-                for Reg3, Reg4 in fv['Rfile3N4'].iteritems():
+                for Reg3 in Reg3Files:
                     File3 = base64.decodestring(Reg3.xmlfile)
+                    tree3 = ET.fromstring(File3)
+                    data3 = tree3.find('Newspaper')
+                    jobData.update(self._job_plates(jobData, Reg3, data3))
+
+                for Reg4 in Reg4Files:
                     File4 = base64.decodestring(Reg4.xmlfile)
-
-                    tree3 = ET.fromstring(File3)
-                    data3 = tree3.find('Newspaper')
-
                     data4 = ET.fromstring(File4)
-
-                    edData.update(self._extract_EditionData(edData, Reg3, data3, Reg4, data4))
-
                     generated_by = Reg4.generated_by
+                    edData.update(self._extract_EditionData(edData, Reg4, data4))
 
-                # UnMapped files: <Xml3>
-                for Reg3 in fv['Rfile3']:
-                    File3 = base64.decodestring(Reg3.xmlfile)
-                    tree3 = ET.fromstring(File3)
-                    data3 = tree3.find('Newspaper')
-
-                    edData.update(self._extract_EditionData(edData, Reg3, data3))
+                if Reg1FileAB:
+                    self._extract_XmlAB(Reg1FileAB, edData)
 
                 if not job:
-                    vals = self._prepare_job_data(data1, edData)
-                    vals['company_id'] = Reg1.company_id.id or self.env.user.company_id.id
-                    vals['generated_by'] = generated_by
-                    job = Job_obj.create(vals)
+                    jobData.update(self._prepare_job_data(data1, edData))
+                    jobData['company_id'] = Reg1.company_id.id or self.env.user.company_id.id
+                    jobData['generated_by'] = generated_by
+                    job = Job_obj.create(jobData)
 
-                elif job.state in ('waiting', 'ready', 'exception'):
-                    vals = self._prepare_job_data(data1, edData, Job=job)
-                    vals['generated_by'] = generated_by
-                    job.write(vals)
-                    for Reg3, Reg4 in fv['Rfile3N4'].iteritems():
-                        #Job created without XML4 update paper roll
-                        if Reg3.job_id and not Reg4.job_id:
-                            job.update_paper_roll(Reg4)
+                elif job:
+                    jobData.update(self._prepare_job_data(data1, edData, Job=job))
+                    jobData['generated_by'] = generated_by
+                    job.write(jobData)
+                    if Reg4Files:
+                        job.update_paper_roll(Reg4Files)
                 else:
                     continue
 
                 # --------------------------------------------
                 # Registry: Update Status
                 # --------------------------------------------
-                rDone = {'job_id': job.id, 'state':'done'}
-                rPending = {'job_id': job.id, 'state':'pending'}
+                rDone = {'job_id': job.id, 'state': 'done'}
+                rPending = {'job_id': job.id, 'state': 'pending'}
 
                 def _update_RegStatus(RgFile, Rvals):
                     RgFile.write(Rvals)
-                    if RgFile.duplicate_ref:
-                        _update_RegStatus(RgFile.duplicate_ref, Rvals)
 
                 QtyCheck = job.net_quantity >= job.planned_quantity
-                EditionCheck = len(job.edition_ids) == job.edition_count and all(l.net_quantity for l in job.edition_ids)
+                EditionCheck = len(job.edition_ids) == job.edition_count and all(
+                    l.net_quantity for l in job.edition_ids)
 
                 if QtyCheck or EditionCheck:
                     _update_RegStatus(Reg1, rDone)
                 else:
                     _update_RegStatus(Reg1, rPending)
 
-                for rf in fv['Rfile3N4'].keys() + fv['Rfile3N4'].values():
-                    _update_RegStatus(rf, rDone)
+                #update other xml files to state done
+                _update_RegStatus(Reg1FileAB+Reg3Files+Reg4Files, rDone)
 
-                for rf in fv['Rfile3']:
-                    _update_RegStatus(rf, rPending)
-                job.merge_registry_xml4(merge_XML4_withJob_id, merge_XML4_withoutJob_id, unmappedXML4)
-            except:
-                pass
+            # except:
+            #     pass
 
         self._reset_Job_status()
         return True
+
+    # @api.multi
+    # def action_create_job_old(self):
+    #     '''
+    #         Extract data from XML-data stored in File-Registry
+    #         & Create Job records
+    #     '''
+    #     Job_obj = self.env['wobe.job']
+    #     Reg = self.env['file.registry']
+    #
+    #     groupedFiles = defaultdict(lambda: {'Rfile1': False, 'Rfile3N4': {}, 'Rfile3':[]})
+    #     part1, part3, part4 = {}, {}, {}
+    #     merge_XML4_withJob_id, merge_XML4_withoutJob_id = {}, {}
+    #     unmappedXML4 = []
+    #
+    #     # ----------------------------
+    #     # Registry Files: Search
+    #     # ----------------------------
+    #     for x1 in Reg.search([('state','!=','done'), ('part','=', 'xml1')]
+    #             , order='run_date, file_create_date, is_duplicate'):
+    #         part1[x1.bduorder_ref] = [x1, x1.edition_count]
+    #
+    #     for x3 in Reg.search([('state','!=','done'), ('part','=', 'xml3')]
+    #             , order='run_date, file_create_date, is_duplicate'):
+    #         BDUOrder = x3.bduorder_ref
+    #         KBAJobId = x3.job_ref
+    #         if not BDUOrder in part3:
+    #             part3[BDUOrder] = {KBAJobId: x3}
+    #         else:
+    #             part3[BDUOrder].update({KBAJobId: x3})
+    #
+    #     for x4 in Reg.search([('state','!=','done'), ('part','=', 'xml4')]
+    #             , order='run_date, file_create_date, is_duplicate'):
+    #         part4[x4.job_ref] = x4
+    #
+    #         if x4.duplicate_ref:
+    #             # Collect XML4 Files to update later
+    #             if x4.duplicate_ref.part == 'xml4':
+    #                 if x4.duplicate_ref in merge_XML4_withJob_id:
+    #                     merge_XML4_withJob_id[x4.duplicate_ref].append(x4)
+    #                 else:
+    #                     merge_XML4_withJob_id.update({x4.duplicate_ref: [x4]})#dict:{Registry_Duplicated_XML4:[Registry_Original_XML4]}
+    #             elif x4.duplicate_ref and x4.duplicate_ref.part == 'xml1':
+    #                 # dict:{Registry_XML1:[Registry_XML4's]}
+    #                 if x4.duplicate_ref in merge_XML4_withoutJob_id:
+    #                     merge_XML4_withoutJob_id[x4.duplicate_ref].append(x4)
+    #                 else:
+    #                     merge_XML4_withoutJob_id[x4.duplicate_ref] = [x4]
+    #         else:
+    #             unmappedXML4.append(x4)
+    #
+    #     # ---------------------------------------
+    #     # Files are linked & grouped: <Xml1>
+    #     # ---------------------------------------
+    #     for key in part1.keys():
+    #         Rfile1 = part1[key][0]
+    #         groupedFiles[key] = {'Rfile1': Rfile1, 'Rfile3N4': {}, 'Rfile3':[]}
+    #
+    #     # ---------------------------------------------------------------
+    #     # Files are linked & grouped: <Xml1> => <Xml3> => [<Xml4>]
+    #     # ---------------------------------------------------------------
+    #     for key in set(part1).intersection(set(part3)):
+    #
+    #         map3N4, unmap3 = {}, []
+    #         for y in set(part3[key]).intersection(set(part4)):
+    #             f3, f4 = part3[key][y], part4[y]
+    #             map3N4[f3] = f4
+    #
+    #         for z in set(part3[key]) - set(part3[key]).intersection(set(part4)):
+    #             regF3 = part3[key][z]
+    #             if regF3.state == 'new':
+    #                 unmap3.append(regF3)
+    #
+    #         groupedFiles[key].update({'Rfile3N4': map3N4, 'Rfile3': unmap3})
+    #
+    #     # --------------------------
+    #     # Extract Data & Create job
+    #     # --------------------------
+    #     for key, fv in groupedFiles.iteritems():
+    #         Reg1 = fv['Rfile1']
+    #
+    #         File1 = base64.decodestring(Reg1.xmlfile)
+    #         job = Job_obj.search([('bduorder_ref', '=', key)], limit=1)
+    #         if job:
+    #             # Pairing not allowed for Regioman Jobs
+    #             if job.job_type == 'regioman':
+    #                 continue
+    #
+    #         try:
+    #             tree1 = ET.fromstring(File1)
+    #             data1 = tree1.find('Newspaper')
+    #
+    #             edData = {}
+    #             generated_by = False
+    #             # Mapped files: <Xml3> && <Xml4>
+    #             for Reg3, Reg4 in fv['Rfile3N4'].iteritems():
+    #                 File3 = base64.decodestring(Reg3.xmlfile)
+    #                 File4 = base64.decodestring(Reg4.xmlfile)
+    #
+    #                 tree3 = ET.fromstring(File3)
+    #                 data3 = tree3.find('Newspaper')
+    #
+    #                 data4 = ET.fromstring(File4)
+    #
+    #                 edData.update(self._extract_EditionData(edData, Reg3, data3, Reg4, data4))
+    #
+    #                 generated_by = Reg4.generated_by
+    #
+    #             # UnMapped files: <Xml3>
+    #             for Reg3 in fv['Rfile3']:
+    #                 File3 = base64.decodestring(Reg3.xmlfile)
+    #                 tree3 = ET.fromstring(File3)
+    #                 data3 = tree3.find('Newspaper')
+    #
+    #                 edData.update(self._extract_EditionData(edData, Reg3, data3))
+    #
+    #             if not job:
+    #                 vals = self._prepare_job_data(data1, edData)
+    #                 vals['company_id'] = Reg1.company_id.id or self.env.user.company_id.id
+    #                 vals['generated_by'] = generated_by
+    #                 job = Job_obj.create(vals)
+    #
+    #             elif job.state in ('waiting', 'ready', 'exception'):
+    #                 vals = self._prepare_job_data(data1, edData, Job=job)
+    #                 vals['generated_by'] = generated_by
+    #                 job.write(vals)
+    #                 for Reg3, Reg4 in fv['Rfile3N4'].iteritems():
+    #                     #Job created without XML4 update paper roll
+    #                     if Reg3.job_id and not Reg4.job_id:
+    #                         job.update_paper_roll(Reg4)
+    #             else:
+    #                 continue
+    #
+    #             # --------------------------------------------
+    #             # Registry: Update Status
+    #             # --------------------------------------------
+    #             rDone = {'job_id': job.id, 'state':'done'}
+    #             rPending = {'job_id': job.id, 'state':'pending'}
+    #
+    #             def _update_RegStatus(RgFile, Rvals):
+    #                 RgFile.write(Rvals)
+    #                 if RgFile.duplicate_ref:
+    #                     _update_RegStatus(RgFile.duplicate_ref, Rvals)
+    #
+    #             QtyCheck = job.net_quantity >= job.planned_quantity
+    #             EditionCheck = len(job.edition_ids) == job.edition_count and all(l.net_quantity for l in job.edition_ids)
+    #
+    #             if QtyCheck or EditionCheck:
+    #                 _update_RegStatus(Reg1, rDone)
+    #             else:
+    #                 _update_RegStatus(Reg1, rPending)
+    #
+    #             for rf in fv['Rfile3N4'].keys() + fv['Rfile3N4'].values():
+    #                 _update_RegStatus(rf, rDone)
+    #
+    #             for rf in fv['Rfile3']:
+    #                 _update_RegStatus(rf, rPending)
+    #             job.merge_registry_xml4(merge_XML4_withJob_id, merge_XML4_withoutJob_id, unmappedXML4)
+    #         except:
+    #             pass
+    #
+    #     self._reset_Job_status()
+    #     return True
 
     def _edition_alternating_pages(self, name, data1):
         alternatingPages = 0
@@ -303,167 +422,418 @@ class Job(models.Model):
         return alternatingPages
 
     @api.multi
+    def _job_plates(self, jobData, RegFile3, data3):
+        if RegFile3:
+            Plates = data3.find('PlatesUsed')
+            jobData['plate_type'] = Plates.find('PlateType').text
+            if 'plate_amount' in jobData:
+                jobData['plate_amount'] += int(Plates.find('PlateAmount').text or 0)
+            else:
+                jobData['plate_amount'] = int(Plates.find('PlateAmount').text or 0)
+                
+        return jobData
+
+    @api.multi
     def _prepare_job_data(self, data1, edData, Job=False):
         res = {}
         edlines, lines = [], []
 
-        editionInfoL = ['plate_amount', 'net_quantity', 'gross_quantity', 'net_quantity',
+        editionInfoL = ['net_quantity', 'gross_quantity', 'net_quantity',
                         'production_start', 'production_stop', 'waste_start', 'waste_total',
-                        'kbajob_ref', 'infojob_ref', 'info_product']
+                        'infojob_ref', 'info_product', 'planned_quantity']
 
-        commonInfoL = ['plate_type',
-                       'paper_mass_1', 'paper_mass_2', 'paper_mass_3', 'paper_mass_4', 'paper_mass_5',
-                       'paper_mass_6', 'paper_mass_7',
-                       'paper_width_1', 'paper_width_2', 'paper_width_3', 'paper_width_4', 'paper_width_5',
-                       'paper_width_6', 'paper_width_7']
+        commonInfoL = ['paper_mass_1', 'paper_mass_2', 'paper_mass_3', 'paper_mass_4', 'paper_mass_5',
+                       'paper_mass_6', 'paper_mass_7', 'paper_width_1', 'paper_width_2', 'paper_width_3',
+                        'paper_width_4', 'paper_width_5', 'paper_width_6', 'paper_width_7']
+
+        editionUpdateL = ['gross_quantity', 'net_quantity', 'waste_start', 'waste_total']
+
+        def _prepare_booklet(edition, booklets):
+            lines = []
+
+            for bookPos, booklet in booklets.iteritems():
+
+                ref = booklet.get('booklet_ref')
+                found = False
+
+                if edition:
+                    found = edition.booklet_ids.filtered(lambda x: x.booklet_ref == ref)
+
+                weight = booklet.get('paper_weight')
+                weight = 65 if float(weight) == 70 else weight
+
+                lnvals = {
+                    'booklet_ref': ref,
+                    'pages': booklet.get('pages'),
+                    'format': booklet.get('format'),
+                    'paper_weight': weight,
+
+                    # 'stitching': True if booklet.find('Stitching').text == 'Yes' else False,
+                    # 'glueing'  : True if booklet.find('Glueing').text == 'Yes' else False,
+                }
+
+                if found:
+                    lines.append((1, found.id, lnvals))
+                else:
+                    lines.append((0, 0, lnvals))
+            return lines
+
+        def _reset_data(key, vals):
+            return vals
 
         # Edition Lines
         for key, val in edData.iteritems():
+
             name = key
             found = False
 
             if Job:
                 found = Job.edition_ids.filtered(lambda x: x.name == key)
-                if not found and key.isalpha():
-                    found = Job.edition_ids.filtered(lambda x: x.name == val.get('infojob_ref'))
 
-            elnvals = {'name' : name }
+            elnvals = {'name': name}
 
-            #get count of alternating pages per edition
+            # get count of alternating pages per edition
             elnvals['alternating_pages'] = self._edition_alternating_pages(name, data1)
 
-            for x in editionInfoL:
-                elnvals[x] = val.get(x, False)
-
-            # Note: paper/Other Info
-            # remains same for all Editions
-            for y in commonInfoL:
-                res[y] = val.get(y)
-
             if found:
+                for x in editionInfoL:
+                    if x in val:
+                        elnvals[x] = val.get(x, False)
+
+                for y in commonInfoL:
+                    if y in val:
+                        res[y] = val.get(y)
+
+                for z in editionUpdateL:
+                    if z not in val:
+                        elnvals[z] = val.get(z, False)
+
                 #edition found sum up of values
                 elnvals['gross_quantity'] += found.gross_quantity
                 elnvals['net_quantity'] += found.net_quantity
                 elnvals['waste_start'] += found.waste_start
                 elnvals['waste_total'] += found.waste_total
+                if 'booklets' in val:
+                    booklet = _prepare_booklet(found, val['booklets'])
+                    elnvals['booklet_ids'] = booklet
                 edlines.append((1, found.id, elnvals))
             else:
+                for x in editionInfoL:
+                    elnvals[x] = val.get(x, False)
+
+                for y in commonInfoL:
+                    res[y] = val.get(y)
+
+                booklet = _prepare_booklet(found, val['booklets'])
+                elnvals['booklet_ids'] = booklet
                 edlines.append((0,0, elnvals))
 
-        # Booklet Lines
-        for booklet in data1.iter('Booklet'):
-            ref = booklet.get('id')
-            found = False
+            res.update({
+                'title': data1.find('NewspaperTitle').text,
+                'edition_count': len(data1.findall('Edition')),
 
-            if Job:
-                found = Job.booklet_ids.filtered(lambda x: x.booklet_ref == ref)
+                'issue_date': data1.find('IssueDate').text,
+                'total_pages': int(data1.find('TotalPages').text or 0),
+                'strook': data1.find('Strook').text,
+                # 'planned_quantity': int(data1.find('ProductionAmount').text or 0),
 
-            weight = booklet.find('PaperWeight').text
-            weight = 65 if float(weight) == 70 else weight
-
-            lnvals = {
-                'booklet_ref': ref,
-                'pages' : booklet.find('Pages').text,
-                'format': booklet.find('Format').text,
-                'paper_weight': weight,
-
-                'stitching': True if booklet.find('Stitching').text == 'Yes' else False,
-                'glueing'  : True if booklet.find('Glueing').text == 'Yes' else False,
-            }
-
-            if found:
-                lines.append((1, found.id, lnvals))
-            else:
-                lines.append((0,0, lnvals))
-
-
-        res.update({
-            'title'   : data1.find('NewspaperTitle').text,
-            'edition_count': len(data1.findall('Edition')),
-
-            'issue_date' : data1.find('IssueDate').text,
-            'total_pages': int(data1.find('TotalPages').text or 0),
-            'strook': data1.find('Strook').text,
-            'planned_quantity': int(data1.find('ProductionAmount').text or 0),
-
-            'edition_ids' : edlines,
-            'booklet_ids' : lines,
-               })
+                'edition_ids': edlines,
+            })
 
         if Job: return res
         # Data: for New-Job Record
         res.update({
-            'job_ref' : data1.find('WobeJobId').text,
+            # 'job_ref': data1.find('WobeJobId').text,
             'bduorder_ref': data1.find('BduOrderId').text,
-            'name'    : data1.find('BduOrderId').text,
-            })
+            'name': data1.find('BduOrderId').text,
+        })
 
         return res
 
 
+
+    # @api.multi
+    # def _prepare_job_data_old(self, data1, edData, Job=False):
+    #     res = {}
+    #     edlines, lines = [], []
+    #
+    #     editionInfoL = ['plate_amount', 'net_quantity', 'gross_quantity', 'net_quantity',
+    #                     'production_start', 'production_stop', 'waste_start', 'waste_total',
+    #                     'kbajob_ref', 'infojob_ref', 'info_product']
+    #
+    #     commonInfoL = ['plate_type',
+    #                    'paper_mass_1', 'paper_mass_2', 'paper_mass_3', 'paper_mass_4', 'paper_mass_5',
+    #                    'paper_mass_6', 'paper_mass_7',
+    #                    'paper_width_1', 'paper_width_2', 'paper_width_3', 'paper_width_4', 'paper_width_5',
+    #                    'paper_width_6', 'paper_width_7']
+    #
+    #     # Edition Lines
+    #     for key, val in edData.iteritems():
+    #         name = key
+    #         found = False
+    #
+    #         if Job:
+    #             found = Job.edition_ids.filtered(lambda x: x.name == key)
+    #             if not found and key.isalpha():
+    #                 found = Job.edition_ids.filtered(lambda x: x.name == val.get('infojob_ref'))
+    #
+    #         elnvals = {'name' : name }
+    #
+    #         #get count of alternating pages per edition
+    #         elnvals['alternating_pages'] = self._edition_alternating_pages(name, data1)
+    #
+    #         for x in editionInfoL:
+    #             elnvals[x] = val.get(x, False)
+    #
+    #         # Note: paper/Other Info
+    #         # remains same for all Editions
+    #         for y in commonInfoL:
+    #             res[y] = val.get(y)
+    #
+    #         if found:
+    #             #edition found sum up of values
+    #             elnvals['gross_quantity'] += found.gross_quantity
+    #             elnvals['net_quantity'] += found.net_quantity
+    #             elnvals['waste_start'] += found.waste_start
+    #             elnvals['waste_total'] += found.waste_total
+    #             edlines.append((1, found.id, elnvals))
+    #         else:
+    #             edlines.append((0,0, elnvals))
+    #
+    #     # Booklet Lines
+    #     for booklet in data1.iter('Booklet'):
+    #         ref = booklet.get('id')
+    #         found = False
+    #
+    #         if Job:
+    #             found = Job.booklet_ids.filtered(lambda x: x.booklet_ref == ref)
+    #
+    #         weight = booklet.find('PaperWeight').text
+    #         weight = 65 if float(weight) == 70 else weight
+    #
+    #         lnvals = {
+    #             'booklet_ref': ref,
+    #             'pages' : booklet.find('Pages').text,
+    #             'format': booklet.find('Format').text,
+    #             'paper_weight': weight,
+    #
+    #             # 'stitching': True if booklet.find('Stitching').text == 'Yes' else False,
+    #             # 'glueing'  : True if booklet.find('Glueing').text == 'Yes' else False,
+    #         }
+    #
+    #         if found:
+    #             lines.append((1, found.id, lnvals))
+    #         else:
+    #             lines.append((0,0, lnvals))
+    #
+    #
+    #     res.update({
+    #         'title'   : data1.find('NewspaperTitle').text,
+    #         'edition_count': len(data1.findall('Edition')),
+    #
+    #         'issue_date' : data1.find('IssueDate').text,
+    #         'total_pages': int(data1.find('TotalPages').text or 0),
+    #         'strook': data1.find('Strook').text,
+    #         'planned_quantity': int(data1.find('ProductionAmount').text or 0),
+    #
+    #         'edition_ids' : edlines,
+    #         'booklet_ids' : lines,
+    #            })
+    #
+    #     if Job: return res
+    #     # Data: for New-Job Record
+    #     res.update({
+    #         'job_ref' : data1.find('WobeJobId').text,
+    #         'bduorder_ref': data1.find('BduOrderId').text,
+    #         'name'    : data1.find('BduOrderId').text,
+    #         })
+    #
+    #     return res
+
     @api.multi
-    def _extract_EditionData(self, res, RegFile3=False, data3={}, RegFile4=False, data4={}):
-        '''
-            Data extracted from XMLFile3 & XMLFile4
-            Note:
-                Key will be either be Edition-Name or WinpressJob-Id, depending on file (unpaired),
-                But when both files are paired, then the key will be changed to
-                reflect Edition-Name. (e.g. 'TZE')
+    def _extract_XmlAB(self, Reg1FileAB, edData={}):
 
-        '''
-        evals = {}
-
-        if RegFile3:
-            Plates = data3.find('PlatesUsed')
+        def _fetch_XML1A(reg1A, evals):
+            File1A = base64.decodestring(reg1A.xmlfile)
+            root = ET.fromstring(File1A)
+            xmlaDt = reg1A.parse_xml1a(root)
+            planned_quantity = xmlaDt['PlannedCopies'] if 'PlannedCopies' in xmlaDt else 0.0
             evals.update({
-                'kbajob_ref'  : RegFile3.job_ref,
-                'plate_type'  : Plates.find('PlateType').text,
-                'plate_amount': int(Plates.find('PlateAmount').text or 0),
-                })
+                'planned_quantity': planned_quantity
+            })
+            return evals
 
-        if RegFile4:
+        def _fetch_XML1B(reg1B, evals):
+            File1B = base64.decodestring(reg1B.xmlfile)
+            root = ET.fromstring(File1B)
+            xmlbDt = reg1B.parse_xml1b(root)
             evals.update({
-                'infojob_ref' : RegFile4.job_ref,
-                'info_product': data4.find('info_product').text,
+                'booklets': xmlbDt['booklets']
+            })
+            return evals
 
-                'production_start' : self.convert_TZ_UTC(data4.find('info_datetime_start').text),
-                'production_stop'  : self.convert_TZ_UTC(data4.find('info_datetime_end').text),
-                'gross_quantity'   : int(data4.find('prints_gross').text or 0),
-                'net_quantity'     : int(data4.find('prints_net').text or 0),
+        list_query = ("""
+              SELECT
+                edition_name, array_agg(id ORDER BY part)
+              FROM
+                file_registry
+              WHERE
+                id in {0}
+             GROUP BY
+                edition_name"""
+            .format(
+                tuple(Reg1FileAB.ids)
+            ))
 
-                'waste_start' : int(data4.find('waste_start').text or 0),
-                'waste_total' : int(data4.find('waste_total').text or 0),
+        self.env.cr.execute(list_query)
+        result = self.env.cr.fetchall()
 
-                'paper_mass_1'  : int(data4.find('used_gram01').text or 0),
-                'paper_mass_2'  : int(data4.find('used_gram02').text or 0),
-                'paper_mass_3'  : int(data4.find('used_gram03').text or 0),
-                'paper_mass_4'  : int(data4.find('used_gram04').text or 0),
-                'paper_mass_5'  : int(data4.find('used_gram05').text or 0),
-                'paper_mass_6'  : int(data4.find('used_gram06').text or 0),
-                'paper_mass_7'  : int(data4.find('used_gram07').text or 0),
+        for data in result:
+            edname = str(data[0])
+            regIds = data[1]
 
-                'paper_width_1'  : int(data4.find('used_webwidth01').text or 0),
-                'paper_width_2'  : int(data4.find('used_webwidth02').text or 0),
-                'paper_width_3'  : int(data4.find('used_webwidth03').text or 0),
-                'paper_width_4'  : int(data4.find('used_webwidth04').text or 0),
-                'paper_width_5'  : int(data4.find('used_webwidth05').text or 0),
-                'paper_width_6'  : int(data4.find('used_webwidth06').text or 0),
-                'paper_width_7'  : int(data4.find('used_webwidth07').text or 0),
-               })
+            for reg in Reg1FileAB.search([('id','in',regIds)]):
+                if edname in edData:
+                    if reg.part == 'xml1a':
+                        edData[edname] = _fetch_XML1A(reg, edData[edname])
+                    elif reg.part == 'xml1b':
+                        edData[edname] = _fetch_XML1B(reg, edData[edname])
+                else:
+                    if reg.part == 'xml1a':
+                        edData[edname] = _fetch_XML1A(reg, {})
+                    elif reg.part == 'xml1b':
+                        edData[edname] = _fetch_XML1B(reg, {})
+        return edData
 
-        key = False
-        if RegFile4:
-            key = evals['info_product']
+    @api.multi
+    def _extract_EditionData(self, res, RegFile4=False, data4={}):
+        '''
+            Data extracted from XMLFile4 for edition
+        '''
+        evals, bvals = {}, {}
 
-        elif RegFile3:
-            key = RegFile3.job_ref
+        evals.update({
+            'infojob_ref': RegFile4.job_ref,
+            'info_product': data4.find('info_product').text,
 
+            'production_start': self.convert_TZ_UTC(data4.find('info_datetime_start').text),
+            'production_stop': self.convert_TZ_UTC(data4.find('info_datetime_end').text),
+            'gross_quantity': int(data4.find('prints_gross').text or 0),
+            'net_quantity': int(data4.find('prints_net').text or 0),
+
+            'waste_start': int(data4.find('waste_start').text or 0),
+            'waste_total': int(data4.find('waste_total').text or 0),
+
+            'paper_mass_1': int(data4.find('used_gram01').text or 0),
+            'paper_mass_2': int(data4.find('used_gram02').text or 0),
+            'paper_mass_3': int(data4.find('used_gram03').text or 0),
+            'paper_mass_4': int(data4.find('used_gram04').text or 0),
+            'paper_mass_5': int(data4.find('used_gram05').text or 0),
+            'paper_mass_6': int(data4.find('used_gram06').text or 0),
+            'paper_mass_7': int(data4.find('used_gram07').text or 0),
+
+            'paper_width_1': int(data4.find('used_webwidth01').text or 0),
+            'paper_width_2': int(data4.find('used_webwidth02').text or 0),
+            'paper_width_3': int(data4.find('used_webwidth03').text or 0),
+            'paper_width_4': int(data4.find('used_webwidth04').text or 0),
+            'paper_width_5': int(data4.find('used_webwidth05').text or 0),
+            'paper_width_6': int(data4.find('used_webwidth06').text or 0),
+            'paper_width_7': int(data4.find('used_webwidth07').text or 0),
+        })
+
+        key = evals['info_product']
+
+        # planned_quantity = 0.0
+        # RegXML1A = Reg1FileAB.search([('edition_name','=',key),('part','=','xml1a')])
+        # for reg1A in RegXML1A:
+        #     File1A = base64.decodestring(reg1A.xmlfile)
+        #     root = ET.fromstring(File1A)
+        #     xmlaDt = reg1A.parse_xml1a(root)
+        #     planned_quantity = xmlaDt['PlannedCopies'] if 'PlannedCopies' in xmlaDt else 0.0
+        # evals.update({
+        #     'planned_quantity': planned_quantity
+        # })
+        #
+        # RegXML1B = Reg1FileAB.search([('edition_name', '=', key), ('part', '=', 'xml1b')])
+        #
+        # for reg1B in RegXML1B:
+        #     File1B = base64.decodestring(reg1B.xmlfile)
+        #     root = ET.fromstring(File1B)
+        #     xmlbDt = reg1B.parse_xml1b(root)
+        #     evals.update({
+        #         'booklets':xmlbDt['booklets']
+        #     })
         if key not in res:
             res[key] = evals
         else:
             res[key].update(evals)
 
         return res
+
+
+    # @api.multi
+    # def _extract_EditionData_old(self, res, RegFile3=False, data3={}, RegFile4=False, data4={}):
+    #     '''
+    #         Data extracted from XMLFile3 & XMLFile4
+    #         Note:
+    #             Key will be either be Edition-Name or WinpressJob-Id, depending on file (unpaired),
+    #             But when both files are paired, then the key will be changed to
+    #             reflect Edition-Name. (e.g. 'TZE')
+    #
+    #     '''
+    #     evals = {}
+    #
+    #     if RegFile3:
+    #         Plates = data3.find('PlatesUsed')
+    #         evals.update({
+    #             'kbajob_ref'  : RegFile3.job_ref,
+    #             'plate_type'  : Plates.find('PlateType').text,
+    #             'plate_amount': int(Plates.find('PlateAmount').text or 0),
+    #             })
+    #
+    #     if RegFile4:
+    #         evals.update({
+    #             'infojob_ref' : RegFile4.job_ref,
+    #             'info_product': data4.find('info_product').text,
+    #
+    #             'production_start' : self.convert_TZ_UTC(data4.find('info_datetime_start').text),
+    #             'production_stop'  : self.convert_TZ_UTC(data4.find('info_datetime_end').text),
+    #             'gross_quantity'   : int(data4.find('prints_gross').text or 0),
+    #             'net_quantity'     : int(data4.find('prints_net').text or 0),
+    #
+    #             'waste_start' : int(data4.find('waste_start').text or 0),
+    #             'waste_total' : int(data4.find('waste_total').text or 0),
+    #
+    #             'paper_mass_1'  : int(data4.find('used_gram01').text or 0),
+    #             'paper_mass_2'  : int(data4.find('used_gram02').text or 0),
+    #             'paper_mass_3'  : int(data4.find('used_gram03').text or 0),
+    #             'paper_mass_4'  : int(data4.find('used_gram04').text or 0),
+    #             'paper_mass_5'  : int(data4.find('used_gram05').text or 0),
+    #             'paper_mass_6'  : int(data4.find('used_gram06').text or 0),
+    #             'paper_mass_7'  : int(data4.find('used_gram07').text or 0),
+    #
+    #             'paper_width_1'  : int(data4.find('used_webwidth01').text or 0),
+    #             'paper_width_2'  : int(data4.find('used_webwidth02').text or 0),
+    #             'paper_width_3'  : int(data4.find('used_webwidth03').text or 0),
+    #             'paper_width_4'  : int(data4.find('used_webwidth04').text or 0),
+    #             'paper_width_5'  : int(data4.find('used_webwidth05').text or 0),
+    #             'paper_width_6'  : int(data4.find('used_webwidth06').text or 0),
+    #             'paper_width_7'  : int(data4.find('used_webwidth07').text or 0),
+    #            })
+    #
+    #     key = False
+    #     if RegFile4:
+    #         key = evals['info_product']
+    #
+    #     elif RegFile3:
+    #         key = RegFile3.job_ref
+    #
+    #     if key not in res:
+    #         res[key] = evals
+    #     else:
+    #         res[key].update(evals)
+    #
+    #     return res
 
 
     @api.multi
@@ -546,13 +916,13 @@ class Job(models.Model):
 
         lines = []
         strook = glueing = stitching = plateChange = pressStop = False
-        glueCnt = stitchCnt = 0
+        # glueCnt = stitchCnt = 0
         for p in product_obj.search([('print_category','in', ('strook', 'stitching', 'glueing',
                                                               'plate_change', 'press_stop'))]):
-            if p.print_category   == 'strook'   : strook = p.id
-            elif p.print_category == 'glueing'  : glueing = p.id
-            elif p.print_category == 'stitching': stitching = p.id
-            elif p.print_category == 'plate_change': plateChange = p.id
+        #     if p.print_category   == 'strook'   : strook = p.id
+        #     elif p.print_category == 'glueing'  : glueing = p.id
+        #     elif p.print_category == 'stitching': stitching = p.id
+            if p.print_category == 'plate_change': plateChange = p.id
             elif p.print_category == 'press_stop'  : pressStop = p.id
 
         pPages  = self.env.ref('wobe_imports.variant_attribute_2', False)
@@ -566,18 +936,18 @@ class Job(models.Model):
             return {}
 
         # Strook:
-        if self.strook == 'Ja':
-            if not strook:
-                self.message_post(body=_("Product not found for the print-category : 'Strook'"))
-                return {}
-
-            lnvals = _get_linevals(strook)
-            lines.append(lnvals)
+        # if self.strook == 'Ja':
+        #     if not strook:
+        #         self.message_post(body=_("Product not found for the print-category : 'Strook'"))
+        #         return {}
+        #
+        #     lnvals = _get_linevals(strook)
+        #     lines.append(lnvals)
 
         booklet_processed_ids = []
         for booklet in self.booklet_ids:
-            if booklet.glueing: glueCnt += 1
-            if booklet.stitching: stitchCnt += 1
+            # if booklet.glueing: glueCnt += 1
+            # if booklet.stitching: stitchCnt += 1
 
             if booklet.id not in booklet_processed_ids:
                 pFormat = 'MP' if booklet.format == 'MAG' else booklet.format
@@ -612,18 +982,18 @@ class Job(models.Model):
                     self.message_post(body=body)
                     return {}
         # Glueing:
-        if glueCnt:
-            if not glueing:
-                self.message_post(body=_("Product not found for the print-category : 'Glueing'"))
-                return {}
-            lines.append(_get_linevals(glueing, qty=1))
+        # if glueCnt:
+        #     if not glueing:
+        #         self.message_post(body=_("Product not found for the print-category : 'Glueing'"))
+        #         return {}
+        #     lines.append(_get_linevals(glueing, qty=1))
 
         # Stitching:
-        if stitchCnt:
-            if not stitching:
-                self.message_post(body=_("Product not found for the print-category : 'Stitching'"))
-                return {}
-            lines.append(_get_linevals(stitching, qty=1))
+        # if stitchCnt:
+        #     if not stitching:
+        #         self.message_post(body=_("Product not found for the print-category : 'Stitching'"))
+        #         return {}
+        #     lines.append(_get_linevals(stitching, qty=1))
 
         # Multiple Editions:
         if len(self.edition_ids) > 1:
@@ -1274,15 +1644,23 @@ class Job(models.Model):
     #update Paper roll whenever new XML4 comes
     @api.multi
     def update_paper_roll(self, registry):
-        self.ensure_one()
+        # self.ensure_one()
         self.write({'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids])})
 
         # re-create from new XML4
         self.fetch_paperProducts()
 
-        msg_body = _(
-            "Paper products updated from XML4: <a href=# data-oe-model=file.registry data-oe-id=%d>%s</a>") % (
-                       registry.id, registry.name)
+        if len(registry) > 1:
+            msg = "Paper products updated from XML4:"
+            for reg in registry:
+                msg +=" <a href=# data-oe-model=file.registry data-oe-id=%d>%s</a>"% (
+                    reg.id, reg.name)
+            msg_body = _(msg)
+        else:
+            msg_body = _(
+                "Paper products updated from XML4: <a href=# data-oe-model=file.registry data-oe-id=%d>%s</a>") % (
+                           registry.id, registry.name)
+
         self.message_post(body=msg_body)
 
         return True
@@ -1355,7 +1733,7 @@ class Booklet(models.Model):
     _description = 'WOBE Booklet'
     _rec_name = 'booklet_ref'
 
-    job_id = fields.Many2one('wobe.job', required=True, ondelete='cascade', index=True, copy=False)
+    job_id = fields.Many2one('wobe.job', ondelete='cascade', index=True, copy=False)
     booklet_ref = fields.Char('Booklet Ref', help='XML reference', required=True, index=True)
     job_type = fields.Selection(related='job_id.job_type', type='selection', string='Type', track_visibility='onchange',
                                 selection=[
@@ -1365,14 +1743,15 @@ class Booklet(models.Model):
     pages = fields.Char('Pages')
     format = fields.Char('Format')
     paper_weight = fields.Char('Paper Weight')
-    stitching = fields.Boolean('Stitching', default=False)
-    glueing = fields.Boolean('Glueing', default=False)
+    # stitching = fields.Boolean('Stitching', default=False)
+    # glueing = fields.Boolean('Glueing', default=False)
 
     calculated_plates = fields.Integer(string='Calculated Plates', store=True, compute='_compute_all')
     calculated_mass = fields.Float(string='Calculated Mass', store=True, compute='_compute_all', digits=dp.get_precision('Paper Mass'))
     calculated_ink = fields.Float(string='Calculated Ink', store=True, compute='_compute_all', digits=dp.get_precision('Paper Mass'))
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all')
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
+    edition_id = fields.Many2one('wobe.edition', ondelete='cascade', index=True, copy=False)
 
     @api.depends('format', 'pages', 'paper_weight','job_id.job_type')
     def _compute_all(self):
@@ -1426,7 +1805,7 @@ class Booklet(models.Model):
             booklet.calculated_ink = booklet.calculated_mass * .04
 
             #Calculated_hours
-            booklet.calculated_hours = booklet.job_id.planned_quantity / float(60000)
+            booklet.calculated_hours = booklet.edition_id.planned_quantity / float(60000)
 
 
 class Edition(models.Model):
@@ -1436,7 +1815,7 @@ class Edition(models.Model):
     job_id = fields.Many2one('wobe.job', required=True, ondelete='cascade', index=True, copy=False)
     name = fields.Char('Edition', help='Edition Name', required=True, copy=False)
 
-    plate_amount = fields.Integer('Plate Amount', store=True)
+    # plate_amount = fields.Integer('Plate Amount', store=True)
     net_quantity = fields.Integer('Net Qty', help='Prints Net')
 
     gross_quantity = fields.Integer('Gross Qty', help='Prints Gross')
@@ -1450,6 +1829,9 @@ class Edition(models.Model):
     infojob_ref = fields.Char('Info Job #', help='Info Job (XML4)', copy=False)
     info_product = fields.Char('Info Product', help='Info product / Edition Name', copy=False)
     alternating_pages = fields.Integer(string='Alternating Pages', help="Count of number of Alternating Pages", copy=False)
+
+    booklet_ids = fields.One2many('wobe.booklet', 'edition_id', 'Booklets', copy=True)
+    planned_quantity = fields.Integer('Production Amount')
 
     @api.onchange('name')
     def edition_create(self):
