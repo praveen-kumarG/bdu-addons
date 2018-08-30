@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
+import logging
 from odoo import models, fields, api
+
+_logger = logging.getLogger(__name__)
 
 class mis_pubble_kpi(models.Model):
 	_name        = 'mis.pubble.kpi'
@@ -20,11 +22,8 @@ class mis_pubble_kpi(models.Model):
 	company_id            = fields.Many2one('res.company',              string='Company')
 	analytic_account_id   = fields.Many2one('account.analytic.account', string='Analytic account')
 
-	"""todo:
-	def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False,lazy=True) :
-		pdb.set_trace()
+	@api.model
+	def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True) :
 		if 'page_nr' in fields :
 			fields.remove('page_nr')
-		return super(mis_pubble_kpi, self).read_group(cr, uid, domain, fields, groupby, offset, limit, context, orderby,lazy)
-
-	"""
+		return super(mis_pubble_kpi, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)

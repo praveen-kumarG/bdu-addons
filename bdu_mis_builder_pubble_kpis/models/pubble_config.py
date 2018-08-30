@@ -2,12 +2,14 @@
 
 import datetime, httplib, json, logging, pdb
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 
 _logger = logging.getLogger(__name__)
 
-class KpiConfig(models.Model):
+class PubbleConfig(models.Model):
     _name        = 'pubble.config'
-    _description = 'Connection info to KPI sources'
+    _description = 'Connection info to Pubble issue data'
     server  	 = fields.Char(string='Server',help="servername, without protocol, e.g. ws.pubble.nl" )
     method		 = fields.Char(string='Method and query',help="method with start slash, e.g. /dir/api?date=20180101")
     
@@ -28,6 +30,7 @@ class KpiConfig(models.Model):
             server = "bdu.nl"
             self.write({'server' : server})
             configuration = self.id
+            _logger.info("configuration created")
         else :
             configuration = configurations[0].id
         action = {
@@ -76,16 +79,21 @@ class KpiConfig(models.Model):
         configuration.end   = datetime.date.today()
         configuration.write()
         return self.do_collect()
+
     
     @api.multi 
     def do_collect(self):
 
         #collect data based on config 	    
         config = self[0] 
-        li=config.latest_issue.split('-')
-        most_recent = datetime.date(int(li[0]),int(li[1]),int(li[2]))
+        most_recent=datetime.datetime.strptime(config.latest_issue,DEFAULT_SERVER_DATE_FORMAT).date()
         if not most_recent :
             most_recent=datetime.date(1970,1,1)
+
+        if not config.begin or not config.end :
+            raise ValidationError("Please provide begin and end date")
+            return False
+
         conn   = httplib.HTTPSConnection(config.server.strip())
         api    = config.method.strip()
         api    = api.replace("$begin",config.begin).replace("$end",config.end)
@@ -110,11 +118,11 @@ class KpiConfig(models.Model):
             #flatten json and write every page to new or existing records
             for title_summary in json_anwser :
                 d['title']      = title_summary['titel']
-                _logger.debug("title : " + d['title'])
 
                 #keep track of latest updated issue
                 issue_date = self.ms_datetime_to_python_date(title_summary['datum'])
                 d['issue_date'] = issue_date
+
                 if issue_date>most_recent :
                     most_recent = issue_date
                 
@@ -135,7 +143,6 @@ class KpiConfig(models.Model):
 
                 for page in pages :
                     d['page_nr']      = int(page['paginaNummer'])
-                    _logger.debug("page : "+str(d['page_nr']))
 
                     d['page_type']=page.get('paginaType', 'n.a.') 
                     if d['page_type'] is None :
@@ -184,12 +191,14 @@ class KpiConfig(models.Model):
             config.latest_status  = status
             config.latest_reason  = reason
             config.write({})
+            _logger.info("Successfull import for dates between %s and %s", config.begin, config.end)
             return True
         else :
             config.latest_run     = datetime.date.today()
             config.latest_status  = status
             config.latest_reason  = reason
             config.write({})
+            _logger.info("Error while trying to import Pubble data")
             return False
 
 		

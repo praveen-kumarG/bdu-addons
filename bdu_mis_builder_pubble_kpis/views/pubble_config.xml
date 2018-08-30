@@ -1,12 +1,12 @@
-<?xml version="1.0"?> 
+<?xml version="1.0" encoding="utf-8"?> 
 <odoo>
 
   <!--  Form view for Pubble connector settings and operation --> 
-  <record id="view_pubble_kpi_data_connector" model="ir.ui.view">
-    <field name="name">Pubble KPI data</field>
-    <field name="model">pubble.config</field>
+  <record id="view_form_pubble_kpi_data_connector" model="ir.ui.view">
+    <field name="name">Pubble KPI connector</field>
+    <field name="model">pubble.config</field> 
     <field name="arch" type="xml">
-      <form string="Pubble KPI data" create="false" edit="false" action="false" 
+      <form string="Pubble KPI connector" create="false" edit="false" action="false" 
                                      class="oe_form_configuration">
         <header > 
         </header>
@@ -68,8 +68,6 @@
     </field>
   </record> 
 
-
-
   <!-- Connection info via server action and submenu-->
   <record id="config_pubble_kpi_connector" model="ir.actions.server"> 
     <field name="name">Pubble kpi connector</field> 
@@ -80,36 +78,12 @@
   </record> 
 
   <!-- Menu item to open KPI connection configuration--> 
-  <menuitem id="Pubble KPI connector" 
+  <menuitem id="Pubble_KPI_connector_menuitem" 
     name="Pubble connector" 
     action="config_pubble_kpi_connector"
     parent="mis_builder.mis_report_conf_menu" 
     sequence="23"
      /> 
+
+
 </odoo>
-
-
-
-  <!-- Form for record interaction , only for dev 
-  <record id="view_tree_kpi_data_connector" model="ir.ui.view"> 
-    <field name="name">KPI config list</field> 
-    <field name="model">pubble.config</field> 
-    <field name="arch" type="xml"> 
-      <tree string="KPI data"> 
-          <field name="server"/> 
-          <field name="method"/> 
-          <field name="query"/> 
-      </tree> 
-    </field> 
-  </record> 
---> 
-
-
-
-  <!-- Action to open KPI configuration
-  <act_window id="config_pubble_kpi_connector" 
-    name="Pubble KPI data connector config" 
-    res_model="pubble.config" 
-    view_mode="tree,form"
-    /> 
--->
