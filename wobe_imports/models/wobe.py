@@ -523,9 +523,9 @@ class Job(models.Model):
 
                 for y in commonInfoL:
                     res[y] = val.get(y)
-
-                booklet = _prepare_booklet(found, val['booklets'])
-                elnvals['booklet_ids'] = booklet
+                if 'booklets' in val:
+                    booklet = _prepare_booklet(found, val['booklets'])
+                    elnvals['booklet_ids'] = booklet
                 edlines.append((0,0, elnvals))
 
             res.update({
@@ -1606,40 +1606,40 @@ class Job(models.Model):
                 AnalyticLines.create(line)
             case.write({'state': 'cost_created'})
 
-    @api.multi
-    def merge_registry_xml4(self, merge_XML4_Job_id, merge_XML4_noJob_id, unmappedXMl4):
-        for firstXMl4, listXML4 in merge_XML4_Job_id.iteritems():
-            if firstXMl4.job_id and firstXMl4.job_id.id == self.id:
-                for XMl4 in listXML4:
-                    if not XMl4.job_id:
-                        self.update_job_edition(XMl4)
-            else:
-                unmappedXMl4 = list(set([firstXMl4]+listXML4+unmappedXMl4))
-        for XMl1, listXML4 in merge_XML4_noJob_id.iteritems():
-            if XMl1.job_id and XMl1.job_id.id == self.id:
-                for XML4 in listXML4:
-                    if not XML4.job_id:
-                        self.update_job_edition(XML4)
-            else:
-                unmappedXMl4 = list(set(listXML4 + unmappedXMl4))
-        # re-check with XML3 and XML4 during Job creates
-        for XML4 in unmappedXMl4:
-            if XML4.job_id:
-                continue
-            Registry = self.env['file.registry']
-            Job = XML4.duplicate_ref.job_id if XML4.duplicate_ref and XML4.duplicate_ref.part == 'xml1' and XML4.duplicate_ref.job_id else False
-            if not Job:
-                checkWithXMl3 = Registry.search([('part', '=', 'xml3'), ('job_ref', '=', XML4.job_ref)])
-                if checkWithXMl3:
-                    Job = checkWithXMl3.job_id
-                elif not checkWithXMl3:
-                    xml1Reg = Registry.search([('part', '=', 'xml1'), ('issue_date', '=', XML4.issue_date),('info_issue', '=', XML4.info_issue)], limit=1)
-                    if xml1Reg:
-                        XML4.duplicate_ref = xml1Reg.id  # non matching JOBID for XML4 add reference of XML1 registry
-                        Job = xml1Reg.job_id
-            if Job:
-                Job.update_job_edition(XML4)
-        return True
+    # @api.multi
+    # def merge_registry_xml4(self, merge_XML4_Job_id, merge_XML4_noJob_id, unmappedXMl4):
+    #     for firstXMl4, listXML4 in merge_XML4_Job_id.iteritems():
+    #         if firstXMl4.job_id and firstXMl4.job_id.id == self.id:
+    #             for XMl4 in listXML4:
+    #                 if not XMl4.job_id:
+    #                     self.update_job_edition(XMl4)
+    #         else:
+    #             unmappedXMl4 = list(set([firstXMl4]+listXML4+unmappedXMl4))
+    #     for XMl1, listXML4 in merge_XML4_noJob_id.iteritems():
+    #         if XMl1.job_id and XMl1.job_id.id == self.id:
+    #             for XML4 in listXML4:
+    #                 if not XML4.job_id:
+    #                     self.update_job_edition(XML4)
+    #         else:
+    #             unmappedXMl4 = list(set(listXML4 + unmappedXMl4))
+    #     # re-check with XML3 and XML4 during Job creates
+    #     for XML4 in unmappedXMl4:
+    #         if XML4.job_id:
+    #             continue
+    #         Registry = self.env['file.registry']
+    #         Job = XML4.duplicate_ref.job_id if XML4.duplicate_ref and XML4.duplicate_ref.part == 'xml1' and XML4.duplicate_ref.job_id else False
+    #         if not Job:
+    #             checkWithXMl3 = Registry.search([('part', '=', 'xml3'), ('job_ref', '=', XML4.job_ref)])
+    #             if checkWithXMl3:
+    #                 Job = checkWithXMl3.job_id
+    #             elif not checkWithXMl3:
+    #                 xml1Reg = Registry.search([('part', '=', 'xml1'), ('issue_date', '=', XML4.issue_date),('info_issue', '=', XML4.info_issue)], limit=1)
+    #                 if xml1Reg:
+    #                     XML4.duplicate_ref = xml1Reg.id  # non matching JOBID for XML4 add reference of XML1 registry
+    #                     Job = xml1Reg.job_id
+    #         if Job:
+    #             Job.update_job_edition(XML4)
+    #     return True
 
     #update Paper roll whenever new XML4 comes
     @api.multi
@@ -1666,55 +1666,55 @@ class Job(models.Model):
         return True
 
 
-    @api.multi
-    def update_job_edition(self, registry):
-        self.ensure_one()
-        for Job in self:
-            edlines = []
-            res = {}
-            if Job and not Job.order_id and Job.state in ('waiting', 'ready', 'exception'):
-                File4 = base64.decodestring(registry.xmlfile)
-                data4 = ET.fromstring(File4)
-                edData = Job._extract_EditionData({}, False, {}, RegFile4=registry, data4=data4)
-
-                for key, elnvals in edData.iteritems():
-                    for idx in range(1, 8):
-                        res.update({
-                            'paper_mass_' + str(idx): elnvals['paper_mass_' + str(idx)],
-                            'paper_width_' + str(idx): elnvals['paper_width_' + str(idx)],
-                        })
-                        elnvals.pop('paper_mass_' + str(idx))
-                        elnvals.pop('paper_width_' + str(idx))
-                    found = Job.edition_ids.filtered(lambda x: x.name == key)
-                    if not found and key.isalpha():
-                        found = Job.edition_ids.filtered(lambda x: x.name == elnvals.get('infojob_ref'))
-
-                    if found:
-                        # Multiple XML4 adding the values
-                        for edition in found:
-                            elnvals['gross_quantity'] += edition.gross_quantity
-                            elnvals['net_quantity'] += edition.net_quantity
-                            elnvals['waste_start'] += edition.waste_start
-                            elnvals['waste_total'] += edition.waste_total
-                        edlines.append((1, found.id, elnvals))
-                    else:
-                        elnvals.update({'name': key, 'kbajob_ref': registry.job_ref})
-                        edlines.append((0, 0, elnvals))
-                res.update({'edition_ids':edlines})
-
-                Job.write(res)
-
-                Job.update_paper_roll(registry)
-
-                #check updated edition condition & update Registry Xml1 to Done, If pending
-                EditionCheck = len(Job.edition_ids) == Job.edition_count and all(l.net_quantity for l in Job.edition_ids)
-                if EditionCheck:
-                    Reg1 = self.env['file.registry'].search([('state','=','pending'),('part','=','xml1'),('job_id','=',Job.id)])
-                    if Reg1:
-                        Reg1.write({'state':'done'})
-
-                registry.write({'job_id': Job.id, 'is_duplicate': False, 'state': 'done'})
-        return True
+    # @api.multi
+    # def update_job_edition(self, registry):
+    #     self.ensure_one()
+    #     for Job in self:
+    #         edlines = []
+    #         res = {}
+    #         if Job and not Job.order_id and Job.state in ('waiting', 'ready', 'exception'):
+    #             File4 = base64.decodestring(registry.xmlfile)
+    #             data4 = ET.fromstring(File4)
+    #             edData = Job._extract_EditionData({}, False, {}, RegFile4=registry, data4=data4)
+    #
+    #             for key, elnvals in edData.iteritems():
+    #                 for idx in range(1, 8):
+    #                     res.update({
+    #                         'paper_mass_' + str(idx): elnvals['paper_mass_' + str(idx)],
+    #                         'paper_width_' + str(idx): elnvals['paper_width_' + str(idx)],
+    #                     })
+    #                     elnvals.pop('paper_mass_' + str(idx))
+    #                     elnvals.pop('paper_width_' + str(idx))
+    #                 found = Job.edition_ids.filtered(lambda x: x.name == key)
+    #                 if not found and key.isalpha():
+    #                     found = Job.edition_ids.filtered(lambda x: x.name == elnvals.get('infojob_ref'))
+    #
+    #                 if found:
+    #                     # Multiple XML4 adding the values
+    #                     for edition in found:
+    #                         elnvals['gross_quantity'] += edition.gross_quantity
+    #                         elnvals['net_quantity'] += edition.net_quantity
+    #                         elnvals['waste_start'] += edition.waste_start
+    #                         elnvals['waste_total'] += edition.waste_total
+    #                     edlines.append((1, found.id, elnvals))
+    #                 else:
+    #                     elnvals.update({'name': key, 'kbajob_ref': registry.job_ref})
+    #                     edlines.append((0, 0, elnvals))
+    #             res.update({'edition_ids':edlines})
+    #
+    #             Job.write(res)
+    #
+    #             Job.update_paper_roll(registry)
+    #
+    #             #check updated edition condition & update Registry Xml1 to Done, If pending
+    #             EditionCheck = len(Job.edition_ids) == Job.edition_count and all(l.net_quantity for l in Job.edition_ids)
+    #             if EditionCheck:
+    #                 Reg1 = self.env['file.registry'].search([('state','=','pending'),('part','=','xml1'),('job_id','=',Job.id)])
+    #                 if Reg1:
+    #                     Reg1.write({'state':'done'})
+    #
+    #             registry.write({'job_id': Job.id, 'is_duplicate': False, 'state': 'done'})
+    #     return True
 
     def convert_TZ_UTC(self, TZ_datetime):
         fmt = "%Y-%m-%d %H:%M:%S"
