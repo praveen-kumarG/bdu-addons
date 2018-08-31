@@ -54,7 +54,7 @@ class Job(models.Model):
         self.planned_quantity = sum(line.planned_quantity for line in eds)
 
 
-    job_ref = fields.Char('WOBE Job #', help='XML reference', index=True)
+    # job_ref = fields.Char('WOBE Job #', help='XML reference', index=True)
     bduorder_ref = fields.Char('BDUOrder #', help='BDUOrder reference', required=True, index=True)
     name = fields.Char('Name', help='BDUOrder reference', required=True, index=True)
 
@@ -179,9 +179,9 @@ class Job(models.Model):
                     # Pairing not allowed for Regioman Jobs
                     if job.job_type == 'regioman':
                         continue
-                    Reg1 = Reg.search([('job_id', '=', job.id), ('part', '=', 'xml1')])
+                    Reg1 = Reg.search([('job_id', '=', job.id), ('part', '=', 'xml1')], limit=1)
                 else:
-                    Reg1 = Reg.search([('id', 'in', regIds),('part','=','xml1')])
+                    Reg1 = Reg.search([('id', 'in', regIds),('part','=','xml1')], limit=1)
                 if Reg1:
                     File1 = base64.decodestring(Reg1.xmlfile)
                     tree1 = ET.fromstring(File1)
@@ -440,7 +440,7 @@ class Job(models.Model):
 
         editionInfoL = ['net_quantity', 'gross_quantity', 'net_quantity',
                         'production_start', 'production_stop', 'waste_start', 'waste_total',
-                        'infojob_ref', 'info_product', 'planned_quantity']
+                        'info_product', 'planned_quantity']
 
         commonInfoL = ['paper_mass_1', 'paper_mass_2', 'paper_mass_3', 'paper_mass_4', 'paper_mass_5',
                        'paper_mass_6', 'paper_mass_7', 'paper_width_1', 'paper_width_2', 'paper_width_3',
@@ -523,9 +523,9 @@ class Job(models.Model):
 
                 for y in commonInfoL:
                     res[y] = val.get(y)
-
-                booklet = _prepare_booklet(found, val['booklets'])
-                elnvals['booklet_ids'] = booklet
+                if 'booklets' in val:
+                    booklet = _prepare_booklet(found, val['booklets'])
+                    elnvals['booklet_ids'] = booklet
                 edlines.append((0,0, elnvals))
 
             res.update({
@@ -672,17 +672,24 @@ class Job(models.Model):
             })
             return evals
 
+        sqlop = 'IN'
+        xmlABIds = tuple(Reg1FileAB.ids)
+        if len(Reg1FileAB.ids) == 1:
+            sqlop = '='
+            xmlABIds = Reg1FileAB.ids[0]
+
         list_query = ("""
               SELECT
                 edition_name, array_agg(id ORDER BY part)
               FROM
                 file_registry
               WHERE
-                id in {0}
+                id {0} {1}
              GROUP BY
                 edition_name"""
             .format(
-                tuple(Reg1FileAB.ids)
+                sqlop,
+                xmlABIds
             ))
 
         self.env.cr.execute(list_query)
@@ -713,7 +720,7 @@ class Job(models.Model):
         evals, bvals = {}, {}
 
         evals.update({
-            'infojob_ref': RegFile4.job_ref,
+            # 'infojob_ref': RegFile4.job_ref,
             'info_product': data4.find('info_product').text,
 
             'production_start': self.convert_TZ_UTC(data4.find('info_datetime_start').text),
@@ -915,10 +922,11 @@ class Job(models.Model):
             return vals
 
         lines = []
-        strook = glueing = stitching = plateChange = pressStop = False
+        plateChange = pressStop = False
+        # strook = glueing = stitching = plateChange = pressStop = False
         # glueCnt = stitchCnt = 0
-        for p in product_obj.search([('print_category','in', ('strook', 'stitching', 'glueing',
-                                                              'plate_change', 'press_stop'))]):
+        # for p in product_obj.search([('print_category','in', ('strook', 'stitching', 'glueing', 'plate_change', 'press_stop'))]):
+        for p in product_obj.search([('print_category','in', ('plate_change', 'press_stop'))]):
         #     if p.print_category   == 'strook'   : strook = p.id
         #     elif p.print_category == 'glueing'  : glueing = p.id
         #     elif p.print_category == 'stitching': stitching = p.id
@@ -943,26 +951,34 @@ class Job(models.Model):
         #
         #     lnvals = _get_linevals(strook)
         #     lines.append(lnvals)
+        sqlop = 'IN'
+        edIds = tuple(self.edition_ids.ids)
+        if len(self.edition_ids) == 1:
+            sqlop = '='
+            edIds = self.edition_ids.ids[0]
 
-        booklet_processed_ids = []
-        for booklet in self.booklet_ids:
-            # if booklet.glueing: glueCnt += 1
-            # if booklet.stitching: stitchCnt += 1
+        if self.edition_ids:
+            list_query = ("""
+                SELECT
+                  format, array_agg(pages), paper_weight, array_agg(id)
+                FROM
+                  wobe_booklet 
+                WHERE 
+                  edition_id {0} {1} 
+                GROUP BY 
+                  format, paper_weight
+            """.format(
+                sqlop,
+                edIds
+            ))
+            self.env.cr.execute(list_query)
+            result = self.env.cr.fetchall()
+            for data in result:
+                pFormat = str(data[0])
+                pages = sum(int(p) for p in data[1])
+                paper_weight = float(data[2])
 
-            if booklet.id not in booklet_processed_ids:
-                pFormat = 'MP' if booklet.format == 'MAG' else booklet.format
-                #search for record in booklet with same format & page weight
-                search_format = [booklet.format]
-                if booklet.format == 'MAG':
-                    search_format = ['MAG', 'MP']
-                dup_booklet_ids = (self.booklet_ids.filtered(lambda r: (r.format in search_format and r.paper_weight == booklet.paper_weight)))
-                pages = 0
-                for booklet_obj in dup_booklet_ids:
-                    booklet_processed_ids.append(booklet_obj.id)
-                    pages += int(booklet_obj.pages)
-                ###################
-                v1 = variant_obj.search([('name','=', str(pages)), ('attribute_id','=', pPages.id)])
-                paper_weight = float(booklet.paper_weight)
+                v1 = variant_obj.search([('name', '=', str(pages)), ('attribute_id', '=', pPages.id)])
                 paper_weight = int(paper_weight) if paper_weight % 1 == 0 else paper_weight
                 v2 = variant_obj.search([('name','=', str(paper_weight)), ('attribute_id','=', pWeight.id)])
                 product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
@@ -978,9 +994,48 @@ class Job(models.Model):
                             lines.append(_get_linevals(p.id))
                 else:
                     body = _("Product not found for this variants 'Pages: %s', 'Format: %s', 'Paper Weight: %s'!!"
-                              %(str(pages), pFormat, booklet.paper_weight))
+                              %(str(pages), pFormat, str(paper_weight)))
                     self.message_post(body=body)
                     return {}
+                
+
+        # booklet_processed_ids = []
+        # for booklet in self.booklet_ids:
+        #     # if booklet.glueing: glueCnt += 1
+        #     # if booklet.stitching: stitchCnt += 1
+        #
+        #     if booklet.id not in booklet_processed_ids:
+        #         pFormat = 'MP' if booklet.format == 'MAG' else booklet.format
+        #         #search for record in booklet with same format & page weight
+        #         search_format = [booklet.format]
+        #         if booklet.format == 'MAG':
+        #             search_format = ['MAG', 'MP']
+        #         dup_booklet_ids = (self.booklet_ids.filtered(lambda r: (r.format in search_format and r.paper_weight == booklet.paper_weight)))
+        #         pages = 0
+        #         for booklet_obj in dup_booklet_ids:
+        #             booklet_processed_ids.append(booklet_obj.id)
+        #             pages += int(booklet_obj.pages)
+        #         ###################
+        #         v1 = variant_obj.search([('name','=', str(pages)), ('attribute_id','=', pPages.id)])
+        #         paper_weight = float(booklet.paper_weight)
+        #         paper_weight = int(paper_weight) if paper_weight % 1 == 0 else paper_weight
+        #         v2 = variant_obj.search([('name','=', str(paper_weight)), ('attribute_id','=', pWeight.id)])
+        #         product = product_obj.search([('attribute_value_ids', 'in', v1.ids),
+        #                                       ('attribute_value_ids', 'in', v2.ids),
+        #                                       ('print_format_template','=', True),
+        #                                       ('formats','=', pFormat),], order='id desc', limit=2)
+        #         # Booklet-Product
+        #         if product:
+        #             for p in product:
+        #                 if p.fixed_cost:
+        #                     lines.append(_get_linevals(p.id, forceQty=1 ))
+        #                 else:
+        #                     lines.append(_get_linevals(p.id))
+        #         else:
+        #             body = _("Product not found for this variants 'Pages: %s', 'Format: %s', 'Paper Weight: %s'!!"
+        #                       %(str(pages), pFormat, booklet.paper_weight))
+        #             self.message_post(body=body)
+        #             return {}
         # Glueing:
         # if glueCnt:
         #     if not glueing:
@@ -1006,7 +1061,14 @@ class Job(models.Model):
                 return {}
 
             lines.append(_get_linevals(pressStop, forceQty=len(self.edition_ids.ids)-1))
-            lines.append(_get_linevals(plateChange, forceQty=(round((self.plate_amount-sum(line.calculated_plates for line in self.booklet_ids))/4.0))))
+            total_mass = 0.0
+            # planned_quantity = 0.0
+            bookletPlates = 0.0
+            for ed in self.edition_ids:
+                for booklet in ed.booklet_ids:
+                    bookletPlates += booklet.calculated_mass
+            lines.append(_get_linevals(plateChange, forceQty=(round((self.plate_amount-bookletPlates)/4.0))))
+            # lines.append(_get_linevals(plateChange, forceQty=(round((self.plate_amount-sum(line.calculated_plates for line in self.booklet_ids))/4.0))))
 
         res['order_line'] = map(lambda x:(0,0,x), lines)
 
@@ -1202,7 +1264,39 @@ class Job(models.Model):
         product_obj = self.env['product.product']
         lines = []
         print_category3, print_category4 = 'plates_regioman', 'ink_regioman'
-        PlateQty, InkQty = job.plate_amount, sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000 / 4
+
+        sqlop = 'IN'
+        edIds = tuple(self.edition_ids.ids)
+        if len(self.edition_ids) == 1:
+            sqlop = '='
+            edIds = self.edition_ids.ids[0]
+
+        list_query = ("""
+                        SELECT
+                          array_agg(calculated_mass), paper_weight, array_agg(calculated_ink), array_agg(id), format
+                        FROM
+                          wobe_booklet 
+                        WHERE 
+                          edition_id {0} {1}
+                        GROUP BY 
+                          format, paper_weight
+                    """.format(
+                        sqlop,
+                        edIds
+                    ))
+        self.env.cr.execute(list_query)
+        result = self.env.cr.fetchall()
+
+        MassPerUnit = {}
+        bookletCalInk = 0.0
+        for data in result:
+            calculated_mass = sum(float(p) for p in data[0])
+            paper_weight = float(data[1])
+            MassPerUnit[paper_weight] = calculated_mass
+            bookletCalInk += sum(float(p) for p in data[2])
+
+        PlateQty, InkQty = job.plate_amount, bookletCalInk * sum(ed.gross_quantity for ed in job.edition_ids) / 1000 / 4
+        # PlateQty, InkQty = job.plate_amount, sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000 / 4
 
         pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
         pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
@@ -1229,14 +1323,14 @@ class Job(models.Model):
 
 
         # Total Mass per PaperMass
-        MassPerUnit = {}
-        for booklet in job.booklet_ids:
-            key = float(booklet.paper_weight)
-
-            if key not in MassPerUnit:
-                MassPerUnit[key] = booklet.calculated_mass
-            else:
-                MassPerUnit[key] += booklet.calculated_mass
+        # MassPerUnit = {}
+        # for booklet in job.booklet_ids:
+        #     key = float(booklet.paper_weight)
+        #
+        #     if key not in MassPerUnit:
+        #         MassPerUnit[key] = booklet.calculated_mass
+        #     else:
+        #         MassPerUnit[key] += booklet.calculated_mass
 
         # Paper Rolls
         for roll in job.paper_product_ids:
@@ -1435,9 +1529,10 @@ class Job(models.Model):
         ' Recompute Booklet Values'
 
         for job in self:
-            for bk in job.booklet_ids:
-                # Trigger the Calculation
-                bk.write({'product_id':bk.product_id.id})
+            for ed in job.edition_ids:
+                for bk in ed.booklet_ids:
+                    # Trigger the Calculation
+                    bk.write({'product_id':bk.product_id.id})
 
     def _prepare_analytic_lines(self):
         job = self
@@ -1490,14 +1585,49 @@ class Job(models.Model):
 
 
         # Total Mass per PaperMass
-        MassPerUnit = {}
-        for booklet in job.booklet_ids:
-            key = float(booklet.paper_weight)
+        # MassPerUnit = {}
+        # for booklet in job.booklet_ids:
+        #     key = float(booklet.paper_weight)
+        #
+        #     if key not in MassPerUnit:
+        #         MassPerUnit[key] = booklet.calculated_mass
+        #     else:
+        #         MassPerUnit[key] += booklet.calculated_mass
 
-            if key not in MassPerUnit:
-                MassPerUnit[key] = booklet.calculated_mass
-            else:
-                MassPerUnit[key] += booklet.calculated_mass
+        sqlop = 'IN'
+        edIds = tuple(self.edition_ids.ids)
+        if len(self.edition_ids) == 1:
+            sqlop = '='
+            edIds = self.edition_ids.ids[0]
+
+        list_query = ("""
+                SELECT
+                  array_agg(calculated_mass), paper_weight, array_agg(calculated_plates), array_agg(calculated_hours), array_agg(calculated_ink)
+                FROM
+                  wobe_booklet 
+                WHERE 
+                  edition_id {0} {1}
+                GROUP BY 
+                  format, paper_weight
+            """.format(
+                sqlop,
+                edIds
+            ))
+        self.env.cr.execute(list_query)
+        result = self.env.cr.fetchall()
+
+        bookletCalMass, bookletCalHrs, bookletCalInk = 0.0, 0.0, 0.0
+        bookletCalplate = 0
+
+        MassPerUnit = {}
+        for data in result:
+            calculated_mass = sum(float(p) for p in data[0])
+            paper_weight = float(data[1])
+            MassPerUnit[paper_weight] = calculated_mass
+            bookletCalMass += calculated_mass
+            bookletCalplate += sum(int(p) for p in data[2])
+            bookletCalHrs += sum(int(p) for p in data[3])
+            bookletCalInk += sum(int(p) for p in data[4])
 
         paperAmount = 0.0
 
@@ -1531,9 +1661,11 @@ class Job(models.Model):
         # Paper Unit Amount : (in Kg)
         # totBookletMass = round(sum(bookObj.calculated_mass for bookObj in job.booklet_ids),4)
         # paperUnitAmt =  totBookletMass/ 1000
-        paperUnitAmt  = sum(bookObj.calculated_mass for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
+        # paperUnitAmt  = sum(bookObj.calculated_mass for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
+        paperUnitAmt  = bookletCalMass * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
 
-        totBookletHours = round(sum(bookObj.calculated_hours for bookObj in job.booklet_ids), 4)
+        # totBookletHours = round(sum(bookObj.calculated_hours for bookObj in job.booklet_ids), 4)
+        totBookletHours = round(bookletCalHrs, 4)
         hoursAmount = totBookletHours * 1200
 
         hoursUnitAmt = totBookletHours
@@ -1558,7 +1690,8 @@ class Job(models.Model):
             return []
 
         # Plates:
-        totBookletPlates = round(sum(bookObj.calculated_plates for bookObj in job.booklet_ids),4)
+        # totBookletPlates = round(sum(bookObj.calculated_plates for bookObj in job.booklet_ids),4)
+        totBookletPlates = round(bookletCalplate,4)
         plateUnitAmt = totBookletPlates
         for p in Plates_prods:
             platesAmount = totBookletPlates * p.standard_price
@@ -1567,7 +1700,8 @@ class Job(models.Model):
         # Ink Unit Amount : (in Kg)
         # totBookletInk = round(sum(bookObj.calculated_ink for bookObj in job.booklet_ids),4)
         # InkUnitAmt = totBookletInk/1000
-        InkUnitAmt = sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
+        # InkUnitAmt = sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
+        InkUnitAmt = bookletCalInk * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
         totBookletInk = InkUnitAmt/4
         # Ink :
         InkAmount = 0.0
@@ -1606,40 +1740,40 @@ class Job(models.Model):
                 AnalyticLines.create(line)
             case.write({'state': 'cost_created'})
 
-    @api.multi
-    def merge_registry_xml4(self, merge_XML4_Job_id, merge_XML4_noJob_id, unmappedXMl4):
-        for firstXMl4, listXML4 in merge_XML4_Job_id.iteritems():
-            if firstXMl4.job_id and firstXMl4.job_id.id == self.id:
-                for XMl4 in listXML4:
-                    if not XMl4.job_id:
-                        self.update_job_edition(XMl4)
-            else:
-                unmappedXMl4 = list(set([firstXMl4]+listXML4+unmappedXMl4))
-        for XMl1, listXML4 in merge_XML4_noJob_id.iteritems():
-            if XMl1.job_id and XMl1.job_id.id == self.id:
-                for XML4 in listXML4:
-                    if not XML4.job_id:
-                        self.update_job_edition(XML4)
-            else:
-                unmappedXMl4 = list(set(listXML4 + unmappedXMl4))
-        # re-check with XML3 and XML4 during Job creates
-        for XML4 in unmappedXMl4:
-            if XML4.job_id:
-                continue
-            Registry = self.env['file.registry']
-            Job = XML4.duplicate_ref.job_id if XML4.duplicate_ref and XML4.duplicate_ref.part == 'xml1' and XML4.duplicate_ref.job_id else False
-            if not Job:
-                checkWithXMl3 = Registry.search([('part', '=', 'xml3'), ('job_ref', '=', XML4.job_ref)])
-                if checkWithXMl3:
-                    Job = checkWithXMl3.job_id
-                elif not checkWithXMl3:
-                    xml1Reg = Registry.search([('part', '=', 'xml1'), ('issue_date', '=', XML4.issue_date),('info_issue', '=', XML4.info_issue)], limit=1)
-                    if xml1Reg:
-                        XML4.duplicate_ref = xml1Reg.id  # non matching JOBID for XML4 add reference of XML1 registry
-                        Job = xml1Reg.job_id
-            if Job:
-                Job.update_job_edition(XML4)
-        return True
+    # @api.multi
+    # def merge_registry_xml4(self, merge_XML4_Job_id, merge_XML4_noJob_id, unmappedXMl4):
+    #     for firstXMl4, listXML4 in merge_XML4_Job_id.iteritems():
+    #         if firstXMl4.job_id and firstXMl4.job_id.id == self.id:
+    #             for XMl4 in listXML4:
+    #                 if not XMl4.job_id:
+    #                     self.update_job_edition(XMl4)
+    #         else:
+    #             unmappedXMl4 = list(set([firstXMl4]+listXML4+unmappedXMl4))
+    #     for XMl1, listXML4 in merge_XML4_noJob_id.iteritems():
+    #         if XMl1.job_id and XMl1.job_id.id == self.id:
+    #             for XML4 in listXML4:
+    #                 if not XML4.job_id:
+    #                     self.update_job_edition(XML4)
+    #         else:
+    #             unmappedXMl4 = list(set(listXML4 + unmappedXMl4))
+    #     # re-check with XML3 and XML4 during Job creates
+    #     for XML4 in unmappedXMl4:
+    #         if XML4.job_id:
+    #             continue
+    #         Registry = self.env['file.registry']
+    #         Job = XML4.duplicate_ref.job_id if XML4.duplicate_ref and XML4.duplicate_ref.part == 'xml1' and XML4.duplicate_ref.job_id else False
+    #         if not Job:
+    #             checkWithXMl3 = Registry.search([('part', '=', 'xml3'), ('job_ref', '=', XML4.job_ref)])
+    #             if checkWithXMl3:
+    #                 Job = checkWithXMl3.job_id
+    #             elif not checkWithXMl3:
+    #                 xml1Reg = Registry.search([('part', '=', 'xml1'), ('issue_date', '=', XML4.issue_date),('info_issue', '=', XML4.info_issue)], limit=1)
+    #                 if xml1Reg:
+    #                     XML4.duplicate_ref = xml1Reg.id  # non matching JOBID for XML4 add reference of XML1 registry
+    #                     Job = xml1Reg.job_id
+    #         if Job:
+    #             Job.update_job_edition(XML4)
+    #     return True
 
     #update Paper roll whenever new XML4 comes
     @api.multi
@@ -1666,55 +1800,55 @@ class Job(models.Model):
         return True
 
 
-    @api.multi
-    def update_job_edition(self, registry):
-        self.ensure_one()
-        for Job in self:
-            edlines = []
-            res = {}
-            if Job and not Job.order_id and Job.state in ('waiting', 'ready', 'exception'):
-                File4 = base64.decodestring(registry.xmlfile)
-                data4 = ET.fromstring(File4)
-                edData = Job._extract_EditionData({}, False, {}, RegFile4=registry, data4=data4)
-
-                for key, elnvals in edData.iteritems():
-                    for idx in range(1, 8):
-                        res.update({
-                            'paper_mass_' + str(idx): elnvals['paper_mass_' + str(idx)],
-                            'paper_width_' + str(idx): elnvals['paper_width_' + str(idx)],
-                        })
-                        elnvals.pop('paper_mass_' + str(idx))
-                        elnvals.pop('paper_width_' + str(idx))
-                    found = Job.edition_ids.filtered(lambda x: x.name == key)
-                    if not found and key.isalpha():
-                        found = Job.edition_ids.filtered(lambda x: x.name == elnvals.get('infojob_ref'))
-
-                    if found:
-                        # Multiple XML4 adding the values
-                        for edition in found:
-                            elnvals['gross_quantity'] += edition.gross_quantity
-                            elnvals['net_quantity'] += edition.net_quantity
-                            elnvals['waste_start'] += edition.waste_start
-                            elnvals['waste_total'] += edition.waste_total
-                        edlines.append((1, found.id, elnvals))
-                    else:
-                        elnvals.update({'name': key, 'kbajob_ref': registry.job_ref})
-                        edlines.append((0, 0, elnvals))
-                res.update({'edition_ids':edlines})
-
-                Job.write(res)
-
-                Job.update_paper_roll(registry)
-
-                #check updated edition condition & update Registry Xml1 to Done, If pending
-                EditionCheck = len(Job.edition_ids) == Job.edition_count and all(l.net_quantity for l in Job.edition_ids)
-                if EditionCheck:
-                    Reg1 = self.env['file.registry'].search([('state','=','pending'),('part','=','xml1'),('job_id','=',Job.id)])
-                    if Reg1:
-                        Reg1.write({'state':'done'})
-
-                registry.write({'job_id': Job.id, 'is_duplicate': False, 'state': 'done'})
-        return True
+    # @api.multi
+    # def update_job_edition(self, registry):
+    #     self.ensure_one()
+    #     for Job in self:
+    #         edlines = []
+    #         res = {}
+    #         if Job and not Job.order_id and Job.state in ('waiting', 'ready', 'exception'):
+    #             File4 = base64.decodestring(registry.xmlfile)
+    #             data4 = ET.fromstring(File4)
+    #             edData = Job._extract_EditionData({}, False, {}, RegFile4=registry, data4=data4)
+    #
+    #             for key, elnvals in edData.iteritems():
+    #                 for idx in range(1, 8):
+    #                     res.update({
+    #                         'paper_mass_' + str(idx): elnvals['paper_mass_' + str(idx)],
+    #                         'paper_width_' + str(idx): elnvals['paper_width_' + str(idx)],
+    #                     })
+    #                     elnvals.pop('paper_mass_' + str(idx))
+    #                     elnvals.pop('paper_width_' + str(idx))
+    #                 found = Job.edition_ids.filtered(lambda x: x.name == key)
+    #                 if not found and key.isalpha():
+    #                     found = Job.edition_ids.filtered(lambda x: x.name == elnvals.get('infojob_ref'))
+    #
+    #                 if found:
+    #                     # Multiple XML4 adding the values
+    #                     for edition in found:
+    #                         elnvals['gross_quantity'] += edition.gross_quantity
+    #                         elnvals['net_quantity'] += edition.net_quantity
+    #                         elnvals['waste_start'] += edition.waste_start
+    #                         elnvals['waste_total'] += edition.waste_total
+    #                     edlines.append((1, found.id, elnvals))
+    #                 else:
+    #                     elnvals.update({'name': key, 'kbajob_ref': registry.job_ref})
+    #                     edlines.append((0, 0, elnvals))
+    #             res.update({'edition_ids':edlines})
+    #
+    #             Job.write(res)
+    #
+    #             Job.update_paper_roll(registry)
+    #
+    #             #check updated edition condition & update Registry Xml1 to Done, If pending
+    #             EditionCheck = len(Job.edition_ids) == Job.edition_count and all(l.net_quantity for l in Job.edition_ids)
+    #             if EditionCheck:
+    #                 Reg1 = self.env['file.registry'].search([('state','=','pending'),('part','=','xml1'),('job_id','=',Job.id)])
+    #                 if Reg1:
+    #                     Reg1.write({'state':'done'})
+    #
+    #             registry.write({'job_id': Job.id, 'is_duplicate': False, 'state': 'done'})
+    #     return True
 
     def convert_TZ_UTC(self, TZ_datetime):
         fmt = "%Y-%m-%d %H:%M:%S"
@@ -1753,6 +1887,19 @@ class Booklet(models.Model):
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
     edition_id = fields.Many2one('wobe.edition', ondelete='cascade', index=True, copy=False)
 
+    def create(self, vals):
+        format = vals.get('format', False)
+        if format and format == 'MAG':
+            vals['format'] = 'MP'
+        return super(Booklet, self).create(vals)
+
+    def write(self, vals):
+        format = vals.get('format', False)
+        if format and format == 'MAG':
+            vals['format'] = 'MP'
+        return super(Booklet, self).write(vals)
+
+
     @api.depends('format', 'pages', 'paper_weight','job_id.job_type')
     def _compute_all(self):
 
@@ -1761,7 +1908,7 @@ class Booklet(models.Model):
             plates = 0.0
             pages = float(booklet.pages)
             paper_weight = float(booklet.paper_weight)
-            format = 'MP' if booklet.format == 'MAG' else booklet.format
+            # format = 'MP' if booklet.format == 'MAG' else booklet.format
 
             if format == 'BS':
                 plates = pages * 4
@@ -1825,8 +1972,8 @@ class Edition(models.Model):
     production_start = fields.Datetime('Production Start', help='Info DateTime Start')
     production_stop = fields.Datetime('Production End', help='Info DateTime End')
 
-    kbajob_ref  = fields.Char('KBA Job #', help='KBA Job (XML3)', copy=False)
-    infojob_ref = fields.Char('Info Job #', help='Info Job (XML4)', copy=False)
+    # kbajob_ref  = fields.Char('KBA Job #', help='KBA Job (XML3)', copy=False)
+    # infojob_ref = fields.Char('Info Job #', help='Info Job (XML4)', copy=False)
     info_product = fields.Char('Info Product', help='Info product / Edition Name', copy=False)
     alternating_pages = fields.Integer(string='Alternating Pages', help="Count of number of Alternating Pages", copy=False)
 
