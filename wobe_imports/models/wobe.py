@@ -1266,14 +1266,14 @@ class Job(models.Model):
         print_category3, print_category4 = 'plates_regioman', 'ink_regioman'
 
         sqlop = 'IN'
-        edIds = tuple(self.edition_ids.ids)
-        if len(self.edition_ids) == 1:
+        edIds = tuple(job.edition_ids.ids)
+        if len(job.edition_ids) == 1:
             sqlop = '='
-            edIds = self.edition_ids.ids[0]
+            edIds = job.edition_ids.ids[0]
 
         list_query = ("""
                         SELECT
-                          array_agg(calculated_mass), paper_weight, array_agg(calculated_ink), array_agg(id), format
+                          array_agg(calculated_mass), paper_weight, array_agg(id), format
                         FROM
                           wobe_booklet 
                         WHERE 
@@ -1288,14 +1288,21 @@ class Job(models.Model):
         result = self.env.cr.fetchall()
 
         MassPerUnit = {}
-        bookletCalInk = 0.0
+
         for data in result:
             calculated_mass = sum(float(p) for p in data[0])
             paper_weight = float(data[1])
             MassPerUnit[paper_weight] = calculated_mass
-            bookletCalInk += sum(float(p) for p in data[2])
 
-        PlateQty, InkQty = job.plate_amount, bookletCalInk * sum(ed.gross_quantity for ed in job.edition_ids) / 1000 / 4
+        InkQty = 0.0
+        for ed in job.edition_ids:
+            bookInk = 0.0
+            for booklet in ed.booklet_ids:
+                bookInk += booklet.calculated_ink
+            InkQty += bookInk * ed.gross_quantity / 1000 / 4
+
+        PlateQty = job.plate_amount
+
         # PlateQty, InkQty = job.plate_amount, sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000 / 4
 
         pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
@@ -1595,14 +1602,14 @@ class Job(models.Model):
         #         MassPerUnit[key] += booklet.calculated_mass
 
         sqlop = 'IN'
-        edIds = tuple(self.edition_ids.ids)
-        if len(self.edition_ids) == 1:
+        edIds = tuple(job.edition_ids.ids)
+        if len(job.edition_ids) == 1:
             sqlop = '='
-            edIds = self.edition_ids.ids[0]
+            edIds = job.edition_ids.ids[0]
 
         list_query = ("""
                 SELECT
-                  array_agg(calculated_mass), paper_weight, array_agg(calculated_plates), array_agg(calculated_hours), array_agg(calculated_ink)
+                  array_agg(calculated_mass), paper_weight, array_agg(calculated_plates), array_agg(calculated_hours)
                 FROM
                   wobe_booklet 
                 WHERE 
@@ -1616,18 +1623,14 @@ class Job(models.Model):
         self.env.cr.execute(list_query)
         result = self.env.cr.fetchall()
 
-        bookletCalMass, bookletCalHrs, bookletCalInk = 0.0, 0.0, 0.0
-        bookletCalplate = 0
-
+        bookletCalHrs, bookletCalPlate = 0.0, 0
         MassPerUnit = {}
         for data in result:
             calculated_mass = sum(float(p) for p in data[0])
             paper_weight = float(data[1])
             MassPerUnit[paper_weight] = calculated_mass
-            bookletCalMass += calculated_mass
-            bookletCalplate += sum(int(p) for p in data[2])
+            bookletCalPlate += sum(int(p) for p in data[2])
             bookletCalHrs += sum(int(p) for p in data[3])
-            bookletCalInk += sum(int(p) for p in data[4])
 
         paperAmount = 0.0
 
@@ -1662,7 +1665,17 @@ class Job(models.Model):
         # totBookletMass = round(sum(bookObj.calculated_mass for bookObj in job.booklet_ids),4)
         # paperUnitAmt =  totBookletMass/ 1000
         # paperUnitAmt  = sum(bookObj.calculated_mass for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
-        paperUnitAmt  = bookletCalMass * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
+
+        paperUnitAmt, InkUnitAmt, totBookletInk = 0.0, 0.0, 0.0
+        for ed in job.edition_ids:
+            bookMass = 0.0
+            bookInk = 0.0
+            for booklet in ed.booklet_ids:
+                bookMass += booklet.calculated_mass
+                bookInk += booklet.calculated_ink
+            paperUnitAmt += bookMass * ed.gross_quantity / 1000
+            InkUnitAmt += bookInk * ed.gross_quantity / 1000
+            totBookletInk += InkUnitAmt / 4
 
         # totBookletHours = round(sum(bookObj.calculated_hours for bookObj in job.booklet_ids), 4)
         totBookletHours = round(bookletCalHrs, 4)
@@ -1691,7 +1704,7 @@ class Job(models.Model):
 
         # Plates:
         # totBookletPlates = round(sum(bookObj.calculated_plates for bookObj in job.booklet_ids),4)
-        totBookletPlates = round(bookletCalplate,4)
+        totBookletPlates = round(bookletCalPlate,4)
         plateUnitAmt = totBookletPlates
         for p in Plates_prods:
             platesAmount = totBookletPlates * p.standard_price
@@ -1701,8 +1714,8 @@ class Job(models.Model):
         # totBookletInk = round(sum(bookObj.calculated_ink for bookObj in job.booklet_ids),4)
         # InkUnitAmt = totBookletInk/1000
         # InkUnitAmt = sum(bookObj.calculated_ink for bookObj in job.booklet_ids) * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
-        InkUnitAmt = bookletCalInk * sum(ed.gross_quantity for ed in job.edition_ids) / 1000
-        totBookletInk = InkUnitAmt/4
+        # totBookletInk = InkUnitAmt/4
+
         # Ink :
         InkAmount = 0.0
         for p in Ink_prods:
@@ -1908,7 +1921,7 @@ class Booklet(models.Model):
             plates = 0.0
             pages = float(booklet.pages)
             paper_weight = float(booklet.paper_weight)
-            # format = 'MP' if booklet.format == 'MAG' else booklet.format
+            format = booklet.format
 
             if format == 'BS':
                 plates = pages * 4
