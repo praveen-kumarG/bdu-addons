@@ -107,6 +107,8 @@
                                 </field>
                             </page>
                             <page string="Editions" autofocus="">
+                                <button name="button_recompute" type="object" string="" help="Recompute "
+                                                    states="ready,waiting" class="oe_stat_button oe_right" icon="fa-refresh"/>
                                 <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree">
                                     <tree string="Edition Details" editable="bottom">
                                         <field name="name" />
@@ -133,30 +135,30 @@
                                             <field name="planned_quantity" />
                                             <!--<field name="kbajob_ref" invisible="0"/>-->
                                         </group>
-                                        <div>
-                                            <button name="button_recompute" type="object" string="" help="Recompute"
-                                                states="ready,waiting" class="oe_stat_button oe_right" icon="fa-refresh"/>
-                                            <field name="booklet_ids" nolabel="1" widget="one2many_list" mode="tree" readonly="True">
-                                                <tree string="Booklet Details" >
-                                                    <field name="format"/>
-                                                    <field name="pages"/>
-                                                    <field name="paper_weight"/>
-                                                    <!--<field name="stitching"/>-->
-                                                    <!--<field name="glueing"/>-->
-                                                    <field name="calculated_plates"/>
-                                                    <field name="calculated_mass"/>
-                                                    <field name="calculated_ink"/>
-                                                    <field name="calculated_hours"/>
-                                                    <field name="product_id"/>
-                                                </tree>
-                                            </field>
-                                        </div>
+                                        <notebook>
+                                            <page string="Booklet Details">
+                                                <field name="booklet_ids" nolabel="1" widget="one2many_list" mode="tree" readonly="True">
+                                                    <tree string="Booklet Details" >
+                                                        <field name="format"/>
+                                                        <field name="pages"/>
+                                                        <field name="paper_weight"/>
+                                                        <!--<field name="stitching"/>-->
+                                                        <!--<field name="glueing"/>-->
+                                                        <field name="calculated_plates"/>
+                                                        <field name="calculated_mass"/>
+                                                        <field name="calculated_ink"/>
+                                                        <field name="calculated_hours"/>
+                                                        <field name="product_id"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
+                                        </notebook>
                                     </form>
                                 </field>
                             </page>
                             <page string="References">
                                 <group string="References" colspan="4">
-                                    <field name="job_ref" readonly="True"/>
+                                    <!--<field name="job_ref" readonly="True"/>-->
                                     <field name="bduorder_ref" readonly="True"/>
                                     <field name="company_id" readonly="True"/>
                                     <field name="job_type" invisible="1"/>
