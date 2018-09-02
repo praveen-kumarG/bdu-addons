@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_mis_kpi_collector_mis_kpi_collector,mis_kpi_collector.mis_kpi_collector,model_mis_kpi_collector_mis_kpi_collector,,1,0,0,0
+access_pubble_connector,access_pubble_connector,model_pubble_config,pubble_connector,1,1,1,0
+access_pubble_kpi_data,access_pubble_kpi_data.pubble_data,model_mis_pubble_kpi,pubble_kpi_data,1,1,1,1

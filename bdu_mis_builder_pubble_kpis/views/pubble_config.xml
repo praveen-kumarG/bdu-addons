@@ -56,8 +56,9 @@
 
           <group name="documentation" string="Summary" col="1">
               <p>Pubble provides an API by which we can collect the page usage per issue. </p>
-              <p>Normal configuration expects a daily usage by an automation task (see Configuration). Every time the connector collects information from an issue it checks its pressence. This way updates can be retrieved if Pubble administrators are correcting their issue configurations.</p>
-              <p>Each page that is explicitly named as an advertisement page is counted as such. In case of a spread it is counted for two. <u>Every other page</u> is counted as an editiorial one. Inherited pages are practically not in use by the time of conception of this software and as such not taken into consideration.</p>              
+              <p>Normal configuration expects a daily usage by an automation task calling the automated_do_collect from the pubble.config object. This method uses the current system date to collect info. </p> 
+              <p>By using this interface to collect information dates may differ from the system date and thus run a forgotten run or rerun an erronious one or in case Pubble administrators have corrected their issue configurations. Every time the connector collects information, whether automated or manual, it checks the presence of the collected information. This way reruns can safely be done.</p>
+              <p>Each page that is explicitly named as an advertisement page is counted as such. In case of a spread it is counted as one, since Pubble has recently changed their policy on this. <u>Every other page</u> is counted as an editiorial one. Inherited pages are practically not in use by the time of conception of this software and as such not taken into consideration.</p>              
               <p/>
               <p/>
               <a href="https://www.pubble.nl/" target="_blank"> More about Pubble</a>
