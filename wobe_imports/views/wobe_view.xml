@@ -70,10 +70,10 @@
                                 <field name="net_quantity" />
                             </group>
                             <group string="Waste">
-                                <field name="waste_start" />
-                                <field name="waste_total" />
+                                <field name="waste_start" string="% Units startup waste"/>
+                                <field name="waste_total" string="% Units total waste"/>
                             </group>
-                            <group string="Waste">
+                            <group string="Mass">
                                 <field name="total_mass" />
                                 <field name="perc_waste" string="% Mass"/>
                             </group>
