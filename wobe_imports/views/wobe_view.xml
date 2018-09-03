@@ -59,8 +59,8 @@
                                 <field name="total_pages" />
                                 <field name="plate_type" />
                                 <field name="plate_amount"/>
-                                <field name="production_start"/>
-                                <field name="production_stop"/>
+                                <field name="production_start" attrs="{'invisible'}"/>
+                                <field name="production_stop" attrs="{'invisible'}"/>/>
                             </group>
                             <group>
                                 <field name="issue_date" />
@@ -70,8 +70,8 @@
                                 <field name="net_quantity" />
                             </group>
                             <group string="Waste">
-                                <field name="waste_start" string="% Units startup waste"/>
-                                <field name="waste_total" string="% Units total waste"/>
+                                <field name="waste_start" string="Units startup waste"/>
+                                <field name="waste_total" string="Units total waste"/>
                             </group>
                             <group string="Mass">
                                 <field name="total_mass" />
