@@ -59,8 +59,8 @@
                                 <field name="total_pages" />
                                 <field name="plate_type" />
                                 <field name="plate_amount"/>
-                                <field name="production_start" attrs="{'invisible'}"/>
-                                <field name="production_stop" attrs="{'invisible'}"/>/>
+                                <field name="production_start" invisible="True"/>
+                                <field name="production_stop" invisible="True"/>
                             </group>
                             <group>
                                 <field name="issue_date" />
