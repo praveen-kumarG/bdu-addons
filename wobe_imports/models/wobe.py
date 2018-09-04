@@ -1216,7 +1216,7 @@ class Job(models.Model):
             paper_weight = float(data[1])
             MassPerUnit[paper_weight] = calculated_mass
             bookletCalPlate += sum(int(p) for p in data[2])
-            bookletCalHrs += sum(int(p) for p in data[3])
+            bookletCalHrs += sum(float(p) for p in data[3])
 
         paperAmount = 0.0
 
