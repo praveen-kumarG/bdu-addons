@@ -74,15 +74,22 @@ class PubbleConfig(models.Model):
 
     @api.multi
     def automated_do_collect(self):
-        configuration = self[0]
-        configuration.begin = datetime.date.today()
-        configuration.end   = datetime.date.today()
-        configuration.write()
-        return self.do_collect()
+        pdb.set_trace()
+        configurations = self.search([])
+        if not configurations :
+            _logger.info("Cannot run automated_do_collect. Need a valid configuration")
+            return False
+        else :
+            self = configurations[0]
+            self.begin = datetime.date.today()
+            self.end   = datetime.date.today()
+            self.write({})
+            return self.do_collect()
 
     
     @api.multi 
     def do_collect(self):
+        pdb.set_trace()
 
         #collect data based on config 	    
         config = self[0] 
