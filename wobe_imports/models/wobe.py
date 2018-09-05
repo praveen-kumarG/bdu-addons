@@ -1199,7 +1199,7 @@ class Job(models.Model):
                 WHERE 
                   edition_id {0} {1}
                 GROUP BY 
-                  format, paper_weight
+                  paper_weight
             """.format(
                 sqlop,
                 edIds
@@ -1209,14 +1209,39 @@ class Job(models.Model):
 
         bookletCalHrs, bookletCalPlate = 0.0, 0
 
-        # Total Mass per PaperMass
-        MassPerUnit = {}
+        # Total Waste Mass per PaperMass
+        wMassPerUnit ={}
         for data in result:
             calculated_mass = sum(float(p) for p in data[0])
             paper_weight = float(data[1])
-            MassPerUnit[paper_weight] = calculated_mass
+            wMassPerUnit[paper_weight] = calculated_mass
             bookletCalPlate += sum(int(p) for p in data[2])
             bookletCalHrs += sum(float(p) for p in data[3])
+
+        # Total Net Mass per PaperMass
+        nMassPerUnit = {}
+        for ed in job.edition_ids:
+            list_query = ("""
+                        SELECT
+                          array_agg(calculated_mass), paper_weight 
+                        FROM
+                          wobe_booklet 
+                        WHERE 
+                          edition_id = {0}
+                        GROUP BY 
+                          paper_weight
+                    """.format(
+                        ed.id
+                ))
+            self.env.cr.execute(list_query)
+            result = self.env.cr.fetchall()
+            for data in result:
+                calculated_mass = sum(float(p) for p in data[0])
+                paper_weight = float(data[1])
+                if paper_weight in nMassPerUnit:
+                    nMassPerUnit[paper_weight] += calculated_mass * ed.net_quantity / 1000
+                else:
+                    nMassPerUnit[paper_weight] = calculated_mass * ed.net_quantity / 1000
 
         paperAmount = 0.0
 
@@ -1227,12 +1252,13 @@ class Job(models.Model):
             num_width = width * int(roll.number_rolls)
 
             # Net Production: (in Kg)
-            NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
+            # NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
+            NetMass = nMassPerUnit.get(mass, 0)
             num_mass = num_mass if num_mass > 0 else 1
             NetQty = (NetMass/ num_mass * num_width)
 
             # Waste Production: (in Kg)
-            WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
+            WasteMass = wMassPerUnit.get(mass, 0) * job.waste_total / 1000.0
             WasteQty = (WasteMass / num_mass * num_width)
 
             paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price
@@ -1250,8 +1276,9 @@ class Job(models.Model):
                 bookMass += booklet.calculated_mass
                 bookInk += booklet.calculated_ink
             paperUnitAmt += bookMass * ed.gross_quantity / 1000
-            InkUnitAmt += bookInk * ed.gross_quantity / 1000
-            totBookletInk += InkUnitAmt / 4
+            inkAmt = bookInk * ed.gross_quantity / 1000
+            InkUnitAmt += inkAmt
+            totBookletInk += (inkAmt / 4)
 
         totBookletHours = round(bookletCalHrs, 4)
         hoursAmount = totBookletHours * 1200
