@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from product import PrintCategory
 from lxml import etree
+import time
 
 
 _logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ class Job(models.Model):
     _description = 'WOBE Job'
 
     @api.one
-    @api.depends('edition_ids', 'booklet_ids')
+    @api.depends('edition_ids')
     def _compute_all(self):
         eds = self.edition_ids
         self.waste_start = sum(line.waste_start for line in eds)
@@ -33,8 +34,9 @@ class Job(models.Model):
         nq = sum(line.net_quantity for line in eds)
 
         self.perc_waste = int(float(wt) / float(gq) * 100) if gq > 0 else False
-        self.production_start = eds and min(line.production_start for line in eds) or False
-        self.production_stop = eds and max(line.production_stop for line in eds) or False
+        self.production_start = eds and self.convert_UTC_TZ(min(line.production_start for line in eds)) or False
+        self.production_stop = eds and self.convert_UTC_TZ(max(line.production_stop for line in eds)) or False
+
         self.gross_quantity = gq
         self.net_quantity = nq
         self.waste_total = wt
@@ -1387,6 +1389,17 @@ class Job(models.Model):
         local_datetime = datetime.strptime(TZ_datetime, fmt)
         result_utc_datetime = local_datetime + UTC_OFFSET_TIMEDELTA
         return result_utc_datetime.strftime(fmt)
+
+    def convert_UTC_TZ(self, UTC_datetime):
+        UTC_datetime = datetime.strptime(UTC_datetime, "%Y-%m-%d %H:%M:%S")
+        fmt = "%Y-%m-%d %H:%M:%S"
+        now_utc = datetime.now(timezone('UTC'))
+        # Convert to current user time zone
+        now_timezone = now_utc.astimezone(timezone(self.env.user.tz))
+        UTC_OFFSET_TIMEDELTA =  datetime.strptime(
+            now_timezone.strftime(fmt), fmt) - datetime.strptime(now_utc.strftime(fmt), fmt)
+        result_tz_datetime = UTC_datetime + UTC_OFFSET_TIMEDELTA
+        return result_tz_datetime.strftime(fmt)
 
 
 class Booklet(models.Model):
