@@ -70,8 +70,13 @@
                                 <field name="net_quantity" />
                             </group>
                             <group string="Waste">
+<<<<<<< HEAD
                                 <field name="waste_start" string="Units startup waste"/>
                                 <field name="waste_total" string="Units total waste"/>
+=======
+                                <field name="waste_start" string="Units Startup Waste"/>
+                                <field name="waste_total" string="Units Total Waste"/>
+>>>>>>> 4cf8304... Task:PRINT-2: Wobe Changes
                             </group>
                             <group string="Mass">
                                 <field name="total_mass" />
