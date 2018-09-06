@@ -183,7 +183,7 @@ class Job(models.Model):
                 if not Reg1:
                     continue
 
-                Reg1FileAB = Reg.search([('id', 'in', regIds),('part','in',('xml1a','xml1b'))], order='part, run_date, file_create_date')
+                Reg1FileAB = Reg.search([('id', 'in', regIds),('part','in',('xml1a','xml1b'))], order='part, file_track_date')
                 Reg3Files = Reg.search([('id', 'in', regIds),('part','=','xml3')], order='run_date, file_create_date')
                 Reg4Files = Reg.search([('id', 'in', regIds), ('part', '=', 'xml4')])
 
@@ -803,8 +803,14 @@ class Job(models.Model):
             'job_type': 'regioman', 'convert_ok': False,
             'edition_ids': map(lambda x: (2, x), [x.id for x in self.edition_ids]),
             'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids]),
+            'plate_type':'PU',
             })
         self.fetch_paperProducts()
+
+        # update file registry status to done
+        registry = self.env['file.registry'].search([('job_id','in',self.ids),('state','!=','done')])
+        registry.write({'state':'done'})
+
         ctx = self.env.context.copy()
         ctx.update({'editionFocus':True})
         return {
@@ -1408,12 +1414,14 @@ class Booklet(models.Model):
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
     edition_id = fields.Many2one('wobe.edition', ondelete='cascade', index=True, copy=False)
 
+    @api.model
     def create(self, vals):
         format = vals.get('format', False)
         if format and format == 'MAG':
             vals['format'] = 'MP'
         return super(Booklet, self).create(vals)
 
+    @api.multi
     def write(self, vals):
         format = vals.get('format', False)
         if format and format == 'MAG':

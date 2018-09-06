@@ -99,6 +99,7 @@
                             <field name="part"/>
                             <field name="name" invisible="1"/>
                             <field name="xmlfile" filename="name"/>
+                            <field name="file_track_date" attrs="{'invisible': [('part','not in',('xml1a','xml1b'))]}" String="Ifra Track Date"/>
                         </group>
                         <group>
                             <field name="bduorder_ref"/>
