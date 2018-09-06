@@ -74,7 +74,6 @@ class PubbleConfig(models.Model):
 
     @api.multi
     def automated_do_collect(self):
-        pdb.set_trace()
         configurations = self.search([])
         if not configurations :
             _logger.info("Cannot run automated_do_collect. Need a valid configuration")
@@ -89,13 +88,13 @@ class PubbleConfig(models.Model):
     
     @api.multi 
     def do_collect(self):
-        pdb.set_trace()
 
         #collect data based on config 	    
         config = self[0] 
-        most_recent=datetime.datetime.strptime(config.latest_issue,DEFAULT_SERVER_DATE_FORMAT).date()
-        if not most_recent :
+        if not config.latest_issue :
             most_recent=datetime.date(1970,1,1)
+        else :
+            most_recent=datetime.datetime.strptime(config.latest_issue,DEFAULT_SERVER_DATE_FORMAT).date()
 
         if not config.begin or not config.end :
             raise ValidationError("Please provide begin and end date")
@@ -139,6 +138,10 @@ class PubbleConfig(models.Model):
                     d['title_code'] = title_account[0]['code']
                     d['company_id'] = title_account[0].analytic_account_id.company_id.id
                     d['analytic_account_id'] = title_account[0].analytic_account_id.id
+                    ou_ids = self.env['account.analytic.account'].search([('id','=',d['analytic_account_id'])])
+                    d['operating_unit_id'] = ou_ids.operating_unit_ids.id
+                    _logger.info("analytic_account_id : %s", d['analytic_account_id'])
+                    _logger.info("operating_unit_id   : %s", d['operating_unit_id'])
                 else:
                     message += ", title "+d['title']+" not/double in ad issues"
                     d['title_code'] = ""
@@ -193,7 +196,7 @@ class PubbleConfig(models.Model):
 
             #leave testimonial with config info
             config.latest_issue   = most_recent
-            config.latest_run     = datetime.date.today().strftime('%Y-%m-%d')+message
+            config.latest_run     = datetime.datetime.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')+message
             config.latest_success = datetime.date.today()
             config.latest_status  = status
             config.latest_reason  = reason
@@ -208,4 +211,4 @@ class PubbleConfig(models.Model):
             _logger.info("Error while trying to import Pubble data")
             return False
 
-		
+	

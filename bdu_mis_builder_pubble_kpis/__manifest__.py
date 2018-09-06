@@ -20,7 +20,10 @@
     'version': '0.1',
 
     # depends on mis_builder to find menu location (see views)
-    'depends': ['base', 'mis_builder'],
+    'depends': ['base', 
+                'mis_builder',
+                'mis_builder_operating_unit', #declares operating units and filter on move lines
+               ],
 
     # always loaded
     'data': [
