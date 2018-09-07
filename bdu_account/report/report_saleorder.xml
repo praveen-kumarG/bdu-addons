@@ -120,7 +120,7 @@
                                                                l.env.ref('sale_advertising_order.magazine_online_advertising_category'))">
                                             <span t-field="l.from_date"/><span> - </span><span t-field="l.to_date"/>
                                         </td>
-                                        <td t-if="not l.medium.name in (l.env.ref('sale_advertising_order.online_advertising_category'),
+                                        <td t-if="not l.medium in (l.env.ref('sale_advertising_order.online_advertising_category'),
                                                                l.env.ref('sale_advertising_order.magazine_online_advertising_category'))">
                                             <span t-field="l.issue_date"/></td>
                                         <!--<t t-if="not doc.operating_unit_id.use_bduprint"><td><span t-if="l.title" t-field="l.title.name"/></td></t>-->
