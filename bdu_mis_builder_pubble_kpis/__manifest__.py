@@ -22,7 +22,7 @@
     # depends on mis_builder to find menu location (see views)
     'depends': ['base', 
                 'mis_builder',
-                'mis_builder_operating_unit', #declares operating units and filter on move lines
+                'mis_builder_operating_unit', #provides analytic account interface on reports and config
                ],
 
     # always loaded
