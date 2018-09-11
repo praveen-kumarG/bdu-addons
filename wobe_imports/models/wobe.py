@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from product import PrintCategory
 from lxml import etree
+import time
 
 
 _logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ class Job(models.Model):
     _description = 'WOBE Job'
 
     @api.one
-    @api.depends('edition_ids', 'booklet_ids')
+    @api.depends('edition_ids')
     def _compute_all(self):
         eds = self.edition_ids
         self.waste_start = sum(line.waste_start for line in eds)
@@ -33,8 +34,9 @@ class Job(models.Model):
         nq = sum(line.net_quantity for line in eds)
 
         self.perc_waste = int(float(wt) / float(gq) * 100) if gq > 0 else False
-        self.production_start = eds and min(line.production_start for line in eds) or False
-        self.production_stop = eds and max(line.production_stop for line in eds) or False
+        self.production_start = eds and self.convert_UTC_TZ(min(line.production_start for line in eds)) or False
+        self.production_stop = eds and self.convert_UTC_TZ(max(line.production_stop for line in eds)) or False
+
         self.gross_quantity = gq
         self.net_quantity = nq
         self.waste_total = wt
@@ -1205,7 +1207,7 @@ class Job(models.Model):
                 WHERE 
                   edition_id {0} {1}
                 GROUP BY 
-                  format, paper_weight
+                  paper_weight
             """.format(
                 sqlop,
                 edIds
@@ -1215,14 +1217,39 @@ class Job(models.Model):
 
         bookletCalHrs, bookletCalPlate = 0.0, 0
 
-        # Total Mass per PaperMass
-        MassPerUnit = {}
+        # Total Waste Mass per PaperMass
+        wMassPerUnit ={}
         for data in result:
             calculated_mass = sum(float(p) for p in data[0])
             paper_weight = float(data[1])
-            MassPerUnit[paper_weight] = calculated_mass
+            wMassPerUnit[paper_weight] = calculated_mass
             bookletCalPlate += sum(int(p) for p in data[2])
             bookletCalHrs += sum(float(p) for p in data[3])
+
+        # Total Net Mass per PaperMass
+        nMassPerUnit = {}
+        for ed in job.edition_ids:
+            list_query = ("""
+                        SELECT
+                          array_agg(calculated_mass), paper_weight 
+                        FROM
+                          wobe_booklet 
+                        WHERE 
+                          edition_id = {0}
+                        GROUP BY 
+                          paper_weight
+                    """.format(
+                        ed.id
+                ))
+            self.env.cr.execute(list_query)
+            result = self.env.cr.fetchall()
+            for data in result:
+                calculated_mass = sum(float(p) for p in data[0])
+                paper_weight = float(data[1])
+                if paper_weight in nMassPerUnit:
+                    nMassPerUnit[paper_weight] += calculated_mass * ed.net_quantity / 1000
+                else:
+                    nMassPerUnit[paper_weight] = calculated_mass * ed.net_quantity / 1000
 
         paperAmount = 0.0
 
@@ -1233,12 +1260,13 @@ class Job(models.Model):
             num_width = width * int(roll.number_rolls)
 
             # Net Production: (in Kg)
-            NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
+            # NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
+            NetMass = nMassPerUnit.get(mass, 0)
             num_mass = num_mass if num_mass > 0 else 1
             NetQty = (NetMass/ num_mass * num_width)
 
             # Waste Production: (in Kg)
-            WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
+            WasteMass = wMassPerUnit.get(mass, 0) * job.waste_total / 1000.0
             WasteQty = (WasteMass / num_mass * num_width)
 
             paperAmount += (NetQty + WasteQty) * roll.product_id.standard_price
@@ -1256,8 +1284,9 @@ class Job(models.Model):
                 bookMass += booklet.calculated_mass
                 bookInk += booklet.calculated_ink
             paperUnitAmt += bookMass * ed.gross_quantity / 1000
-            InkUnitAmt += bookInk * ed.gross_quantity / 1000
-            totBookletInk += InkUnitAmt / 4
+            inkAmt = bookInk * ed.gross_quantity / 1000
+            InkUnitAmt += inkAmt
+            totBookletInk += (inkAmt / 4)
 
         totBookletHours = round(bookletCalHrs, 4)
         hoursAmount = totBookletHours * 1200
@@ -1360,6 +1389,17 @@ class Job(models.Model):
         local_datetime = datetime.strptime(TZ_datetime, fmt)
         result_utc_datetime = local_datetime + UTC_OFFSET_TIMEDELTA
         return result_utc_datetime.strftime(fmt)
+
+    def convert_UTC_TZ(self, UTC_datetime):
+        UTC_datetime = datetime.strptime(UTC_datetime, "%Y-%m-%d %H:%M:%S")
+        fmt = "%Y-%m-%d %H:%M:%S"
+        now_utc = datetime.now(timezone('UTC'))
+        # Convert to current user time zone
+        now_timezone = now_utc.astimezone(timezone(self.env.user.tz))
+        UTC_OFFSET_TIMEDELTA =  datetime.strptime(
+            now_timezone.strftime(fmt), fmt) - datetime.strptime(now_utc.strftime(fmt), fmt)
+        result_tz_datetime = UTC_datetime + UTC_OFFSET_TIMEDELTA
+        return result_tz_datetime.strftime(fmt)
 
 
 class Booklet(models.Model):
