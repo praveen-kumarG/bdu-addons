@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+         <record id="object0" model="pubble.config">
+            <field name="server">ws.pubble.nl</field>
+            <field name="method">/Production.svc/getPageReport?api=P3K556GAL9MM74ZG900RT43GHT1NB&amp;database=nhbdudata&amp;fromDate=$begin&amp;toDate=$end</field>
+
+            <field name="$latest_issue"></field>
+            <field name="$latest_run"></field>
+            <field name="$latest_success"></field>
+            <field name="$latest_status"></field>
+            <field name="$latest_reason"></field> 
+
+            <field name="$begin">20180329</field>
+            <field name="$end">20180329</field>
+          </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<odoo>
+
+  <!--  Form view for Pubble connector settings and operation --> 
+  <record id="view_form_pubble_kpi_data_connector" model="ir.ui.view">
+    <field name="name">Pubble KPI connector</field>
+    <field name="model">pubble.config</field> 
+    <field name="arch" type="xml">
+      <form string="Pubble KPI connector" create="false" edit="false" action="false" 
+                                     class="oe_form_configuration">
+        <header > 
+        </header>
+
+          <br/>
+          <group name="connector_config" string="Connector configuration">
+            <field name="server"/> 
+            <field name="method"/> 
+          </group>
+          <button name="save_config" type="object" 
+            string="Save" class="oe_highlight" /> 
+          <br/>
+          <br/>
+
+
+          <group name="production_status" string="Production status">
+            <group>
+              <field name="latest_issue" readonly="1"/> 
+              <field name="latest_run" readonly="1"/> 
+              <field name="latest_success" readonly="1"/> 
+              <field name="latest_status" readonly="1"/> 
+              <field name="latest_reason" readonly="1"/> 
+            </group>
+            <group>
+            </group>
+          </group>
+          <br/>
+          <br/>
+
+
+
+          <group name="manual_run" string="Manual collect" >
+            <div colspan="2">
+              <p>Enter dates and press "Collect" to collect records for given period. </p>
+            </div>
+            <group>
+              <field name="begin"/> 
+              <field name="end"/> 
+            </group>
+            <group>
+            </group>
+          </group>
+          <button string="Collect" name="do_collect" type="object" class="oe_highlight"/>
+          <br/>
+          <br/>
+
+
+          <group name="documentation" string="Summary" col="1">
+              <p>Pubble provides an API by which we can collect the page usage per issue. </p>
+              <p>Normal configuration expects a daily usage by an automation task calling the automated_do_collect from the pubble.config object. This method uses the current system date to collect info. </p> 
+              <p>By using this interface to collect information dates may differ from the system date and thus run a forgotten run or rerun an erronious one or in case Pubble administrators have corrected their issue configurations. Every time the connector collects information, whether automated or manual, it checks the presence of the collected information. This way reruns can safely be done.</p>
+              <p>Each page that is explicitly named as an advertisement page is counted as such. In case of a spread it is counted as one, since Pubble has recently changed their policy on this. <u>Every other page</u> is counted as an editiorial one. Inherited pages are practically not in use by the time of conception of this software and as such not taken into consideration.</p>              
+              <p/>
+              <p/>
+              <a href="https://www.pubble.nl/" target="_blank"> More about Pubble</a>
+          </group>
+
+
+      </form>
+    </field>
+  </record> 
+
+  <!-- Connection info via server action and submenu-->
+  <record id="config_pubble_kpi_connector" model="ir.actions.server"> 
+    <field name="name">Pubble kpi connector</field> 
+    <field name="model_id" ref="model_pubble_config"/> 
+    <field name="code">
+      action = model.default_view()
+    </field>
+  </record> 
+
+  <!-- Menu item to open KPI connection configuration--> 
+  <menuitem id="Pubble_KPI_connector_menuitem" 
+    name="Pubble connector" 
+    action="config_pubble_kpi_connector"
+    parent="mis_builder.mis_report_conf_menu" 
+    sequence="23"
+     /> 
+
+
+</odoo>

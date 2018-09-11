@@ -1,0 +1,93 @@
+<?xml version="1.0"?> 
+<odoo>
+
+  <!-- Form for record interaction  --> 
+  <record id="view_tree_pubble_data" model="ir.ui.view"> 
+    <field name="name">Pubble data</field> 
+    <field name="model">mis.pubble.kpi</field> 
+    <field name="arch" type="xml"> 
+      <tree string="KPI data"> 
+          <field name="title_code"/> 
+          <field name="issue_date"/> 
+          <field name="page_nr"/> 
+          <field name="ad_page"/> 
+          <field name="ed_page"/>  
+          <field name="is_spread"/> 
+          <field name="is_inherited"/> 
+          <field name="title"/> 
+          <field name="page_type"/> 
+          <field name="page_style"/>
+          <field name="ad_count"/> 
+          <field name="company_id"/> 
+          <field name="operating_unit_id"/> 
+          <field name="analytic_account_id"/> 
+      </tree> 
+    </field> 
+  </record> 
+
+  <!-- List view in first screen --> 
+  <record id="view_form_pubble_data" model="ir.ui.view"> 
+    <field name="name">Pubble data</field> 
+    <field name="model">mis.pubble.kpi</field> 
+    <field name="arch" type="xml"> 
+      <form string="KPI data">
+        <group> 
+          <field name="title"/> 
+          <field name="title_code"/> 
+          <field name="issue_date"/> 
+          <field name="page_nr"/> 
+          <field name="page_type"/> 
+          <field name="page_style"/> 
+          <field name="is_spread"/> 
+          <field name="is_inherited"/> 
+          <field name="ad_count"/> 
+          <field name="ad_page"/> 
+          <field name="ed_page"/> 
+          <field name="company_id"/> 
+          <field name="operating_unit_id"/> 
+          <field name="analytic_account_id"/> 
+        </group> 
+      </form> 
+    </field> 
+  </record> 
+
+  <record id="view_filter_pubble_data" model="ir.ui.view">
+    <field name="name">Pubble data filter</field>
+    <field name="model">mis.pubble.kpi</field>
+    <field name="arch" type="xml">
+      <search string="Search Advertising Sales Order Lines">
+
+          <field name="title_code"/>
+          <field name="issue_date"/>
+          <field name="page_nr"/>
+          <field name="page_type"/>
+
+          <filter string="Spreads" domain="[('is_spread','=', True)]"  />
+          <separator/>
+
+          <group expand="0" string="Group By">
+              <filter string="Title code" domain="[]" context="{'group_by':'title_code'}"/>
+              <filter string="Issue date" domain="[]" context="{'group_by':'issue_date'}"/>
+              <filter string="Page type"  domain="[]" context="{'group_by':'page_type'}"/>
+          </group>
+
+      </search>
+    </field>
+  </record>
+
+
+  <!-- Action to open KPI list --> 
+  <act_window id="show_kpi_data" 
+    name="KPI data" 
+    res_model="mis.pubble.kpi" 
+    view_mode="tree,form" /> 
+  
+  <!-- Menu item to open KPI list with, requires MIS builder to be loaded--> 
+  <menuitem id="show_kpi_data_menu" 
+    name="Pubble data" 
+    action="show_kpi_data"
+    parent="mis_builder.mis_report_finance_menu" 
+    sequence="301"
+     /> 
+
+</odoo>

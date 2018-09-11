@@ -59,8 +59,8 @@
                                 <field name="total_pages" />
                                 <field name="plate_type" />
                                 <field name="plate_amount"/>
-                                <field name="production_start"/>
-                                <field name="production_stop"/>
+                                <field name="production_start" invisible="True"/>
+                                <field name="production_stop" invisible="True"/>
                             </group>
                             <group>
                                 <field name="issue_date" />
@@ -70,17 +70,19 @@
                                 <field name="net_quantity" />
                             </group>
                             <group string="Waste">
-                                <field name="waste_start" />
-                                <field name="waste_total" />
+                                <field name="waste_start" string="Units startup waste"/>
+                                <field name="waste_total" string="Units total waste"/>
+                                <field name="waste_start" string="Units Startup Waste"/>
+                                <field name="waste_total" string="Units Total Waste"/>
                             </group>
-                            <group string="Waste">
+                            <group string="Mass">
                                 <field name="total_mass" />
-                                <field name="perc_waste" />
+                                <field name="perc_waste" string="% Mass"/>
                             </group>
                         </group>
 
                         <notebook colspan="4">
-                            <page string="Booklet Details">
+                            <!--<page string="Booklet Details">
                                 <button name="button_recompute" type="object" string="" help="Recompute"
                                     states="ready,waiting" class="oe_stat_button oe_right" icon="fa-refresh"/>
                                 <field name="booklet_ids" nolabel="1" widget="one2many_list" mode="tree" readonly="True">
@@ -96,7 +98,7 @@
                                         <field name="calculated_hours"/>
                                     </tree>
                                 </field>
-                            </page>
+                            </page>-->
                             <page string="Other/Paper Details">
                                 <field name="paper_product_ids" nolabel="1" widget="one2many_list" mode="tree">
                                     <tree string="Paper Products" editable="bottom">
@@ -107,23 +109,51 @@
                                 </field>
                             </page>
                             <page string="Editions" autofocus="">
+                                <button name="button_recompute" type="object" string="" help="Recompute "
+                                                    states="ready,waiting" class="oe_stat_button oe_right" icon="fa-refresh"/>
                                 <field name="edition_ids" nolabel="1" widget="one2many_list" mode="tree">
                                     <tree string="Edition Details" editable="bottom">
                                         <field name="name" />
-                                        <field name="plate_amount"/>
                                         <field name="net_quantity"/>
                                         <field name="gross_quantity"/>
                                         <field name="alternating_pages"/>
                                         <field name="waste_total" invisible="True"/>
-                                        <field name="production_start" attrs="{'required':[('kbajob_ref','=',False)]}"/>
-                                        <field name="production_stop" attrs="{'required':[('kbajob_ref','=',False)]}"/>
-                                        <field name="kbajob_ref" invisible="0"/>
+                                        <field name="production_start" />
+                                        <field name="production_stop" />
+                                        <field name="planned_quantity" />
                                     </tree>
+                                    <form>
+                                        <group colspan="4">
+                                            <field name="name" />
+                                            <field name="net_quantity"/>
+                                            <field name="gross_quantity"/>
+                                            <field name="alternating_pages"/>
+                                            <field name="waste_total" invisible="True"/>
+                                            <field name="production_start" />
+                                            <field name="production_stop" />
+                                            <field name="planned_quantity" />
+                                        </group>
+                                        <notebook>
+                                            <page string="Booklet Details">
+                                                <field name="booklet_ids" nolabel="1" widget="one2many_list" mode="tree" readonly="True">
+                                                    <tree string="Booklet Details" >
+                                                        <field name="format"/>
+                                                        <field name="pages"/>
+                                                        <field name="paper_weight"/>
+                                                        <field name="calculated_plates"/>
+                                                        <field name="calculated_mass"/>
+                                                        <field name="calculated_ink"/>
+                                                        <field name="calculated_hours"/>
+                                                        <field name="product_id"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
+                                        </notebook>
+                                    </form>
                                 </field>
                             </page>
                             <page string="References">
                                 <group string="References" colspan="4">
-                                    <field name="job_ref" readonly="True"/>
                                     <field name="bduorder_ref" readonly="True"/>
                                     <field name="company_id" readonly="True"/>
                                     <field name="job_type" invisible="1"/>
@@ -163,7 +193,7 @@
                     <field name="waste_start" />
                     <field name="waste_total" />
                     <field name="total_mass" />
-                    <field name="perc_waste" />
+                    <field name="perc_waste" string="% Mass"/>
                     <field name="state"/>
                 </tree>
             </field>
@@ -183,7 +213,7 @@
                     <field name="waste_start" type="measure"/>
                     <field name="waste_total" type="measure"/>
                     <field name="total_mass" type="measure"/>
-                    <field name="perc_waste" type="measure"/>
+                    <field name="perc_waste" type="measure" string="% Mass"/>
                 </pivot>
             </field>
         </record>

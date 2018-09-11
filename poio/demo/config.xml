@@ -1,0 +1,23 @@
+<odoo>
+    <data>
+        
+          <record id="object0" model="poio.config">
+            <field name="order_ftp_user">TMG_Media_Odoo</field>
+            <field name="order_ftp_password">Vandaag22</field>
+            <field name="order_ftp_server">ftp.bdu.nl</field>
+
+            <field name="material_ftp_user">TMG_Media_mat-Pubble</field>
+            <field name="material_ftp_password">Vandaag22</field>
+            <field name="material_ftp_server">ftp.bdu.nl</field>
+            
+            <field name="channel">Promille order interface</field>
+            <field name="partner_am">Promille Interface</field>
+            <field name="partner" ref= "Promille media"></field>
+            
+            <field name="discount_reason_text">Vaste afspraak</field>
+            <field name="partner_order_prefix">Promille_ordernr_</field>
+            <field name="partner_orderline_prefix">Promille_orderregelnr_</field>
+          </record>
+        
+    </data>
+</odoo>
