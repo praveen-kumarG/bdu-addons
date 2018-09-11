@@ -20,11 +20,15 @@
     'version': '0.1',
 
     # depends on mis_builder to find menu location (see views)
-    'depends': ['base', 'mis_builder'],
+    'depends': ['base', 
+                'mis_builder',
+                'mis_builder_operating_unit', #provides analytic account interface on reports and config
+               ],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/security.xml',
+        'security/ir.model.access.csv',
         'views/pubble_config.xml',
         'views/pubble_kpis.xml',
     ],
