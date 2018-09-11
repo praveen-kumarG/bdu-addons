@@ -1,0 +1,90 @@
+<?xml version="1.0"?> 
+<odoo>
+
+
+  <!--  Form view for config settings --> 
+  <record id="view_poio_connection_config" model="ir.ui.view">
+    <field name="name">Promille interface settings</field>
+    <field name="model">poio.config</field>
+    <field name="arch" type="xml">
+      <form string="Configure Promille interface" create="false" edit="false" action="false" class="oe_form_configuration">
+        <header > 
+            <button name="save_config" type="object" string="Save configuration" class="oe_highlight" /> 
+            <button name="test_order_connection" type="object" string="Test orders connection" class="oe_link" /> 
+            <button name="test_material_connection" type="object" string="Test materiaal connection" class="oe_link" />  
+            <button name="get_files" type="object" string="Get files" class="oe_link" /> 
+            <button name="process_files" type="object" string="Process files" class="oe_link" /> 
+        </header>
+          <group name="orders" string="Orders">
+            <field name="o_server"/> 
+            <field name="o_user"/> 
+            <field name="o_password"/> 
+            <field name="work_dir"/> 
+            <field name="o_status"/> 
+          </group>
+          <group name="ad material" string="Materiaal">
+            <field name="m_server"/> 
+            <field name="m_user"/> 
+            <field name="m_password"/> 
+            <field name="m_status"/> 
+          </group>
+          <group name="defaults" string="Standaard waarden">
+            <field name="channel"/> 
+            <field name="partner_am"/> 
+            <field name="partner"/> 
+            <field name="discount_reason"/> 
+            <field name="order_prefix"/> 
+            <field name="orderline_prefix"/> 
+            <field name="sector"/> 
+          </group>
+          <group name="documentation" string="Toelichting">
+            <div colspan="4">
+              <p/>
+              <p/>
+              <p>Orders are stored or updated with reference to accompanying customers and contact persons. Hence import is in a stardard order: first customers, then contacts and finally orders.</p>
+              <p>Orders are uniquely identified by the Promille ordernummber. This is stored in the external reference.
+              Orderlines need a combination of Promille ordernumber, Promille ad_id (identifies an advertisement) and title. This unique combination is stored in orderline's ad_number.</p>
+              <p>Orders are picked up from a configurable FTP server. The working directory is the local directory where orders are copied to and processed until dismissed. 
+              Ad material is expected at a separate configurable server and its URI will be forwarded in the orderline's url_to_material. </p>
+              <p>Each server configuration may be tested using the buttons at the top line.</p>
+              
+              <p></p>
+              <p></p>
+              <p/>
+              <p/>
+              <p/>
+              <p/>
+              <a href="https://promillemedia.nl/" target="_blank"> More about Promille media</a>
+            </div>
+          </group>
+      </form>
+    </field>
+  </record> 
+
+
+
+ 
+
+
+  <!-- Connection info via server action and submenu-->
+  <record id="config_poio_interface" model="ir.actions.server"> 
+    <field name="name">POIO system configuration</field> 
+    <field name="model_id" ref="model_poio_config"/> 
+    <field name="code">
+      action = model.default_view()
+    </field>
+  </record> 
+
+  <menuitem id="config_poio_interface_menu" 
+    name="System configuration" 
+    action="config_poio_interface"
+    sequence="215"
+    parent="poio_config_menu" 
+     /> 
+
+
+
+
+
+
+</odoo>

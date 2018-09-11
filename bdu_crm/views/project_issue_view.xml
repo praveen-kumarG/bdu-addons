@@ -100,7 +100,7 @@
                 <field name="task_id" position="after">
                     <field name="deadline"/>
                     <field name="edition_date"/>
-                    <field name="edition_id" domain="[('parent_id', '=', title_id), ('issue_date', '=', edition_date)]"/>
+                    <field name="edition_id" domain="[('parent_id', '=', title_id)]"/>
                     <field name="solution_id"/>
                 </field>
                 <xpath expr="//notebook/page[1]" position="after">

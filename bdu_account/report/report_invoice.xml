@@ -2,7 +2,6 @@
 <odoo>
 <data>
 
-
 <template id="external_layout_bdu">
     <!-- Multicompany -->
     <t t-if="not o and doc">
@@ -14,14 +13,19 @@
     <t t-if="not o or not 'company_id' in o">
         <t t-set="company" t-value="res_company"/>
     </t>
-    <t t-if="o and o.magazine">
-        <t t-set="ou" t-value="o.env.ref('bdumedia.bdumedia_vakmedia')"/>
+    <t t-if="o._name in ('sale.order', 'account.invoice')">
+        <t t-if="o and o.magazine">
+            <t t-set="ou" t-value="o.env.ref('bdu_account.bdumedia_vakmedia')"/>
+        </t>
+        <t t-if="o and 'operating_unit_id' in o and not o.magazine">
+            <t t-set="ou" t-value="o.operating_unit_id"/>
+        </t>
+        <t t-if="not o or not 'operating_unit_id' in o and not o.magazine">
+            <t t-set="ou" t-value="operating_unit"/>
+        </t>
     </t>
-    <t t-if="o and 'operating_unit_id' in o and not o.magazine">
-        <t t-set="ou" t-value="o.operating_unit_id"/>
-    </t>
-    <t t-if="not o or not 'operating_unit_id' in o and not o.magazine">
-        <t t-set="ou" t-value="operating_unit"/>
+    <t t-if="o._name not in ('sale.order', 'account.invoice')">
+        <t t-set="ou" t-value="o.env.ref('bdu_account.bdumedia_media')"/>
     </t>
 
     <t t-call="bdu_account.external_layout_bdu_header" />
@@ -34,7 +38,7 @@
             <div class="row backgroundimage" style="position:relative;font-size:3em;
                         width:100%;height:100%;z-index:1000;padding-left:5px;">
                 <img t-if="ou.logo" t-att-src="'data:image/png;base64,%s' % ou.report_background_image1"
-                        style="width:100%; display: block;" height="1215"/>
+                        style="width:100%; display: block;"/>
             </div>
         </div>
     </div>
@@ -68,6 +72,7 @@
                          <span><strong>Invoice Number</strong></span>
                          <br/>
                          <span><strong>Customer Code</strong></span>
+                         <span t-if="o.type == 'out_invoice' and o.payment_mode_id.name == 'IDEAL'"><strong>Payment Ref.</strong></span>
                      </div>
                      <div class="col-xs-1" style="padding:0px;">
                          <span><strong>:</strong></span>
@@ -75,6 +80,8 @@
                          <span><strong>:</strong></span>
                          <br/>
                          <span><strong>:</strong></span>
+                         <br/>
+                         <span t-if="o.type == 'out_invoice' and o.payment_mode_id.name == 'IDEAL'"><strong>:</strong></span>
                      </div>
                      <div class="col-xs-8" style="padding:0px;">
                          <span t-field="o.date_invoice"/>
@@ -82,6 +89,9 @@
                          <span t-field="o.number"/>
                          <br/>
                          <span t-field="o.partner_id.ref"/>
+                         <br/>
+                         <span t-if="o.type == 'out_invoice' and o.payment_mode_id.name == 'IDEAL'" t-field="o.name"></span>
+                         <br/>
                      </div>
                  </div>
 
@@ -186,11 +196,11 @@
                             <t t-if="o.type == 'out_refund'">
                                 <td><span t-esc="l.opportunity_subject"/></td>
                             </t>
-                            <t t-if="o.type != 'out_refund'">
+                            <t t-if="not o.magazine">
                                 <td><span t-field="l.ad_number"/></td>
                             </t>
-                            <t t-if="o.type == 'out_refund'">
-                                <td><span t-esc="l.ad_number"/></td>
+                            <t t-if="o.magazine">
+                                <td><span t-esc="sale_order_line.order_id.customer_contact.name"/> <span t-esc="l.ad_number"/></td>
                             </t>
                             <td><span t-if="l.product_id" t-field="l.product_id.name"/></td>
                             <td class="text-right">
