@@ -115,6 +115,9 @@ class PubbleConfig(models.Model):
 
             #lookup values and other init
             title_accounts = self.env['sale.advertising.issue'].search([('parent_id','=', False)])
+            _logger.info("sale.advertising.issue titles found : ")
+            for t in title_accounts :
+                _logger.info("content of default_note : %s", t['default_note'])
             pubble_kpis = self.env['mis.pubble.kpi']
 
             json_anwser = json.loads(answer)
@@ -134,6 +137,9 @@ class PubbleConfig(models.Model):
                 
                 #analytic accounnt and company via sale.advertising.issue
                 title_account   = title_accounts.search([('default_note','=',d['title'])])
+                _logger.info("title search in default_note for : %s gives length %d", d['title'], len(title_account))
+                for r in title_account :
+                    _logger.info("-default_note : %s", r['default_note'])
                 if len(title_account)==1:
                     d['title_code'] = title_account[0]['code']
                     d['company_id'] = title_account[0].analytic_account_id.company_id.id
@@ -143,7 +149,7 @@ class PubbleConfig(models.Model):
                     _logger.info("analytic_account_id : %s", d['analytic_account_id'])
                     _logger.info("operating_unit_id   : %s", d['operating_unit_id'])
                 else:
-                    message += ", title "+d['title']+" not/double in ad issues"
+                    message += ",<br>"+d['title']+" not/double in ad issues"
                     d['title_code'] = ""
                     d['company_id'] = ""
                     d['analytic_account_id'] = ""
