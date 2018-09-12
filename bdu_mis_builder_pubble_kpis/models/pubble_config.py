@@ -149,7 +149,7 @@ class PubbleConfig(models.Model):
                     _logger.info("analytic_account_id : %s", d['analytic_account_id'])
                     _logger.info("operating_unit_id   : %s", d['operating_unit_id'])
                 else:
-                    message += ", title "+d['title']+" not/double in default_note in ad issues\n"
+                    message += ",<br>"+d['title']+" not/double in ad issues"
                     d['title_code'] = ""
                     d['company_id'] = ""
                     d['analytic_account_id'] = ""
