@@ -17,12 +17,13 @@
     # Check https://github.com/odoo/odoo/blob/master/odoo/addons/base/module/module_data.xml
     # for the full list
     'category': 'Reporting',
-    'version': '0.1',
+    'version': '10.0',
 
     # depends on mis_builder to find menu location (see views)
     'depends': ['base', 
                 'mis_builder',
                 'mis_builder_operating_unit', #provides analytic account interface on reports and config
+                'sale_advertising_order',     #to convert title name into analytic account 
                ],
 
     # always loaded
