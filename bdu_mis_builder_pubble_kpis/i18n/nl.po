@@ -1,0 +1,204 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* bdu_mis_builder_pubble_kpis
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: Piet Bouw, i.e. p.bouw@bdu.nl\n"
+"POT-Creation-Date: 2018-08-14 22:00+0200\n"
+"PO-Revision-Date: 2018-08-14 22:00+0200\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: nl\n"
+"X-Generator: Poedit 2.0.7\n"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Connector configuration"
+msgstr "Connector configuratie"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Server"
+msgstr "Server"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Method and query"
+msgstr "Pad en query"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Save"
+msgstr "Opslaan"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Production status"
+msgstr "Productie status"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Latest issue"
+msgstr "Jongste editie"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Latest run"
+msgstr "Laatste verwerking"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Latest success"
+msgstr "Verwerking OK tot"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Latest status"
+msgstr "Status verbinding"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Latest reason"
+msgstr "Toelichting status"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Manual collect"
+msgstr "Handmatig ophalen"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Please provide begin and end date"
+msgstr "Voer begin- en einddatum in voor het ophalen van gegevens"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Enter dates and press \"Collect\" to collect records for given period."
+msgstr "Voer begin- en einddatum in en druk op \"Ophalen\" voor ophalen van betreffende periode."
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Begin"
+msgstr "Begin"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "End"
+msgstr "Einde"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Collect"
+msgstr "Ophalen"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_pubble_kpi_data_connector
+msgid "Summary"
+msgstr "Toelichting"
+
+
+
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Title"
+msgstr "Titel"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Title code"
+msgstr "Titel code"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Issue date"
+msgstr "Editie datum"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Page nr"
+msgstr "Pagina"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Ad page"
+msgstr "Adv. pagina"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Ed page"
+msgstr "Red. pagina"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Spread"
+msgstr "Spread"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Inherited"
+msgstr "Overerfd"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Page type"
+msgstr "Pagina type"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Page style"
+msgstr "Stramien"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Ad count"
+msgstr "Aantal adv."
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid ""
+msgstr ""
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Company"
+msgstr "Bedrijf"
+
+#. module: bdu_mis_builder_pubble_kpis
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_tree_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_form_pubble_data
+#: model:ir.ui.view,arch_db:bdu_mis_builder_pubble_kpis.view_filter_pubble_data
+msgid "Analytic account"
+msgstr "Kostenplaats"
