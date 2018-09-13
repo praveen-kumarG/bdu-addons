@@ -64,7 +64,7 @@
                             </group>
                             <group>
                                 <field name="issue_date" />
-                                <field name="strook" />
+                                <field name="strook" invisible="1"/>
                                 <field name="planned_quantity" />
                                 <field name="gross_quantity" />
                                 <field name="net_quantity" />
@@ -121,6 +121,7 @@
                                         <field name="production_start" />
                                         <field name="production_stop" />
                                         <field name="planned_quantity" />
+                                        <field name="strook"/>
                                     </tree>
                                     <form>
                                         <group colspan="4">
@@ -132,6 +133,7 @@
                                             <field name="production_start" />
                                             <field name="production_stop" />
                                             <field name="planned_quantity" />
+                                            <field name="strook"/>
                                         </group>
                                         <notebook>
                                             <page string="Booklet Details">
@@ -145,6 +147,7 @@
                                                         <field name="calculated_ink"/>
                                                         <field name="calculated_hours"/>
                                                         <field name="product_id"/>
+                                                        <field name="position" invisible="1"/>
                                                     </tree>
                                                 </field>
                                             </page>

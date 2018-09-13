@@ -278,7 +278,7 @@ class Job(models.Model):
 
         editionInfoL = ['net_quantity', 'gross_quantity', 'net_quantity',
                         'production_start', 'production_stop', 'waste_start', 'waste_total',
-                        'info_product', 'planned_quantity']
+                        'info_product', 'planned_quantity', 'strook', 'info_collect']
 
         commonInfoL = ['paper_mass_1', 'paper_mass_2', 'paper_mass_3', 'paper_mass_4', 'paper_mass_5',
                        'paper_mass_6', 'paper_mass_7', 'paper_width_1', 'paper_width_2', 'paper_width_3',
@@ -288,48 +288,33 @@ class Job(models.Model):
 
         def _prepare_booklet(edition, booklets):
             lines = []
-            Items = {}
-
             for bookPos, booklet in booklets.iteritems():
 
-                # ref = booklet.get('booklet_ref')
+                ref = booklet.get('booklet_ref')
                 found = False
+
+                if edition:
+                    found = edition.booklet_ids.filtered(lambda x: x.booklet_ref == ref)
+
                 weight = booklet.get('paper_weight')
                 weight = 65 if float(weight) == 70 else weight
-                
-                format = booklet.get('format')
-                pages = booklet.get('pages')
 
-                #Booklet(same format and weight): pages would be added
-                if edition:
-                    # found = edition.booklet_ids.filtered(lambda x: x.booklet_ref == ref)
-                    found = edition.booklet_ids.filtered(lambda x: x.paper_weight == weight and format == format)
-
-                if (format, weight) in Items:
-                    Items[(format, weight)] = {'pages':Items[(format, weight)]['pages']+int(pages)}
-                else:
-                    Items[(format, weight)] = {'pages':int(pages)}
-
-                if found:
-                    Items[(format, weight)]['obj'] = found
-                    # Items[(format, weight)]['pages'] += int(found.pages)
-
-            for key, val in Items.iteritems():
                 lnvals = {
-                    'format': key[0],
-                    'paper_weight': key[1],
-                    'pages': str(val['pages']),
+                    'booklet_ref': ref,
+                    'pages': booklet.get('pages'),
+                    'format': booklet.get('format'),
+                    'paper_weight': weight,
+
                     # 'stitching': True if booklet.find('Stitching').text == 'Yes' else False,
                     # 'glueing'  : True if booklet.find('Glueing').text == 'Yes' else False,
                 }
-                if 'obj' in val:
-                    booklet = val['obj']
-                    lnvals['pages'] = str(int(lnvals['pages'])+int(booklet.pages))
-                    lines.append((1, booklet.id, lnvals))
+
+                if found:
+                    lines.append((1, found.id, lnvals))
                 else:
                     lines.append((0, 0, lnvals))
-                
             return lines
+
 
         # Edition Lines
         for key, val in edData.iteritems():
@@ -469,10 +454,11 @@ class Job(models.Model):
         '''
             Data extracted from XMLFile4 for edition
         '''
-        evals, bvals = {}, {}
+        evals = {}
 
         evals.update({
             'info_product': data4.find('info_product').text,
+            'info_collect': int(data4.find('info_collect').text or 0),
 
             'production_start': self.convert_TZ_UTC(data4.find('info_datetime_start').text),
             'production_stop': self.convert_TZ_UTC(data4.find('info_datetime_end').text),
@@ -498,6 +484,10 @@ class Job(models.Model):
             'paper_width_6': int(data4.find('used_webwidth06').text or 0),
             'paper_width_7': int(data4.find('used_webwidth07').text or 0),
         })
+
+        for idx in range(1, 8):
+            if evals['paper_width_' + str(idx)] == 1156:
+                evals.update({'strook':True})
 
         key = evals['info_product']
 
@@ -1426,12 +1416,15 @@ class Booklet(models.Model):
     calculated_hours = fields.Float(string='Calculated Hours', store=True, compute='_compute_all')
     product_id = fields.Many2one('product.product', string='Product used for Calculation', store=True, compute='_compute_all')
     edition_id = fields.Many2one('wobe.edition', ondelete='cascade', index=True, copy=False)
+    position = fields.Integer('Position')
 
     @api.model
     def create(self, vals):
         format = vals.get('format', False)
         if format and format == 'MAG':
             vals['format'] = 'MP'
+        if not self.search([('edition_id','=', vals['edition_id'])]):
+            vals['position'] = 1
         return super(Booklet, self).create(vals)
 
     @api.multi
@@ -1483,6 +1476,9 @@ class Booklet(models.Model):
                     if p.product_tmpl_id.fixed_cost:
                         continue
                     booklet.product_id = p.id
+                    if booklet.position:
+                        pages -= 1 if booklet.edition_id.info_collect == 2 else 2
+
                     mass = (p.product_tmpl_id.booklet_surface_area * pages) * float(paper_weight) / float(2000)
             else:
                 mass, booklet.product_id = 0.0, False
@@ -1518,6 +1514,8 @@ class Edition(models.Model):
 
     booklet_ids = fields.One2many('wobe.booklet', 'edition_id', 'Booklets', copy=True)
     planned_quantity = fields.Integer('Production Amount')
+    strook = fields.Boolean('Strook')
+    info_collect = fields.Integer('Info Collect')
 
     @api.onchange('name')
     def edition_create(self):
