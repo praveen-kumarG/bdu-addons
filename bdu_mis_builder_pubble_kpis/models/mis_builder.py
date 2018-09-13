@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import pdb
 from odoo import api, fields, models
 
 class MisReportInstancePeriod(models.Model):
