@@ -79,15 +79,15 @@ class SaleOrder(models.Model):
 
 
     order_pubble_allow = fields.Boolean(compute=_pubble_allow, default=False, store=True,
-                                        string='Allow to Pubble')
-    date_sent_pubble = fields.Datetime('Datetime Sent to Pubble', index=True,
+                                        string='Allow to Pubble', copy=False)
+    date_sent_pubble = fields.Datetime('Datetime Sent to Pubble', index=True, copy=False,
                                     help="Datetime on which sales order is sent to Pubble.")
     pubble_write_after_sent = fields.Boolean(compute=_pubble_write_after_sent, search='_pubble_write_after_sent_search',
-                                        string='Written after transferred to Pubble', default=False, store=True)
-    pubble_trans_id = fields.Char(string='Transmission ID', size=16, readonly=True)
-    pubble_tbu = fields.Boolean(string='Pubble to be updated', default=False)
-    pubble_sent = fields.Boolean(compute=_pubble_sent, string='Order to Pubble', default=False, store=True)
-    publog_id = fields.Many2one('sofrom.odooto.pubble', )
+                                        string='Written after transferred to Pubble', default=False, store=True, copy=False)
+    pubble_trans_id = fields.Char(string='Transmission ID', size=16, readonly=True, copy=False)
+    pubble_tbu = fields.Boolean(string='Pubble to be updated', default=False, copy=False)
+    pubble_sent = fields.Boolean(compute=_pubble_sent, string='Order to Pubble', default=False, store=True, copy=False)
+    publog_id = fields.Many2one('sofrom.odooto.pubble', copy=False)
 
     @job
     @api.multi
@@ -217,8 +217,8 @@ class SaleOrderLine(models.Model):
             line.line_pubble_allow = res
 
 
-    pubble_sent = fields.Boolean('Order Line sent to Pubble')
-    line_pubble_allow = fields.Boolean(compute='_compute_allowed', string='Pubble Allowed', store=True)
+    pubble_sent = fields.Boolean('Order Line sent to Pubble', copy=False)
+    line_pubble_allow = fields.Boolean(compute='_compute_allowed', string='Pubble Allowed', store=True, copy=False)
 
     @api.multi
     def unlink(self):
