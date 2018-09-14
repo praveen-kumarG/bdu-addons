@@ -9,16 +9,20 @@ class Partner(models.Model):
     @api.model
     def create(self, values):
         res = super(Partner, self).create(values)
+        ctx = self.env.context.copy()
         if res.user_ids:
-            res.with_context({'falseCustomer':False}).write({'customer':False})
+            ctx.update({'falseCustomer':False})
+            res.with_context(ctx).write({'customer':False})
         return res
 
     @api.multi
     def write(self, values):
         res = super(Partner, self).write(values)
+        ctx = self.env.context.copy()
         if 'falseCustomer' in self.env.context:
             return res
         for partner in self:
             if partner.user_ids:
-                partner.with_context({'falseCustomer':False}).write({'customer': False})
+                ctx.update({'falseCustomer': False})
+                partner.with_context(ctx).write({'customer': False})
         return res
