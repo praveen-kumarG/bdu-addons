@@ -486,7 +486,7 @@ class Job(models.Model):
         })
 
         for idx in range(1, 8):
-            if evals['paper_width_' + str(idx)] == 1056:
+            if evals['paper_width_' + str(idx)] == 1012:
                 evals.update({'strook':True})
 
         key = evals['info_product']
