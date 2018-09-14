@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
-import pdb
+
 class MisReportInstancePeriod(models.Model):
 
     _inherit = 'mis.report.instance.period'
 
     @api.multi
     def _get_additional_query_filter(self, query):
-        pdb.set_trace()
+        
         #let super do its job first (although current implementation does not add anything)
         aml_domain = super(MisReportInstancePeriod, self).\
             _get_additional_query_filter(query)
