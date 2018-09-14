@@ -286,6 +286,8 @@ class Job(models.Model):
 
         editionUpdateL = ['gross_quantity', 'net_quantity', 'waste_start', 'waste_total']
 
+        strook = data1.find('Strook').text
+
         def _prepare_booklet(edition, booklets):
             lines = []
             for bookPos, booklet in booklets.iteritems():
@@ -342,6 +344,9 @@ class Job(models.Model):
                 for z in editionUpdateL:
                     if z not in val:
                         elnvals[z] = val.get(z, False)
+                # reset strook values if not staand
+                if strook != 'Staand':
+                    elnvals['strook'] = False
 
                 #edition found sum up of values
                 elnvals['gross_quantity'] += found.gross_quantity
@@ -358,6 +363,10 @@ class Job(models.Model):
 
                 for y in commonInfoL:
                     res[y] = val.get(y)
+                # reset strook values if not staand
+                if strook != 'Staand':
+                    elnvals['strook'] = False
+
                 if 'booklets' in val:
                     booklet = _prepare_booklet(found, val['booklets'])
                     elnvals['booklet_ids'] = booklet
@@ -369,7 +378,7 @@ class Job(models.Model):
 
                 'issue_date': data1.find('IssueDate').text,
                 'total_pages': int(data1.find('TotalPages').text or 0),
-                'strook': data1.find('Strook').text,
+                'strook': strook,
                 # 'planned_quantity': int(data1.find('ProductionAmount').text or 0),
 
                 'edition_ids': edlines,
@@ -1476,7 +1485,7 @@ class Booklet(models.Model):
                     if p.product_tmpl_id.fixed_cost:
                         continue
                     booklet.product_id = p.id
-                    if booklet.position:
+                    if booklet.position and booklet.edition_id.strook:
                         pages -= 1 if booklet.edition_id.info_collect == 2 else 2
 
                     mass = (p.product_tmpl_id.booklet_surface_area * pages) * float(paper_weight) / float(2000)
