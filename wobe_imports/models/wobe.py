@@ -1407,6 +1407,8 @@ class Job(models.Model):
         return result_utc_datetime.strftime(fmt)
 
     def convert_UTC_TZ(self, UTC_datetime):
+        if not UTC_datetime:
+            return False
         UTC_datetime = datetime.strptime(UTC_datetime, "%Y-%m-%d %H:%M:%S")
         fmt = "%Y-%m-%d %H:%M:%S"
         now_utc = datetime.now(timezone('UTC'))
