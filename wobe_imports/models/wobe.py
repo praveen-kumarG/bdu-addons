@@ -202,7 +202,7 @@ class Job(models.Model):
                     edData.update(self._extract_EditionData(edData, Reg4, data4))
 
                 if Reg1FileAB:
-                    self._extract_XmlAB(Reg1FileAB, edData)
+                    edData = self._extract_XmlAB(Reg1FileAB, edData)
 
                 if not job:
                     jobData.update(self._prepare_job_data(data1, edData))
@@ -428,7 +428,7 @@ class Job(models.Model):
 
         list_query = ("""
               SELECT
-                edition_name, array_agg(id ORDER BY part)
+                edition_name, array_agg(id ORDER BY part, file_track_date)
               FROM
                 file_registry
               WHERE
@@ -446,8 +446,7 @@ class Job(models.Model):
         for data in result:
             edname = str(data[0])
             regIds = data[1]
-
-            for reg in Reg1FileAB.search([('id','in',regIds)]):
+            for reg in Reg1FileAB.search([('id','in',regIds)], order='part, file_track_date, id'):
                 if edname in edData:
                     if reg.part == 'xml1a':
                         edData[edname] = _fetch_XML1A(reg, edData[edname])
