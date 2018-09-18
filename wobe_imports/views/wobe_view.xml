@@ -103,7 +103,7 @@
                                 <field name="paper_product_ids" nolabel="1" widget="one2many_list" mode="tree">
                                     <tree string="Paper Products" editable="bottom">
                                         <field name="product_id" domain="[('print_category','=','paper_regioman')]"/>
-                                        <field name="number_rolls" />
+                                        <field name="total_rolls" invisible="True"/>
                                         <field name="name" />
                                     </tree>
                                 </field>
@@ -148,6 +148,15 @@
                                                         <field name="calculated_hours"/>
                                                         <field name="product_id"/>
                                                         <field name="position" invisible="1"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
+                                            <page string="Other/Paper Details">
+                                                <field name="paper_product_ids" nolabel="1" widget="one2many_list" mode="tree">
+                                                    <tree string="Paper Products" editable="bottom">
+                                                        <field name="product_id" domain="[('print_category','=','paper_regioman')]"/>
+                                                        <field name="number_rolls" />
+                                                        <field name="name" />
                                                     </tree>
                                                 </field>
                                             </page>
