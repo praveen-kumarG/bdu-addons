@@ -649,7 +649,8 @@ class Job(models.Model):
                         if p.fixed_cost:
                             lines.append(_get_linevals(p.id, forceQty=1 ))
                         else:
-                            lines.append(_get_linevals(p.id))
+                            Qty = float((ed.planned_quantity) / 1000.0) or 1.000
+                            lines.append(_get_linevals(p.id, forceQty=Qty))
                 else:
                     body = _("Product not found for this variants 'Pages: %s', 'Format: %s', 'Paper Weight: %s'!!"
                               %(str(pages), pFormat, str(paper_weight)))
