@@ -70,8 +70,6 @@
                                 <field name="net_quantity" />
                             </group>
                             <group string="Waste">
-                                <field name="waste_start" string="Units startup waste"/>
-                                <field name="waste_total" string="Units total waste"/>
                                 <field name="waste_start" string="Units Startup Waste"/>
                                 <field name="waste_total" string="Units Total Waste"/>
                             </group>
@@ -122,6 +120,8 @@
                                         <field name="production_stop" />
                                         <field name="planned_quantity" />
                                         <field name="strook"/>
+                                        <field name="net_mass"/>
+                                        <field name="waste_mass"/>
                                     </tree>
                                     <form>
                                         <group colspan="4">
@@ -134,6 +134,8 @@
                                             <field name="production_stop" />
                                             <field name="planned_quantity" />
                                             <field name="strook"/>
+                                            <field name="net_mass"/>
+                                            <field name="waste_mass"/>
                                         </group>
                                         <notebook>
                                             <page string="Booklet Details">

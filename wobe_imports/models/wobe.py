@@ -890,34 +890,63 @@ class Job(models.Model):
         lines = []
         print_category3, print_category4 = 'plates_regioman', 'ink_regioman'
 
-        sqlop = 'IN'
-        edIds = tuple(job.edition_ids.ids)
-        if len(job.edition_ids) == 1:
-            sqlop = '='
-            edIds = job.edition_ids.ids[0]
+        pMass = self.env.ref('wobe_imports.variant_attribute_3', False)
+        pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
 
-        list_query = ("""
-                        SELECT
-                          array_agg(calculated_mass), paper_weight, array_agg(id), format
-                        FROM
-                          wobe_booklet 
-                        WHERE 
-                          edition_id {0} {1}
-                        GROUP BY 
-                          format, paper_weight
-                    """.format(
-                        sqlop,
-                        edIds
-                    ))
-        self.env.cr.execute(list_query)
-        result = self.env.cr.fetchall()
+        def _get_MassWidth(product_id):
+            m, w = 0.0, 0.0
+            if not product_id: return m, w
 
-        # Total Mass per PaperMass
-        MassPerUnit = {}
-        for data in result:
-            calculated_mass = sum(float(p) for p in data[0])
-            paper_weight = float(data[1])
-            MassPerUnit[paper_weight] = calculated_mass
+            for av in product_id.attribute_value_ids:
+                if av.attribute_id.id == pMass.id: m = float(av.name)
+                if av.attribute_id.id == pWidth.id: w = float(av.name)
+            return m, w
+
+        lines = []
+        NetRollProducts = {}
+        WasteRollProducts = {}
+        for edition in job.edition_ids:
+            #Ratio-Width per PaperType
+            # ratioSum = {}
+            tot_width = 0.0
+            for roll in edition.paper_product_ids:
+                mass, width = _get_MassWidth(roll.product_id)
+                number = int(roll.number_rolls)
+                tot_width += width * number
+                # if mass not in ratioSum:
+                #     ratioSum[mass] = {'width_mass_total': width * number}
+                # else:
+                #     ratioSum[mass]['width_mass_total'] += width * number
+
+            NetMass = edition.net_mass
+            WasteMass = edition.waste_mass
+
+            # Paper Rolls
+            for roll in edition.paper_product_ids:
+                mass, width = _get_MassWidth(roll.product_id)
+                # num_mass = ratioSum[mass]['width_mass_total']
+                num_width = width * int(roll.number_rolls)
+
+                # Net Production: (in Kg)
+                if tot_width and tot_width > 0:
+                    Qty = (NetMass / tot_width * num_width)
+                    if roll.product_id in NetRollProducts:
+                        NetRollProducts[roll.product_id] += Qty
+                    else:
+                        NetRollProducts[roll.product_id] = Qty
+
+                # Waste Production: (in Kg)
+                if tot_width and tot_width > 0:
+                    Qty = (WasteMass / tot_width * num_width)
+                    if roll.product_id in WasteRollProducts:
+                        WasteRollProducts[roll.product_id] += Qty
+                    else:
+                        WasteRollProducts[roll.product_id] = Qty
+
+        for product_id, qty in NetRollProducts.iteritems():
+            lines.append({'productObj': product_id, 'name': 'Net Paper: ' + str(product_id.name), 'product_uom_qty': qty})
+        for product_id, qty in WasteRollProducts.iteritems():
+            lines.append({'productObj': product_id, 'name': 'Waste Paper: ' + str(product_id.name), 'product_uom_qty': qty})
 
         InkQty = 0.0
         for ed in job.edition_ids:
@@ -927,48 +956,6 @@ class Job(models.Model):
             InkQty += bookInk * ed.gross_quantity / 1000 / 4
 
         PlateQty = job.plate_amount
-
-        pMass  = self.env.ref('wobe_imports.variant_attribute_3', False)
-        pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
-
-        def _get_MassWidth(product_id):
-            m, w = 0.0, 0.0
-            if not product_id: return m, w
-
-            for av in product_id.attribute_value_ids:
-                if av.attribute_id.id == pMass.id : m = float(av.name)
-                if av.attribute_id.id == pWidth.id: w = float(av.name)
-            return m, w
-
-        # Ratio-Width per PaperType
-        ratioSum = {}
-        for roll in job.paper_product_ids:
-            mass, width = _get_MassWidth(roll.product_id)
-            number = int(roll.total_rolls)
-            if mass not in ratioSum:
-                ratioSum[mass] = {'width_mass_total': width * number}
-            else:
-                ratioSum[mass]['width_mass_total'] += width * number
-
-        # Paper Rolls
-        for roll in job.paper_product_ids:
-            mass, width = _get_MassWidth(roll.product_id)
-            num_mass = ratioSum[mass]['width_mass_total']
-            num_width = width * int(roll.total_rolls)
-
-            # Net Production: (in Kg)
-            NetMass = MassPerUnit.get(mass, 0) * job.net_quantity / 1000.0
-            if num_mass and num_mass > 0:
-                Qty = (NetMass * num_width / num_mass)
-                lines.append({'productObj': roll.product_id, 'name': 'Net Paper: ' + str(roll.product_id.name),
-                              'product_uom_qty': Qty})
-
-            # Waste Production: (in Kg)
-            WasteMass = MassPerUnit.get(mass, 0) * job.waste_total / 1000.0
-            if num_mass and num_mass > 0:
-                Qty = (WasteMass * num_width / num_mass)
-                lines.append({'productObj': roll.product_id, 'name': 'Waste Paper: ' + str(roll.product_id.name),
-                              'product_uom_qty': Qty})
 
         if job.plate_type == 'PA' and job.generated_by != 'MAN':
             print_category3 = 'plates_kba'
@@ -1076,11 +1063,11 @@ class Job(models.Model):
 
         domain = ['|', ('print_category', '=', 'paper_regioman'), ('applicable_to_regioman', '=', True)]
 
-        MassWidth = {}
         stockOk = True
         jobPaper = {}
 
         for edition in self.edition_ids:
+            MassWidth = {}
             lines = []
             for idx in range(1, 8):
                 M = edition['paper_mass_' + str(idx)]
@@ -1148,7 +1135,7 @@ class Job(models.Model):
                 if proll['product_id'] in jobPaper:
                     jobPaper[proll['product_id']]['number_rolls'] += int(proll['number_rolls'])
                 else:
-                    jobPaper[proll['product_id']] = {'number_rolls':0}
+                    jobPaper[proll['product_id']] = {'number_rolls':int(proll['number_rolls'])}
 
             lines = map(lambda x: (0, 0, x), lines)
             edition.write({'paper_product_ids': lines})
@@ -1562,6 +1549,36 @@ class Edition(models.Model):
     paper_width_5 = fields.Integer('Paper Width 05', help='Used WebWidth05')
     paper_width_6 = fields.Integer('Paper Width 06', help='Used WebWidth06')
     paper_width_7 = fields.Integer('Paper Width 07', help='Used WebWidth07')
+
+    net_mass = fields.Float('Net Mass', store=True, compute='_compute_all', digits=dp.get_precision('Paper Mass'))
+    waste_mass = fields.Float('Waste Mass', store=True, compute='_compute_all', digits=dp.get_precision('Paper Mass'))
+
+    @api.multi
+    @api.depends('booklet_ids', 'net_quantity')
+    def _compute_all(self):
+
+        pMass = self.env.ref('wobe_imports.variant_attribute_3', False)
+        pWidth = self.env.ref('wobe_imports.variant_attribute_paperWidth', False)
+
+        def _get_MassWidth(product_id):
+            m, w = 0.0, 0.0
+            if not product_id: return m, w
+
+            for av in product_id.attribute_value_ids:
+                if av.attribute_id.id == pMass.id: m = float(av.name)
+                if av.attribute_id.id == pWidth.id: w = float(av.name)
+            return m, w
+
+        for edition in self:
+            NetMass, WasteMass, RollPerKG = 0.0, 0.0, 0.0
+
+            # Total Mass per PaperMass
+            for booklet in edition.booklet_ids:
+                NetMass += booklet.calculated_mass * edition.net_quantity / 1000.0
+                WasteMass += booklet.calculated_mass * edition.waste_total / 1000.0
+
+            edition.net_mass = NetMass
+            edition.waste_mass = WasteMass
 
     @api.onchange('name')
     def edition_create(self):
