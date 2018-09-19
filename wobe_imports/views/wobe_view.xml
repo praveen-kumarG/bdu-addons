@@ -120,6 +120,8 @@
                                         <field name="production_stop" />
                                         <field name="planned_quantity" />
                                         <field name="strook"/>
+                                        <field name="net_mass"/>
+                                        <field name="waste_mass"/>
                                     </tree>
                                     <form>
                                         <group colspan="4">
@@ -132,6 +134,8 @@
                                             <field name="production_stop" />
                                             <field name="planned_quantity" />
                                             <field name="strook"/>
+                                            <field name="net_mass"/>
+                                            <field name="waste_mass"/>
                                         </group>
                                         <notebook>
                                             <page string="Booklet Details">
