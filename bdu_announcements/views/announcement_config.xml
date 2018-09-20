@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<odoo>
+
+  <!--  Form view for Drupal announcements connector settings and operation --> 
+  <record id="view_form_drupal_connector" model="ir.ui.view">
+    <field name="name">Drupal connector</field>
+    <field name="model">announcement.config</field> 
+    <field name="arch" type="xml">
+      <form string="Drupal announcement connector" create="false" edit="false" action="false" 
+                                     class="oe_form_configuration">
+        <header > 
+        </header>
+
+          <br/>
+          <group name="connector_config" string="Connector configuration">
+            <field name="server"/> 
+            <field name="method"/>  
+            <field name="user"/> 
+            <field name="password"/>  
+            <field name="ad_class"/> 
+          </group>
+          <button name="save_config" type="object" 
+            string="Save" class="oe_highlight" /> 
+          <br/>
+          <br/>
+
+
+          <group name="production_status" string="Production status">
+            <group>
+              <field name="oldest_synced" readonly="1"/> 
+              <field name="latest_run"        readonly="1" widget="html"/> 
+              <field name="latest_success"    readonly="1"/> 
+              <field name="latest_status"     readonly="1"/> 
+              <field name="latest_reason"     readonly="1"/> 
+            </group>
+            <group>
+            </group>
+          </group>
+          <br/>
+          <br/>
+
+
+
+          <group name="manual_send" string="Manual send" >
+            <div colspan="2">
+              <p>Enter dates and press "Send" to ship orderlines for given period. </p>
+            </div>
+            <group>
+              <field name="begin"/> 
+              <field name="end"/> 
+            </group>
+            <group>
+            </group>
+          </group>
+          <button string="Send" name="do_send" type="object" class="oe_highlight"/>
+          <br/>
+          <br/>
+
+
+          <group name="documentation" string="Summary" col="1">
+              <p>Announcements are presented via a lookup database on BDU websites. The lookup mechanism requires first name, last name, city and editions of the publication as the metadata joining the original publication, i.e. PDF. </p>
+              <p>This interfaces takes the url and method and ships all orderlines with products from the given product category by consuming a Drupal API. The shipped data consists of: orderline number (unique reference), count (1=create/update, 0=delete), begin- and end-date. The edition to publish is not taken into account since publication of announcements is a multisite service.</p> 
+              <p>The interface can be run manually (via the Send button) and automatically via schedulled actions calling the automated_run method of the announcement.config object.</p>  
+              <p>Websites are currently hosted by Dutch Open Projects</p>           
+              <p/>
+              <p/>
+              <a href="https://www.dop.nu/" target="_blank"> More about Dutch Open Projects</a>
+          </group>
+
+
+      </form>
+    </field>
+  </record> 
+
+  <!-- Connection info via server action and submenu-->
+  <record id="Announcement_connector" model="ir.actions.server"> 
+    <field name="name">Announcements connector</field> 
+    <field name="model_id" ref="model_announcement_config"/> 
+    <field name="code">
+      action = model.default_view()
+    </field>
+  </record> 
+
+  <!-- Menu item to open KPI connection configuration--> 
+  <menuitem id="Drupal_connector_menuitem" 
+    name="Fam. announcements" 
+    action="Announcement_connector"
+    parent="sales_team.menu_sale_config" 
+    sequence="230"
+     /> 
+
+
+</odoo>
