@@ -1064,7 +1064,7 @@ class Job(models.Model):
         domain = ['|', ('print_category', '=', 'paper_regioman'), ('applicable_to_regioman', '=', True)]
 
         stockOk = True
-        jobPaper = {}
+        jobPaper, paperLines = {}, []
 
         for edition in self.edition_ids:
             MassWidth = {}
@@ -1133,18 +1133,24 @@ class Job(models.Model):
 
             for proll in lines:
                 if proll['product_id'] in jobPaper:
-                    jobPaper[proll['product_id']]['number_rolls'] += int(proll['number_rolls'])
+                    if 'number_rolls' in proll:
+                        jobPaper[proll['product_id']]['number_rolls'] += int(proll['number_rolls'])
                 else:
-                    jobPaper[proll['product_id']] = {'number_rolls':int(proll['number_rolls'])}
+                    jobPaper[proll['product_id']] = {}
+                    if 'number_rolls' in proll:
+                        jobPaper[proll['product_id']] = {'number_rolls':int(proll['number_rolls'])}
 
             lines = map(lambda x: (0, 0, x), lines)
             edition.write({'paper_product_ids': lines})
 
 
         jobData = {'stock_ok': stockOk}
-        paperLines = []
+
         for key, val in jobPaper.iteritems():
-            paperLines.append((0, 0, {'product_id':key, 'total_rolls':val['number_rolls']}))
+            item = {'product_id': key}
+            if val:
+                item['total_rolls'] = val['number_rolls']
+            paperLines.append((0, 0, item))
 
         jobData['paper_product_ids'] = paperLines
         self.write(jobData)
