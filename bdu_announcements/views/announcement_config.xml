@@ -24,30 +24,22 @@
           <br/>
           <br/>
 
-
-          <group name="production_status" string="Production status">
-            <group>
+          <group name="production_status" string="Production status" col="1">
               <field name="oldest_synced" readonly="1"/> 
               <field name="latest_run"        readonly="1" widget="html"/> 
               <field name="latest_success"    readonly="1"/> 
               <field name="latest_status"     readonly="1"/> 
-              <field name="latest_reason"     readonly="1"/> 
-            </group>
-            <group>
-            </group>
+              <field name="latest_reason"     readonly="1" widget="html"/> 
           </group>
           <br/>
           <br/>
 
-
-
           <group name="manual_send" string="Manual send" >
             <div colspan="2">
-              <p>Enter dates and press "Send" to ship orderlines for given period. </p>
+              <p>Enter begin date and press "Send" to ship orderlines for period after begin date. </p>
             </div>
             <group>
-              <field name="begin"/> 
-              <field name="end"/> 
+              <field name="begin"/>
             </group>
             <group>
             </group>
@@ -58,8 +50,8 @@
 
 
           <group name="documentation" string="Summary" col="1">
-              <p>Announcements are presented via a lookup database on BDU websites. The lookup mechanism requires first name, last name, city and editions of the publication as the metadata joining the original publication, i.e. PDF. </p>
-              <p>This interfaces takes the url and method and ships all orderlines with products from the given product category by consuming a Drupal API. The shipped data consists of: orderline number (unique reference), count (1=create/update, 0=delete), begin- and end-date. The edition to publish is not taken into account since publication of announcements is a multisite service.</p> 
+              <p>Announcements are presented via a lookup database on BDU websites. The lookup mechanism requires first name, last name, city and editions of the publication as the metadata joining the original publication, i.e. PDF. All this information can only be shipped by one material url, hence a zip file combining all material.</p>
+              <p>This interfaces takes the url and method given under connection info and ships all orderlines with products from the given product category by consuming a Drupal API. The shipped data consists of: orderline number (unique reference), count (1=create/update, 0=delete), begin- and end-date. The edition to publish is not taken into account since publication of announcements is a multisite service.</p> 
               <p>The interface can be run manually (via the Send button) and automatically via schedulled actions calling the automated_run method of the announcement.config object.</p>  
               <p>Websites are currently hosted by Dutch Open Projects</p>           
               <p/>

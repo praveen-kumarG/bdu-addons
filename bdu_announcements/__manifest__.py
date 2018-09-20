@@ -7,7 +7,7 @@
                 """,
 
     'description': """
-        BDU Announcement interface to websites provides a manual and batch facility for shipment of family announcement to BDU's announcement database.
+        BDU Announcements provides a manual and batch facility for shipment of family announcement to BDU's announcement database.
         Orderlines with defined ad class products will be shipped together with multimaterial, from and to date.
         Multimaterial for family announcements consists of zipped JSON and PDF files. The PDF file should hold the announcement.
         The JSON holds the meta data, comprising first name, last name, city and a list of editions (titles and issue dates).

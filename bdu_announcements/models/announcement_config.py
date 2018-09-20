@@ -23,7 +23,6 @@ class AnnouncementConfig(models.Model):
     latest_reason  = fields.Char(string='Latest reason',  help="Reason of status code of latest run")
     
     begin		   = fields.Date(string='Begin', help="Begin date of date range in format yyyy-mm-dd")
-    end 		   = fields.Date(string='End',  help="End date van date range in format yyyy-mm-dd", widget="date")
     
     #show only first record to configure, no options to create an additional one
     @api.multi
@@ -65,9 +64,11 @@ class AnnouncementConfig(models.Model):
             _logger.info("Cannot start automated_run. Need a valid configuration")
             return False
         else :
+            #start with previous end
             self = configurations[0]
-            self.begin = datetime.date.today()
-            self.end   = datetime.date.today()
+            if not config.oldest_synced :
+                 oldest_synced = datetime.datetime(1970,1,1,0,0)
+            self.begin = datetime.datetime.strptime(config.oldest_synced,DEFAULT_SERVER_DATETIME_FORMAT).date()
             self.write({})
             return self.do_send()
 
@@ -77,17 +78,17 @@ class AnnouncementConfig(models.Model):
         #collect data based on config 	    
         config = self[0] 
         if not config.oldest_synced :
-            oldest_synced=datetime.datetime(1970,1,1,0,0)
+            oldest_synced = datetime.datetime(1970,1,1,0,0)
         else :
-            oldest_synced=datetime.datetime.strptime(config.oldest_synced,DEFAULT_SERVER_DATETIME_FORMAT)
+            oldest_synced = datetime.datetime.strptime(config.oldest_synced,DEFAULT_SERVER_DATETIME_FORMAT)
 
-        if not config.begin or not config.end :
-            raise ValidationError("Please provide begin and end date")
+        if not config.begin :
+            raise ValidationError("Please provide a begin date")
             return False
 
         #get changed orderlines since oldest_non_synced
         announcements=self.env['sale.order.line'].search([('ad_class', '=', config.ad_class.id),\
-                                                          ('write_date', '>', oldest_synced.strftime("%Y-%m-%d T%H:%M:%S"))])
+                                                          ('write_date', '>', config.begin+" T00:00:00")])
         
         if not announcements :
             config.latest_run     = datetime.date.today()
@@ -104,42 +105,21 @@ class AnnouncementConfig(models.Model):
                        'cache-control': "no-cache",
                        'content-type' : "application/x-www-form-urlencoded",
                       }
-        """
-        pdb.set_trace()
-        #according postman              
-        payload_test= {
-                       "orderlinenr":4,
-                       "count":"1",
-                       "startdate":"20191130",
-                       "endate":"20191231",
-                       "domain":"5",
-                       "url2material":"ftp://ftp.bdu.nl/material/fam_material_20180914_114142_test.zip"
-                      }
-        headers_test= {
-                       'authorization': "Basic YmR1OmJkdUB0ZXN0",
-                       'content-type': "application/x-www-form-urlencoded",
-                       'cache-control': "no-cache",
-                       'postman-token': "501c153c-b689-17c5-5102-13227cb45ccf"
-                      }
-        payload     = {"orderlinenr":10,
-                       "count":"1",
-                       "startdate":"20191130",
-                       "enddate":"20191231",
-                       "domain":"5",
-                       "url2material":"ftp://ftp.bdu.nl/material/fam_material_20180914_114142_test.zip"
-                      }        
-        """
-        all_good    = True
-        errors      = 0
-        no_material = 0
-        status      = "200"
+
+        all_good      = True
+        ok_recs       = 0
+        errors        = 0
+        no_material   = 0
+        status        = ""
+        message       = ""
+        oldest_synced = datetime.datetime.strptime(config.begin+" T00:00:00", "%Y-%m-%d T%H:%M:%S")
         
         #loop through changed orderlines
         for announcement in announcements :
             payload={}
             payload['orderlinenr'] = announcement['id']
             payload['count']       = str(int(announcement['product_uom_qty']))
-            #pdb.set_trace()
+
             if announcement['from_date'] :
                 payload['startdate']   = announcement['from_date'].replace("-","")   #target format yyyymmdd
             else :
@@ -152,36 +132,40 @@ class AnnouncementConfig(models.Model):
             payload['url2material']= announcement['url_to_material']
             
             if announcement['url_to_material'] :
-                pdb.set_trace()
                 response=requests.post(url, data=payload, headers=headers)
-                if response.status_code != "200" :
+                if response.status_code != requests.codes.ok :  #not equal 200 ok
                     all_good=False
                     errors  += 1
-                    status  += response.status_code+" "+requests.exceptions.HTTPError+\
-                               " for orderlinenr "+announcement['id']+"<br>"
+                    status  = str(response.status_code)
+                    message += "<br>"+response.text+" for orderlinenr "+str(announcement['id'])
+                else :
+                    ok_recs += 1
+                    message += "<br>Sync OK for orderlinenr "+str(announcement['id'])
             else :
                 all_good=False
                 no_material += 1
+                message     += "<br> no material for "+str(announcement['id'])
+
             if all_good :
-                oldest_synced = announcement['changedate']
+                oldest_synced = announcement['write_date']
 
         #leave testimonial with config info
         if all_good :
             config.oldest_synced  = oldest_synced
             config.latest_run     = datetime.datetime.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')
             config.latest_success = datetime.date.today()
-            config.latest_status  = status
+            config.latest_status  = str(response.status_code)
             config.latest_reason  = "Sync OK"
             config.write({})
-            _logger.info("Successfull shipment of %d announcement orderlines created/changed between %s and %s",\
-                         len(announcements), config.begin, config.end)
+            _logger.info("Successfull shipment of %d announcement orderlines created/changed after %s T00:00:00",\
+                         len(announcements), config.begin)
             return True
         else :
             config.oldest_synced  = oldest_synced
             config.latest_run     = datetime.datetime.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')
             config.latest_status  = status
-            message               = "%d lines without material. %d errors. Oldest_non_synced kept at first error/no material. Please resolve." % (no_material, errors)
-            config.latest_reason  = message
+            prologue              = "%d lines without material. %d errors. %d records OK. Oldest_non_synced kept at first error/no material." % (no_material, errors, ok_recs)
+            config.latest_reason  = prologue+message
             config.write({})
             _logger.info(message)
             return False
