@@ -135,13 +135,12 @@ class Job(models.Model):
     def _needaction_domain_get(self):
         return [('state', '=', 'exception')]
 
-
-    @api.multi
-    @api.constrains('edition_ids')
-    def _check_editionRegioman(self):
-        for case in self:
-            if case.job_type == 'regioman' and len(case.edition_ids) > 1:
-                    raise ValidationError(_('Regioman cannot have more than 1 Edition Details'))
+    # @api.multi
+    # @api.constrains('edition_ids')
+    # def _check_editionRegioman(self):
+    #     for case in self:
+    #         if case.job_type == 'regioman' and len(case.edition_ids) > 1:
+    #                 raise ValidationError(_('Regioman cannot have more than 1 Edition Details'))
 
     @api.multi
     def action_create_job(self):
@@ -782,7 +781,7 @@ class Job(models.Model):
 
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
-        result =  super(Job, self).fields_view_get(view_id, view_type, toolbar=toolbar, submenu=submenu)
+        result = super(Job, self).fields_view_get(view_id, view_type, toolbar=toolbar, submenu=submenu)
         focusEdition = self.env.context.get('editionFocus', False)
         if focusEdition and view_type == 'form':
             doc = etree.XML(result['arch'])
@@ -795,20 +794,27 @@ class Job(models.Model):
     def button_convert_regioman(self):
         "Mark Job as 'Regioman' "
         self.ensure_one()
-        self.write({
+        ctx = self.env.context.copy()
+        ctx.update({'jobUpdates': True})
+
+        self.with_context(ctx).write({
             'job_type': 'regioman', 'convert_ok': False,
-            'edition_ids': map(lambda x: (2, x), [x.id for x in self.edition_ids]),
+            # 'edition_ids': map(lambda x: (2, x), [x.id for x in self.edition_ids]),
             'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids]),
-            'plate_type':'PU',
+            'plate_type': 'PU',
             })
-        self.fetch_paperProducts()
+
+        for edition in self.edition_ids:
+            edition.with_context(ctx).write({'paper_product_ids': map(lambda x: (2, x), [x.id for x in edition.paper_product_ids])})
+
+        self.with_context(ctx).fetch_paperProducts()
 
         # update file registry status to done
         registry = self.env['file.registry'].search([('job_id','in',self.ids),('state','!=','done')])
-        registry.write({'state':'done'})
+        registry.write({'state': 'done'})
 
-        ctx = self.env.context.copy()
-        ctx.update({'editionFocus':True})
+        # ctx = self.env.context.copy()
+        ctx.update({'editionFocus': True})
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',
@@ -817,7 +823,7 @@ class Job(models.Model):
             'res_id': self.id,
             'target': 'main',
             'flags': {'initial_mode': 'edit'},
-            'context':ctx,
+            'context': ctx,
         }
 
     @api.onchange('state', 'job_type')
@@ -1050,7 +1056,35 @@ class Job(models.Model):
     @api.model
     def create(self, vals):
         res = super(Job, self).create(vals)
-        res.fetch_paperProducts()
+        ctx = self.env.context.copy()
+        ctx.update({'jobUpdates':True})
+        res.with_context(ctx).fetch_paperProducts()
+        return res
+
+    @api.multi
+    def write(self, vals):
+        res = super(Job, self).write(vals)
+        if 'jobUpdates' in self.env.context or 'edition_ids' not in vals:
+            return res
+        for job in self:
+            edPapers = {}
+            for edition in job.edition_ids:
+                for roll in edition.paper_product_ids:
+                    if roll.product_id.id in edPapers:
+                        edPapers[roll.product_id.id] += int(roll.number_rolls)
+                    else:
+                        edPapers[roll.product_id.id] = int(roll.number_rolls)
+            for key, val in edPapers.iteritems():
+                jobRoll = job.paper_product_ids.search([('product_id.id', '=', key), ('job_id.id', '=', job.id)])
+                if jobRoll:
+                    jobRoll.write({'total_rolls': val})
+                else:
+                    jobRoll.create({'product_id': key, 'total_rolls': val, 'job_id': job.id})
+
+            for roll in job.paper_product_ids:
+                if roll.product_id.id not in edPapers:
+                    roll.unlink()
+
         return res
 
     @api.multi
@@ -1364,15 +1398,17 @@ class Job(models.Model):
                 AnalyticLines.create(line)
             case.write({'state': 'cost_created'})
 
-    #update Paper roll whenever new XML4 comes
-
+    #update Paper roll whenever XML1B comes per edition
     @api.multi
     def update_paper_roll(self, registry):
+        ctx = self.env.context.copy()
+        ctx.update({'jobUpdates': True})
         for ed in self.edition_ids:
-            ed.write({'paper_product_ids': map(lambda x: (2, x), [x.id for x in ed.paper_product_ids])})
-        self.write({'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids])})
+            ed.with_context(ctx).write({'paper_product_ids': map(lambda x: (2, x), [x.id for x in ed.paper_product_ids])})
+        self.with_context(ctx).write({'paper_product_ids': map(lambda x: (2, x), [x.id for x in self.paper_product_ids])})
+
         # re-create from new XML4
-        self.fetch_paperProducts()
+        self.with_context(ctx).fetch_paperProducts()
 
         if len(registry) > 1:
             msg = "Paper products updated from XML4:"
