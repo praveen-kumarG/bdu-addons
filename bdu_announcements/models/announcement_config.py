@@ -138,7 +138,7 @@ class AnnouncementConfig(models.Model):
                     all_good=False
                     errors  += 1
                     status  = str(response.status_code)
-                    pdb.set_trace()
+                    
                     message += "<br>"+str(announcement['id'])+" "+response.json()['message']
                 else :
                     ok_recs += 1
