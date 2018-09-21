@@ -24,7 +24,7 @@
           <br/>
           <br/>
 
-          <group name="production_status" string="Production status" col="1">
+          <group name="production_status" string="Production status" col="2">
               <field name="oldest_synced" readonly="1"/> 
               <field name="latest_run"        readonly="1" widget="html"/> 
               <field name="latest_success"    readonly="1"/> 

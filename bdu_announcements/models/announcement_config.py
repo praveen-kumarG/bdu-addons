@@ -90,7 +90,7 @@ class AnnouncementConfig(models.Model):
         announcements=self.env['sale.order.line'].search([('ad_class', '=', config.ad_class.id),\
                                                           ('write_date', '>', config.begin+" T00:00:00")]).\
                       sorted(key = lambda r : r.write_date)
-        pdb.set_trace()
+
         if not announcements :
             config.latest_run     = datetime.date.today()
             config.latest_status  = "N.A."
@@ -138,14 +138,15 @@ class AnnouncementConfig(models.Model):
                     all_good=False
                     errors  += 1
                     status  = str(response.status_code)
-                    message += "<br>"+response.text+" for orderlinenr "+str(announcement['id'])
+                    pdb.set_trace()
+                    message += "<br>"+str(announcement['id'])+" "+response.json()['message']
                 else :
                     ok_recs += 1
-                    message += "<br>Sync OK for orderlinenr "+str(announcement['id'])
+                    message += "<br>"+str(announcement['id'])+"Synced"
             else :
                 all_good=False
                 no_material += 1
-                message     += "<br> no material for "+str(announcement['id'])
+                message     += "<br>"+str(announcement['id'])+ ": no material" 
 
             if all_good :
                 oldest_synced = announcement['write_date']
