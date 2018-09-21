@@ -617,23 +617,33 @@ class Job(models.Model):
             lines.append(lnvals)
 
         for ed in self.edition_ids:
-            list_query = ("""
-                SELECT
-                  format, array_agg(pages), paper_weight, array_agg(id)
-                FROM
-                  wobe_booklet 
-                WHERE edition_id = {0} 
-                GROUP BY 
-                  format, paper_weight
-            """.format(
-                ed.id
-            ))
-            self.env.cr.execute(list_query)
-            result = self.env.cr.fetchall()
-            for data in result:
-                pFormat = str(data[0])
-                pages = sum(int(p) for p in data[1])
-                paper_weight = float(data[2])
+            items = {}
+            for booklet in ed.booklet_ids.filtered(lambda b: b.format == 'TB'):
+                paper_weight = float(booklet.paper_weight)
+                pages = int(booklet.pages)
+                if (paper_weight, 'TB') in items:
+                    items[(paper_weight, 'TB')] += pages
+                else:
+                    items[(paper_weight, 'TB')] = pages
+
+            for booklet in ed.booklet_ids.filtered(lambda b: b.format != 'TB'):
+                paper_weight = float(booklet.paper_weight)
+                pages = int(booklet.pages)
+                pFormat = booklet.format
+                if pFormat == 'MP':
+                    if (paper_weight, 'TB') in items:
+                        items[(paper_weight, 'TB')] += int(pages/2)
+                    else:
+                        items[(paper_weight, pFormat)] = pages
+                else:
+                    if (paper_weight, pFormat) in items:
+                        items[(paper_weight, pFormat)] += pages
+                    else:
+                        items[(paper_weight, pFormat)] = pages
+
+            for key, pages in items.iteritems():
+                paper_weight = float(key[0])
+                pFormat = str(key[1])
 
                 v1 = variant_obj.search([('name', '=', str(pages)), ('attribute_id', '=', pPages.id)])
                 paper_weight = int(paper_weight) if paper_weight % 1 == 0 else paper_weight
