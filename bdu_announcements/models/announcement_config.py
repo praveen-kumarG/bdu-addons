@@ -88,8 +88,9 @@ class AnnouncementConfig(models.Model):
 
         #get changed orderlines since oldest_non_synced
         announcements=self.env['sale.order.line'].search([('ad_class', '=', config.ad_class.id),\
-                                                          ('write_date', '>', config.begin+" T00:00:00")])
-        
+                                                          ('write_date', '>', config.begin+" T00:00:00")]).\
+                      sorted(key = lambda r : r.write_date)
+        pdb.set_trace()
         if not announcements :
             config.latest_run     = datetime.date.today()
             config.latest_status  = "N.A."
