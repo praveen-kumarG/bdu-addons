@@ -20,7 +20,7 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/odoo/addons/base/module/module_data.xml
     # for the full list
-    'category': 'Unknown',
+    'category': 'Connector',
     'version': '10.0',
 
     # depends on mis_builder to find menu location (see views)
