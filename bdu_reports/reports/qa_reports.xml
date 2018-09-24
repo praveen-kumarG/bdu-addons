@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <report
+        id="bdu_reports.action_invoices_without_zip"
+        model="account.invoice"
+        string="QA check on zip codes"
+        report_type="qweb-html"
+        name="bdu_reports.report_invoices_without_zip"
+    />
+
+    <template id="report_invoices_without_zip" >
+        <t t-call="report.html_container">
+            <t t-call="report.external_layout">
+                <div class="page">
+                    <!-- header  -->
+                    <div class="row bg-primary">                  
+                        <div class="col-xs-2">
+                            Invoice
+                        </div>
+                        <div class="col-xs-1">
+                            Partner id
+                        </div>
+                        <div class="col-xs-3">
+                            Partner address
+                        </div>
+                        <div class="col-xs-1">
+                            Parent id
+                        </div>
+                        <div class="col-xs-3">
+                            Parent address
+                        </div>
+                        <div class="col-xs-2">
+                            Account manager
+                        </div>
+                    </div>
+
+                    <!-- content -->
+                    <t t-foreach="docs" t-as="o">
+                        <!--only row if partner zip is incomplete -->
+                        <t t-if=" not o.partner_id.zip">
+                        <div class="row">                
+                            <div class="col-xs-2"> 
+                                <span t-field="o.number"/>
+                            </div>             
+                            <div class="col-xs-1"> 
+                                <!-- using python code to remove thousand separator -->
+                                <span t-esc="str(o.partner_id.id).replace('.','')"/>
+                            </div>
+                            <div class="col-xs-3">
+                                <address t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                            </div>            
+                            <div class="col-xs-1"> 
+                                <span t-field="o.partner_id.parent_id.id"/>
+                            </div>
+                            <div class="col-xs-3">
+                                <address t-field="o.partner_id.parent_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                            </div>            
+                            <div class="col-xs-2">
+                                <span t-field="o.partner_id.user_id"/> 
+                            </div>
+                        </div>
+                        </t>
+                    </t>
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>
