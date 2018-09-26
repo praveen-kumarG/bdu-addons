@@ -8,7 +8,7 @@
                 <field name="update_posted" position="attributes">
                     <attribute name="groups" >base.group_account_manager</attribute>
                 </field>
-                <xpath expr="//page[@name='advanced_settings']/group/group[1]" position="attributes">
+                <xpath expr="//page[@name='advanced_settings']/group/group[0]" position="attributes">
                     <attribute name="groups" >base.group_account_manager</attribute>
                 </xpath>
                 <field name="show_on_dashboard" position="attributes">
@@ -16,5 +16,6 @@
                 </field>
             </field>
         </record>
+
 
 </odoo>
