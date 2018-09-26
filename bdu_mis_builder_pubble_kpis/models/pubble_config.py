@@ -137,11 +137,6 @@ class PubbleConfig(models.Model):
                 
                 #analytic accounnt and company via sale.advertising.issue
                 title_account   = title_accounts.search([('parent_id','=', False),('default_note','=',d['title'])])
-
-                #_logger.info("title search in default_note for : %s gives length %d", d['title'], len(title_account))
-                #for r in title_account :
-                #    _logger.info("-default_note : %s", r['default_note'])
-
                 if len(title_account)==1:
                     d['title_code'] = title_account[0]['code']
                     d['company_id'] = title_account[0].analytic_account_id.company_id.id
