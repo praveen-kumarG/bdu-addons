@@ -42,7 +42,7 @@ This module adds customization as per BDU Media
                  'partner_contact_gender','purchase', 'account_invoice_refund_link',
                  'partner_sector','base_partner_sequence','account_credit_control',
                  'account_analytic_required', 'account_type_inactive', 'account_type_menu',
-                 'account_type_multi_company'
+                 'account_type_multi_company','account_cancel'
     ],
     'data' : [
             "security/ir.model.access.csv",
@@ -56,6 +56,7 @@ This module adds customization as per BDU Media
             "report/report_credit_control_summary.xml",
             "report/report.xml",
             "views/account_invoice_view.xml",
+            "views/account_view.xml",
             "views/operating_unit_view.xml",
             "views/res_partner_view.xml",
             "views/product_view.xml",

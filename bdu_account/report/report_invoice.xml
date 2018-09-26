@@ -58,8 +58,10 @@
                         <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft INVOICE</span>
                         <span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Cancelled INVOICE</span>
                         <span t-if="o.type == 'out_refund'">CREDIT INVOICE</span>
-                        <span t-if="o.type == 'in_refund'">Vendor Refund</span>
-                        <span t-if="o.type == 'in_invoice'">Vendor Bill</span>
+                        <span t-if="o.type == 'in_refund' and o.revbil">Reverse Vendor Refund</span>
+                        <span t-if="o.type == 'in_invoice' and o.revbil">Reverse Vendor Bill</span>
+                        <span t-if="o.type == 'in_refund' and not o.revbil">Vendor Refund</span>
+                        <span t-if="o.type == 'in_invoice' and not o.revbil">Vendor Bill</span>
                     </h3>
                 </div>
             </div>
