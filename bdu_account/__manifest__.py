@@ -48,6 +48,7 @@ This module adds customization as per BDU Media
             "security/ir.model.access.csv",
             "data/partner_sequence.xml",
             "data/operating_unit.xml",
+            "data/mail_template_data.xml",
             "report/report_invoice.xml",
             "report/report_saleorder.xml",
             "report/purchase_quotation_templates.xml",
