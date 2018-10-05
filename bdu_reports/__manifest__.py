@@ -7,7 +7,7 @@
                 """,
 
     'description': """
-        Reports: <br/>
+        Reports: \n
         - draft invoices without address\n
         - invoice amounts and account manager
     """,
