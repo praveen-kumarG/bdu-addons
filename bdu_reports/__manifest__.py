@@ -7,8 +7,9 @@
                 """,
 
     'description': """
-        Reports: 
-        - draft invoices without address
+        Reports: <br/>
+        - draft invoices without address\n
+        - invoice amounts and account manager
     """,
 
     'author'  : "D. Prosee",
