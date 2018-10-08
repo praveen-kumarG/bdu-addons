@@ -1,0 +1,53 @@
+<?xml version="1.0"?> 
+<odoo>
+
+  <!-- Add account manager to invoice -->
+  <record model="ir.ui.view" id="invoice_tree_with_account_manager">
+    <field name="name">account.invoice.tree_inherit</field>
+    <field name="model">account.invoice</field>
+    <field name="inherit_id" ref="account.invoice_tree"/>
+    <field name="arch" type="xml">
+      <field name="user_id" position="replace">
+        <field name="account_manager_id"/>
+      </field>
+    </field>
+  </record>
+
+  <!--  Tree view for credit history --> 
+  <record id="credit_history_tree" model="ir.ui.view">
+    <field name="name">Credit history</field>
+    <field name="model">credit.history</field>
+    <field name="arch" type="xml">
+      <tree>
+          <field name="year"/>
+          <field name="week"/>
+          <field name="user_id"/>
+          <field name="partner_id" groups="base.group_user" string="Customer"/>
+          <field name="at_lte8d"     string="Amount &lt;=8d"       sum="Amount &lt;=8d"/>
+          <field name="res_lte8d"    string="Amount due &lt;=8d"   sum="Amount due &lt;=8d"/>
+          <field name="at_lte35d"    string="Amount &lt;=35d"      sum="Amount &lt;=35d"/>
+          <field name="res_lte35d"   string="Amount due &lt;=35"   sum="Amount due &lt;=35d"/>
+          <field name="at_gt35d"     string="Amount &gt;35"        sum="Amount &gt;35d"/>
+          <field name="res_gt35d"    string="Amount due &gt;35d"   sum="Amount due &gt;35d"/>
+          <field name="amount_total" string="Total"                sum="Total"/>
+          <field name="residual"     string="Amount Due"           sum="Total Due"/>
+      </tree>
+    </field>
+  </record> 
+
+
+  <!-- Action to open credit history --> 
+  <act_window id="credit_history_action" 
+    name="Credit history" 
+    res_model="credit.history" 
+    view_mode="tree,pivot,graph" /> 
+  
+  <!-- Menu item to open credit history--> 
+  <menuitem id="credit_history_menu" 
+    name="Credit history" 
+    action="credit_history_action"
+    parent="account.menu_finance_receivables" 
+    sequence="105"
+     /> 
+
+</odoo>
