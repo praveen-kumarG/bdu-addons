@@ -23,6 +23,8 @@
                  'account', 
                 ],
     'data'    : [
+                  'security/security.xml',
+                  'security/ir.model.access.csv',
                   'reports/qa_reports.xml',
                   'views/credit_history.xml',
                 ],

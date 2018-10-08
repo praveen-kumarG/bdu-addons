@@ -89,6 +89,7 @@ class credit_history(models.Model):
             #for backward compatibility; if account manager is missing it will not overwrite good info
             if oi['account_manager_id'] :
                 d[partner_id]['user_id']=oi['account_manager_id'].id
+                #toto: add salesteam
 
         #add or change record in target data
         for key in d :
