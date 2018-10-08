@@ -33,7 +33,6 @@ class credit_history(models.Model):
         year = now.isocalendar()[0]
         week = now.isocalendar()[1]
 
-        pdb.set_trace()
         #target data
         ch = self.search([])
 
