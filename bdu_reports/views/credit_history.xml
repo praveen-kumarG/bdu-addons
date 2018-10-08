@@ -19,8 +19,9 @@
     <field name="model">credit.history</field>
     <field name="arch" type="xml">
       <tree>
-          <field name="year"/>
+          <field name="year" widget="char"/>
           <field name="week"/>
+          <field name="crm_team_id"/>
           <field name="user_id"/>
           <field name="partner_id" groups="base.group_user" string="Customer"/>
           <field name="at_lte8d"     string="Amount &lt;=8d"       sum="Amount &lt;=8d"/>
@@ -34,6 +35,57 @@
       </tree>
     </field>
   </record> 
+
+  <!-- Graph view -->
+  <record id="credit_history_graph" model="ir.ui.view">
+    <field name="name">credit.history.graph</field>
+    <field name="model">credit.history</field>
+    <field name="arch" type="xml">
+        <graph string="Credit history" type="bar" stacked="True">
+            <field name="week" type="row"/>
+            <field name="crm_team_id" type="row"/>
+            <field name="amount_total" type="measure"/>
+        </graph>
+    </field>
+  </record>
+
+  <!-- filter and groupby for credit history -->
+  <record model="ir.ui.view" id="crdit_history_filter">
+            <field name="name">credit.history.filter</field>
+            <field name="model">credit.history</field>
+            <field name="priority" eval="25"/>
+            <field name="arch" type="xml">
+                <search string="Credit history totals by the week and responsibles">
+
+                    <field name="partner_id" operator="child_of"/>
+                    <field name="user_id" operator="child_of"/>
+                    <field name="crm_team_id" operator="child_of"/>
+
+
+                    <filter string="My credit history"  domain="[('user_id', '=', uid  )]"/>
+                    <separator/>
+
+                    <!--sold by based on crm team-->
+                    <filter string="Direct sales Alkmaar" domain="[('crm_team_id','in',( 'Alkmaar'))]"/>
+                    <filter string="Direct sales Barneveld" domain="[('crm_team_id','in',( 'Barneveld'))]"/>
+                    <filter string="Direct sales Hoofddorp" domain="[('crm_team_id','in',( 'Hoofddorp'))]"/>
+                    <filter string="Direct sales Online" domain="[('crm_team_id','in',( 'Online'))]"/>
+                    <filter string="Indirect sales" domain="[('crm_team_id','in',( 'Traffic'))]"/>
+                    <filter string="Web sales" domain="[('crm_team_id','in',( 'Web sales', 'Web verkoop'))]"/>
+                    <filter string="No channel / team" domain="[('crm_team_id','not in',('Alkmaar','Barneveld','Gorinchem','Hoofddorp','Online','Traffic','Vakmedia','Web sales', 'Web verkoop'))]"/>
+                    <!--note keep the above group together so they may be joined by user-->
+
+                     <group expand="0" string="Group By">
+                        <filter string="Customer" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Salesteam" domain="[]" context="{'group_by':'crm_team_id''}"/>
+                        <filter string="Salesperson" domain="[]" context="{'group_by':'user_id'}"/>
+                        <filter string="Year" domain="[]" context="{'group_by':'year'}"/>
+                        <filter string="Week" domain="[]" context="{'group_by':'week'}"/>
+                    </group>
+
+                </search>
+            </field>
+  </record>
 
 
   <!-- Action to open credit history --> 

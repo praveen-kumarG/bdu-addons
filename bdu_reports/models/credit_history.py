@@ -22,8 +22,10 @@ class credit_history(models.Model):
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True) :
-        #if 'page_nr' in fields :
-        #	fields.remove('page_nr')
+        if (not 'year' in groupby) and 'year' in fields :
+        	fields.remove('year')
+        if (not 'week' in groupby) and 'week' in fields :
+            fields.remove('week')
         return super(credit_history, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
     @api.multi
@@ -89,7 +91,7 @@ class credit_history(models.Model):
             #for backward compatibility; if account manager is missing it will not overwrite good info
             if oi['account_manager_id'] :
                 d[partner_id]['user_id']=oi['account_manager_id'].id
-                #toto: add salesteam
+                d[partner_id]['crm_team_id']=self.env['crm.team'].search([('member_ids','=',oi['account_manager_id'].id)]).id
 
         #add or change record in target data
         for key in d :
