@@ -1,0 +1,8 @@
+<openerp>
+    <data>
+        <record id="announcement_connector" model="res.groups">
+        <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="name">Announcement connector</field>
+        </record>
+    </data>
+</openerp>
