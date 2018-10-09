@@ -41,7 +41,7 @@ class credit_history(models.Model):
         #source data
         #groupby    =['date_due','account_manager_id','partner_id']
         #sumfields  =['amount_total','residual']
-        open_invoices = self.env['account.invoice'].search([  ('state','=','open'),   ('type','in',('out_invoice', 'out_refund','customer_invoice','customer_refunc'))  ])
+        open_invoices = self.env['account.invoice'].search([  ('state','=','open'),   ('type','in',('out_invoice', 'out_refund','customer_invoice','customer_refund'))  ])
 
         #accumulate per partner within date ranges relative to due date
         d = {}
