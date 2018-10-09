@@ -7,8 +7,11 @@
                 """,
 
     'description': """
-        Reports: 
-        - draft invoices without address
+        Reports: \n
+        - draft invoices without address (print action on selected invoices)\n
+        - invoice amounts and account manager (print action on selected invoices)\n
+        - tree, graph, pivot on open invoice history (menu item)
+        - method to consolidate current (weekly) status (to be called by a scheduled action)
     """,
 
     'author'  : "D. Prosee",
@@ -16,11 +19,13 @@
     'license' : "LGPL-3",     
     'category': 'Reporting',
     'version' : '10.0',
-    'depends' : ['base', 
+    'depends' : ['base',
+                 'account', 
                 ],
     'data'    : [
+                  'security/security.xml',
+                  'security/ir.model.access.csv',
                   'reports/qa_reports.xml',
-                ],
-    'demo'    : [
+                  'views/credit_history.xml',
                 ],
 }

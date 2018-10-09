@@ -68,4 +68,85 @@
         </t>
     </template>
 
+<report
+        id="bdu_reports.action_invoices_with_account_manager"
+        model="account.invoice"
+        string="Invoices with owner"
+        report_type="qweb-html"
+        name="bdu_reports.report_invoices_with_account_manager"
+    />
+
+    <template id="report_invoices_with_account_manager" >
+        <t t-call="report.html_container">
+            <t t-call="report.external_layout">
+                <div class="page">
+                    <!-- header  -->
+                    <div class="row bg-primary">                  
+                        <div class="col-xs-2">
+                            Invoice
+                        </div>
+                        <div class="col-xs-1">
+                            Partner id
+                        </div>
+                        <div class="col-xs-2">
+                            Partner name
+                        </div>
+                        <div class="col-xs-1">
+                            Parent id
+                        </div>
+                        <div class="col-xs-2">
+                            Parent name
+                        </div>
+                        <div class="col-xs-2">
+                            Account manager
+                        </div>
+                        <div class="col-xs-1">
+                            Total
+                        </div>
+                        <div class="col-xs-1">
+                            Amount due
+                        </div>
+                    </div>
+
+                    <!-- content -->
+                    <t t-foreach="docs" t-as="o">
+                        <div class="row">                
+                            <div class="col-xs-2"> 
+                                <span t-field="o.number"/>
+                            </div>             
+                            <div class="col-xs-1"> 
+                                <!-- using python code to remove thousand separator -->
+                                <span t-esc="str(o.partner_id.id).replace('.','')"/>
+                            </div>
+                            <div class="col-xs-2">
+                                <address t-field="o.partner_id.name" />
+                            </div>            
+                            <div class="col-xs-1"> 
+                                <!-- using python code to remove thousand separator -->
+                                <span t-esc="str(o.partner_id.parent_id.id).replace('.','')"/>
+                            </div>
+                            <div class="col-xs-2">
+                                <address t-field="o.partner_id.parent_id.name" />
+                            </div>            
+                            <div class="col-xs-2">
+                                <t t-if="o.partner_id.zip">
+                                     <span t-field="o.partner_id.user_id"/>
+                                </t> 
+                                <t t-if=" not o.partner_id.zip">
+                                     <span t-field="o.partner_id.parent_id.user_id"/>
+                                </t> 
+                            </div>          
+                            <div class="col-xs-1">
+                                <span t-field="o.amount_total"/> 
+                            </div>          
+                            <div class="col-xs-1">
+                                <span t-field="o.residual"/> 
+                            </div>
+                        </div>
+                    </t>
+
+                </div>
+            </t>
+        </t>
+    </template>
 </odoo>
