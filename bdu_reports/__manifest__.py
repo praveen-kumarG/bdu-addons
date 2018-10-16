@@ -19,8 +19,8 @@
     'license' : "LGPL-3",     
     'category': 'Reporting',
     'version' : '10.0',
-    'depends' : ['base',
-                 'account', 
+    'depends' : [
+                 'account_operating_unit', 
                 ],
     'data'    : [
                   'security/security.xml',
