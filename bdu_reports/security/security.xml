@@ -4,5 +4,9 @@
         <field name="category_id" ref="base.module_category_hidden"/>
             <field name="name">Credit history</field>
         </record>
+        <record id="history_order" model="res.groups">
+        <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="name">Order history</field>
+        </record>
     </data>
 </openerp>
