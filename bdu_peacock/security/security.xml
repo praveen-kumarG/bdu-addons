@@ -1,0 +1,8 @@
+<openerp>
+    <data>
+        <record id="peacock_connector" model="res.groups">
+        <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="name">Peacock connector</field>
+        </record>
+    </data>
+</openerp>

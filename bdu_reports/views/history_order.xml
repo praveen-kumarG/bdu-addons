@@ -1,0 +1,130 @@
+<?xml version="1.0"?> 
+<odoo>
+
+  <record id="order_history_tree" model="ir.ui.view">
+    <field name="name">Order history</field>
+    <field name="model">history.order</field>
+    <field name="arch" type="xml">
+      <tree>
+          <field name="source"/>
+          <field name="source"/>
+          <field name="order"/>
+          <field name="orderline"/>
+          <field name="advertiser" />
+          <field name="debtor"/>
+          <field name="contact"/>
+          <field name="salesteam"/>
+          <field name="salesperson"/>
+          <field name="product"/>
+          <field name="adv_category"/>
+          <field name="page_category"/>
+          <field name="issue_code"/>
+          <field name="title"/>
+          <field name="issue_date"/>
+          <field name="issue_year" widget="char"/>
+          <field name="issue_month"/>
+          <field name="issue_day"/>
+          <field name="issue_week"/>
+          <field name="issue_weekday"/>
+          <field name="list_price"/>
+          <field name="net_price"/>
+      </tree>
+    </field>
+  </record> 
+
+  <record id="history_order_pivot" model="ir.ui.view"> 
+    <field name="name">Order history</field>
+    <field name="model">history.order</field>
+  <field name="arch" type="xml"> 
+    <pivot> 
+      <field name="issue_date" interval="year"  type="col"/> 
+      <field name="source"/> 
+      <field name="net_price" type="measure" /> 
+    </pivot> 
+  </field> 
+</record>
+
+  <record id="history_order_graph" model="ir.ui.view">
+    <field name="name">history.order.graph</field>
+    <field name="model">history.order</field>
+    <field name="arch" type="xml">
+        <graph string="Order history" type="bar" stacked="True">
+            <field name="issue_date" interval="month" type="row"/>
+            <field name="source" type="row"/>
+            <field name="net_price" type="measure"/>
+        </graph>
+    </field>
+  </record>
+
+  <!-- filter and groupby for credit history -->
+  <record model="ir.ui.view" id="history_order_filter">
+            <field name="name">history.order.filter</field>
+            <field name="model">history.order</field>
+            <field name="priority" eval="25"/>
+            <field name="arch" type="xml">
+                <search string="Order history totals">
+
+                    <field name="advertiser" />
+                    <field name="debtor"/>
+                    <field name="contact"/>
+
+
+                    <!--starting with advertising orders the setup caters for other types too. e.g. subscriptions, book sale, etc-->
+                    <filter string="Advertising orders"  domain="[('order_type', '=', 'adv' )]"/>
+                    <filter string="Other orders"        domain="[('order_type', '!=', 'adv' )]"/>
+                    <separator/> 
+
+                    <!--period filtering allways helps-->
+                    <filter string="This year" domain="[('issue_date', '&gt;=', datetime.date.today().strftime('%Y-01-01 00:00:00')),('issue_date', '&lt;=',datetime.date.today().strftime('%Y-12-31 23:23:59'))]"/>
+                    <filter string="Last year" domain="[ 
+                      ('issue_date', '&gt;=',(context_today()-relativedelta(years=1)).strftime('%Y-01-01 00:00:00')), 
+                      ('issue_date', '&lt;=',(context_today()-relativedelta(years=1)).strftime('%Y-12-31 23:23:59'))
+                    ]"/>
+                    <filter string="2 Years ago" domain="[
+                      ('issue_date', '&gt;=',(context_today()-relativedelta(years=2)).strftime('%Y-01-01 00:00:00')), 
+                      ('issue_date', '&lt;=',(context_today()-relativedelta(years=2)).strftime('%Y-12-31 23:23:59'))
+                    ]"/>
+                    <filter string="3 Years ago" domain="[
+                      ('issue_date', '&gt;=',(context_today()-relativedelta(years=3)).strftime('%Y-01-01 00:00:00')), 
+                      ('issue_date', '&lt;=',(context_today()-relativedelta(years=3)).strftime('%Y-12-31 23:23:59'))
+                    ]"/>
+                    <separator/>
+
+                    <!--sold by based on crm team-->
+                    <filter string="Source CASA" domain="[('source','in',( 'CASA'))]"/>
+                    <filter string="Source Zeno" domain="[('source','like',( 'Zeno'))]"/>
+                    <filter string="Source Pubble Baarn" domain="[('source','=',( 'pubble_baarn'))]"/>
+                    <filter string="Source Pubble Alkmaar" domain="[('source','-',( 'pubble_nh'))]"/>
+                    <!--note keep the above group together so they may be joined by user-->
+
+                     <group expand="0" string="Group By">
+                        <filter string="Advertiser" domain="[]" context="{'group_by':'advertiser'}"
+                                help="There are many advertisers, so be sure to filter adequatly first!"/>
+                        <filter string="Debtor" domain="[]" context="{'group_by':'debtor'}"
+                                help="There are many debtors (customers), so be sure to filter adequatly first!"/>
+                        <filter string="Salesteam" domain="[]" context="{'group_by':'salesteam''}"/>
+                        <filter string="Salesperson" domain="[]" context="{'group_by':'salesperson'}"/>
+                        <filter string="Year" domain="[]" context="{'group_by':'issue_year'}"/>
+                        <filter string="Week" domain="[]" context="{'group_by':'issue_week'}"/>
+                    </group>
+
+                </search>
+            </field>
+  </record>
+
+
+  <!-- Action to open credit history --> 
+  <act_window id="history_order_action" 
+    name="Order history" 
+    res_model="history.order" 
+    view_mode="pivot,tree,graph" 
+  /> 
+  
+  <menuitem id="history_order_menu" 
+    name="Order history" 
+    action="history_order_action"
+    parent="base.menu_board_root"
+    sequence="100"
+     /> 
+
+</odoo>
