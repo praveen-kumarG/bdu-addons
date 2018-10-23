@@ -94,7 +94,7 @@
                     <filter string="Source CASA" domain="[('source','in',( 'CASA'))]"/>
                     <filter string="Source Zeno" domain="[('source','like',( 'Zeno'))]"/>
                     <filter string="Source Pubble Baarn" domain="[('source','=',( 'pubble_baarn'))]"/>
-                    <filter string="Source Pubble Alkmaar" domain="[('source','-',( 'pubble_nh'))]"/>
+                    <filter string="Source Pubble Alkmaar" domain="[('source','=',( 'pubble_nh'))]"/>
                     <!--note keep the above group together so they may be joined by user-->
 
                      <group expand="0" string="Group By">
