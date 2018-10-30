@@ -24,7 +24,7 @@
                             <newline/> 
                             <field name="landing_page" attrs="{'required' : [('prod_cat','in', 'Online')]}"/>
                             <field name="retarget"     attrs="{'required' : [('prod_cat','in', 'Online')]}"/>
-                            <field name="profile"      widget="many2many_tags"    
+                            <field name="profile"      widget="many2many_tags"    placeholder="Tags..."
                                                        attrs="{'required' : [('prod_cat','in', 'Online')]}"/>
                             <newline/>
                             <field name="from_date"    attrs="{'required' : [('prod_cat','in', 'Online')]}"/>

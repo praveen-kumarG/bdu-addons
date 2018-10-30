@@ -9,6 +9,7 @@
       <tree string="Profiles" toolbar="1"> 
           <field name="profile_cat"       /> 
           <field name="name"              />
+          <field name="color"             />
       </tree> 
     </field> 
   </record> 
