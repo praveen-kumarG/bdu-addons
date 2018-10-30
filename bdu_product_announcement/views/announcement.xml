@@ -1,0 +1,39 @@
+<?xml version="1.0"?> 
+<odoo>
+
+  <!-- List view  --> 
+  <record id="announcement_tree_view" model="ir.ui.view"> 
+    <field name="name">Publications</field> 
+    <field name="model">sale.advertising.issue</field> 
+    <field name="arch" type="xml"> 
+      <tree string="Issues" toolbar="1"> 
+          <field name="parent_id"      string="Title"/> 
+          <field name="default_note"   string="Title"/>
+          <field name="code"           string="Issue"/> 
+          <field name="issue_date"     /> 
+      </tree> 
+    </field> 
+  </record> 
+
+  <!-- Form view  can use form of sale advertising issue --> 
+
+
+  <!-- search filter  -->
+  <record id="announcement_view_filter" model="ir.ui.view">
+    <field name="name">Announcement filter</field>
+    <field name="model">sale.advertising.issue</field>
+    <field name="inherit_id" ref="sale_advertising_order.view_advertising_issue_filter" />
+    <field name="arch" type="xml">
+
+      <!-- custom additions here -->
+      <xpath expr="//separator" position="after">
+        <filter string="Issue date last/next 2 weeks" domain="[('issue_date', '&gt;=',(datetime.date.today()-datetime.timedelta(weeks=2)).strftime('%Y-%m-%d 00:00:00')),('issue_date', '&lt;=',(datetime.date.today()+datetime.timedelta(weeks=2)).strftime('%Y-%m-%d 23:23:59'))]"/>
+        <separator/>
+      </xpath>
+      
+
+    </field>
+  </record>
+
+
+</odoo>

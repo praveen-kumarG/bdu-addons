@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="sale_product_distribution_form_view">
+            <field name="name">sale.product.distribution.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="priority" eval="40"/>
+            <field name="arch" type="xml">
+        
+                <!-- custom attributes go here -->
+                <xpath expr="//field[@name='order_line']/form/label[@for='name']" position="before">
+                    <group name="Custom product info" attrs="{'invisible' : [('prod_cat','not in', 'Distribution')]}">
+                        <group name="custom product info left column">  
+                            <field name="area_id" string="Distribution area" domain="" 
+                                   options="{'no_open': True,'no_create': True, 'no_create_edit': True}" 
+                                   attrs="{'invisible': [('area_id','=', False)]}"/>
+                        </group>
+                        <group name="custom product info right column">
+                            <field name="distributor"
+                                   attrs="{'invisible': [('distributor','=', False)]}"/>
+                        </group>
+                        <field name="area_ids" 
+                               string="Distribution areas" 
+                               attrs="{'invisible': [('area_id','!=', False),('area_ids','=', [])]}" 
+                               domain="" 
+                               options="{'no_open': True,'no_create': True, 'no_create_edit': True}" 
+                               context="{'search_view_ref':'bdu_product_distribution.distribution_area_view_filter',
+                                         'tree_view_ref':'bdu_product_distribution.distribution_areas_tree_view' }"/>
+                    </group>
+                </xpath>  
+
+
+            </field>                               
+        </record>
+    </data>
+</openerp>       
