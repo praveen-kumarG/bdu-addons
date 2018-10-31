@@ -33,8 +33,8 @@
                  'sale_advertising_order',
                 ],
     'data'    : [
-                 #'security/security.xml',
-                 #'security/ir.model.access.csv',
+                 'security/security.xml',
+                 'security/ir.model.access.csv',
                  'views/orderline_adaptions.xml',
                  'views/online.xml',
                  'views/profile.xml'
