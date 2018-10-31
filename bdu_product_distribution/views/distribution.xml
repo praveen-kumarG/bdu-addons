@@ -1,0 +1,94 @@
+<?xml version="1.0"?> 
+<odoo>
+
+  <!-- List view  --> 
+  <record id="distribution_areas_tree_view" model="ir.ui.view"> 
+    <field name="name">Distribution areas</field> 
+    <field name="model">logistics.address.table</field> 
+    <field name="priority" eval="99999"/>
+    <field name="arch" type="xml"> 
+      <tree string="Distribution areas" toolbar="1"> 
+          <field name="distribution_area" string="Area"/> 
+          <field name="province_id"       string="Prov."   invisible="1"/> 
+          <field name="city"/> 
+          <field name="municipality"/> 
+          <field name="zip"               string="Zip 1234" widget="Char"/> 
+          <field name="zip_2"             string="Zip AB"/>  
+          <field name="nr_from"           string="From nr"/> 
+          <field name="nr_until"          string="Until nr" widget="Char"/> 
+          <field name="total_addresses"   string="Total"/> 
+          <field name="folder_addresses"  string="Folders"/> 
+          <field name="number_no_no"      string="No No"    invisible="1"/> 
+          <field name="number_yes_no"     string="Yes No"   invisible="1"/> 
+          <field name="user_id"           string="Distributor"/> 
+      </tree> 
+    </field> 
+  </record> 
+
+  <!-- Form view --> 
+  <record id="distribution_areas_form_view" model="ir.ui.view"> 
+    <field name="name">Distribution area</field> 
+    <field name="model">logistics.address.table</field> 
+    <field name="priority" eval="99999"/>
+    <field name="arch" type="xml"> 
+      <form string="Distribution area">
+        <group> 
+          <group>
+              <field name="country_id"/> 
+              <field name="province_id"/> 
+              <field name="municipality"/> 
+              <field name="city"/> 
+              <field name="zip"/> 
+              <field name="zip_2"/>
+              <field name="nr_from"/>
+              <field name="nr_until"/>
+          </group>   
+          <group>
+              <field name="distribution_area"/> 
+              <field name="user_id"/> 
+              <field name="total_addresses"/> 
+              <field name="folder_addresses"/> 
+              <field name="number_no_no"/> 
+              <field name="number_yes_no"/>
+          </group>   
+        </group> 
+      </form> 
+    </field> 
+  </record> 
+
+  <!-- search filter : no filter defined in folders -->
+  <record id="distribution_area_view_filter" model="ir.ui.view">
+    <field name="name">Distribution areas filter</field>
+    <field name="model">logistics.address.table</field>
+    <field name="priority" eval="99999"/>
+    <field name="arch" type="xml">
+
+       <search string="Search Advertising Sales Order Lines">
+
+          <field name="region"/>
+          <field name="province_id"/>
+          <field name="city"/>
+          <field name="municipality"/>
+          <field name="distribution_area"/>
+          <field name="zip"/>
+          <field name="title_id"/>
+          <field name="user_id"/>
+
+          <filter string="Distributors only" domain="[('user_id','!=',False)]"/>
+   
+          <group expand="0" string="Group By">
+              <filter string="Region" domain="[]" context="{'group_by':'region'}"/>
+              <filter string="Province" domain="[]" context="{'group_by':'province_id'}"/>
+              <filter string="City" domain="[]" context="{'group_by':'city'}"/>
+              <filter string="Distribution area" domain="[]" context="{'group_by':'distribution_area'}"/>
+              <filter string="Zip" domain="[]" context="{'group_by':'zip'}"/>
+              <filter string="Title" domain="[]" context="{'group_by':'title_id'}"/>
+              <filter string="Distributor" domain="[]" context="{'group_by':'user_id'}"/>
+          </group>
+      </search>
+
+    </field>
+  </record>
+
+
+</odoo>

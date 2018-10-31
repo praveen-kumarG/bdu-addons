@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="sale_product_distribution_form_view">
+            <field name="name">sale.product.distribution.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="priority" eval="40"/>
+            <field name="arch" type="xml">
+        
+                <!-- custom attributes go here -->
+                <xpath expr="//field[@name='order_line']/form/label[@for='name']" position="before">
+                    <group attrs="{'invisible' : [('prod_cat','not in', 'Announcement')]}">
+                            <field name="url_to_material" />
+                    </group>
+
+                    <group name="Custom product info" attrs="{'invisible' : [('prod_cat','not in', 'Announcement')]}">
+                        
+                        <group name="custom product info left column">
+                            <label for="" string="Meta data"/> 
+                            <newline/> 
+                            <field name="firstname" attrs="{'required' : [('prod_cat','in', 'Announcement')]}"/>
+                            <field name="lastname"  attrs="{'required' : [('prod_cat','in', 'Announcement')]}"/>
+                            <field name="city"      attrs="{'required' : [('prod_cat','in', 'Announcement')]}"/>
+                            <newline/>
+                            <field name="from_date" attrs="{'required' : [('prod_cat','in', 'Announcement')]}"/>
+                            <field name="to_date"   attrs="{'required' : [('prod_cat','in', 'Announcement')]}"/>
+                        </group>
+
+                        <group name="custom product info right column">
+                            <label for="adv_issue_ids" string="Published in"/> 
+                            <newline/>
+                            <field name="adv_issue_ids" nolabel="1" 
+                                   domain="[('parent_id','!=', False),('parent_id','not in',('ONLINE'))]" 
+                                   options="{'no_open': True,'no_create': True, 'no_create_edit': True}" 
+                                   context="{'search_view_ref':'bdu_product_announcement.announcement_view_filter',
+                                             'tree_view_ref':'bdu_product_announcement.announcement_tree_view' }"
+                                   attrs="{'required'  : [('prod_cat','in', 'Announcement')]}"/>
+                        </group>
+
+                    </group>
+                </xpath>  
+
+
+            </field>                               
+        </record>
+    </data>
+</openerp>       
+
