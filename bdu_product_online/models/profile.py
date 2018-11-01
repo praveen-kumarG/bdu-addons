@@ -5,9 +5,9 @@ class SearchProfile(models.Model):
 	_name        = 'online.profile'
 	_description = 'search profiles for programmatic selling'
 	
-	profile_cat  = fields.Char('Profile category',        required=True)
+	profile_cat  = fields.Char('Profile category')
 	name         = fields.Char('Profile',                 required=True)
-	color        = fields.Integer('Color index',          required=True)
+	color        = fields.Integer('Color index')
 
 """
 Color index	Tags odoo 10
