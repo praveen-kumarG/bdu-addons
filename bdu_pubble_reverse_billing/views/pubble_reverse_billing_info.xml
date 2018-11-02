@@ -1,0 +1,89 @@
+<?xml version="1.0"?> 
+<odoo>
+
+  <!-- List view  --> 
+  <record id="view_tree_pubble_production_data" model="ir.ui.view"> 
+    <field name="name">Pubble production data</field> 
+    <field name="model">pubble.production.data</field> 
+    <field name="arch" type="xml"> 
+      <tree string="Pubble production data"> 
+          <field name="operating_unit_id"/> 
+          <field name="article_id"/> 
+          <field name="product_id"/>  
+          <field name="week"/> 
+          <field name="freelancer"/> 
+          <field name="count"/> 
+          <field name="url"/> 
+          <field name="remark"/> 
+          <field name="commissioned_by"/> 
+          <field name="issue_id"/>
+          <field name="issue_ids"/> 
+      </tree> 
+    </field> 
+  </record> 
+
+  <!-- Form view --> 
+  <record id="view_form_pubble_production_data" model="ir.ui.view"> 
+    <field name="name">Pubble production data</field> 
+    <field name="model">pubble.production.data</field> 
+    <field name="arch" type="xml"> 
+      <form string="Pubble production data">
+        <group> 
+          <field name="operating_unit_id"/> 
+          <field name="article_id"/> 
+          <field name="product_id"/>  
+          <field name="week"/> 
+          <field name="freelancer"/> 
+          <field name="count"/> 
+          <field name="url"/> 
+          <field name="remark"/> 
+          <field name="commissioned_by"/> 
+          <field name="issue_id"/>
+          <field name="issue_ids"/> 
+        </group> 
+      </form> 
+    </field> 
+  </record> 
+
+  <!-- Search filter -->
+  <record id="view_filter_pubble_production_data" model="ir.ui.view">
+    <field name="name">Pubble production data filter</field>
+    <field name="model">pubble.production.data</field>
+    <field name="arch" type="xml">
+      <search string="Search Pubble production data">
+
+          <field name="freelancer"/>
+          <field name="issue_ids"/>
+          <field name="commissioned_by"/>
+
+          <filter string="My orders" domain="[('commissioned_by','=', uid)]"  />
+          <separator/>
+
+          <group expand="0" string="Group By">
+              <filter string="Operating Unit" domain="[]" context="{'group_by':'operating_unit_id'}"/>
+              <filter string="Freelancer" domain="[]" context="{'group_by':'freelancer'}"/>
+              <filter string="Commissioned by"  domain="[]" context="{'group_by':'commissioned_by'}"/>
+          </group>
+
+      </search>
+    </field>
+  </record>
+
+
+  <!-- Action  --> 
+  <act_window id="show_pubble_production_data" 
+              name="Pubble production data" 
+              res_model="pubble.production.data" 
+              view_mode="tree,form" 
+  /> 
+  
+  <!-- Menu item --> 
+  <menuitem id="show_pubble_production_data_menu" 
+            name="Editorial production" 
+            action="show_pubble_production_data"
+            parent="menu_pubble_production" 
+            sequence="100"
+  /> 
+
+
+</odoo>
