@@ -35,7 +35,7 @@
                             <label for="adv_issue_ids" string="Where to serve"/> 
                             <newline/>
                             <field name="adv_issue_ids" nolabel="1" 
-                                   domain="[('parent_id','!=', False),('parent_id','=', 'ONLINE')]" 
+                                   domain="[('parent_id','=', 'Online')]" 
                                    options="{'no_open': True,'no_create': True, 'no_create_edit': True}" 
                                    context="{'search_view_ref':'bdu_product_online.online_view_filter',
                                              'tree_view_ref':'bdu_product_online.online_tree_view' }"/>
