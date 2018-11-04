@@ -1,14 +1,14 @@
 <openerp>
     <data>
-        <record id="pubble_kpi_data" model="res.groups">
+        <record id="pubble_production_data" model="res.groups">
         <field name="category_id" ref="base.module_category_hidden"/>
-            <field name="name">Pubble kpis</field>
+            <field name="name">Pubble reverse billing data</field>
         </record>
     </data>
     <data>
-        <record id="pubble_connector" model="res.groups">
+        <record id="pubble_production_config" model="res.groups">
         <field name="category_id" ref="base.module_category_hidden"/>
-            <field name="name">Pubble connector</field>
+            <field name="name">Pubble reverse billing config</field>
         </record>
     </data>
 </openerp>

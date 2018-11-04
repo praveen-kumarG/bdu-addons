@@ -39,3 +39,4 @@
         'demo/config.xml',
     ],
 }
+
