@@ -32,9 +32,10 @@
         #'security/ir.model.access.csv',
         'views/pubble_reverse_billing_config.xml',
         'views/pubble_reverse_billing_info.xml',
+        'views/pubble_product_conversion.xml',
+        'views/reverse_billing.xml'
     ],
     'demo': [
         'demo/config.xml',
     ],
-    
 }

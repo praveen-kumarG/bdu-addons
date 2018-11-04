@@ -14,9 +14,10 @@ class PubbleProductionConfig(models.Model):
     server         = fields.Char(string='Server',help="servername, without protocol, e.g. ws.pubble.nl" )
     method         = fields.Char(string='Method and query',help="method and query, e.g. /dir/api?date=20180101")
     
-    latest_week    = fields.Date(string='Latest issue',   help="Latest week successfully processed ")
-    latest_run     = fields.Date(string='latest_run',     help="Date of latest run (successfull or not")
-    latest_success = fields.Char(string='Latest success', help="Latest successfull run")
+    latest_success = fields.Date(string='Latest success', help="Latest successfull run")
+    latest_week    = fields.Char(string='Latest week',   help="Latest week successfully processed ")
+    
+    latest_run     = fields.Char(string='latest run',     help="Date of latest run (successfull or not")
     latest_status  = fields.Char(string='Latest status',  help="Status of latest run")
     latest_reason  = fields.Char(string='Latest reason',  help="Reason of status code of latest run")
     
@@ -26,7 +27,6 @@ class PubbleProductionConfig(models.Model):
     #show only first record to configure, no options to create an additional one
     @api.multi
     def default_view(self):
-        #pdb.set_trace()
         configurations = self.search([])
         if not configurations :
             server = "bdu.nl"
@@ -87,11 +87,6 @@ class PubbleProductionConfig(models.Model):
     @api.multi 
     def do_collect(self):
         config = self[0] 
-        if not config.latest_run :
-            most_recent=datetime.date(1970,1,1)
-        else :
-            most_recent=datetime.datetime.strptime(config.latest_run,DEFAULT_SERVER_DATE_FORMAT).date()
-
         if not config.begin or not config.end :
             raise ValidationError("Please provide begin and end date")
             return False
@@ -106,21 +101,21 @@ class PubbleProductionConfig(models.Model):
         status   = response.status
         reason   = response.reason
         conn.close()    
-        
-        #todo: 
+         
         if (reason == "OK") :
 
             #lookup values and other init
             adv_issues   = self.env['sale.advertising.issue'].search([('parent_id','!=', False)])
-            current_data = self.env['pubble.production.data']
-            #todo: product conversie tabel
+            current_data = self.env['pubble.production.data'].search([])
+            conversions  = self.env['pubble.product.conversion'].search([])
 
             json_anwser = json.loads(answer)
             batch=json_anwser['ArticleBatch']
             articles= batch['articles']
 
             message = ""
-            
+
+
             for article in articles :
                 #article specific info
                 article_id         = article['id']
@@ -136,16 +131,24 @@ class PubbleProductionConfig(models.Model):
 
                 #order_lines details who gave the order(s)
                 commissioned_by = ""
+                commissioned_by_xxl = ""
                 for order in order_lines :
-                    commissioned_by += ", "+order['gemaaktDoor']+" aan "+order['toegewezenAan']
-                #todo: prefix ", " weghalen, later overgang op res.partner
+                    if commissioned_by=="" :
+                        commissioned_by     = order['gemaaktDoor']
+                        commissioned_by_xxl = order['gemaaktDoor']+" aan "+order['toegewezenAan']
+                    else :
+                        commissioned_by     += ",\n"+order['gemaaktDoor']
+                        commissioned_by_xxl += ",\n"+order['gemaaktDoor']+" aan "+order['toegewezenAan']
 
                 #publication steers cost and time stamp
                 if (len(publications)>0) :
                     #todo: sort on publication date
                     title = publications[0]['publicatieCode']
                 else :
-                    title = False 
+                    title = False
+
+                #other publications as informational text added
+                publications_as_text = self.pretty_publications(publications) 
 
                 #Timestamp filled by first publication (precendence) or time of acceptance
                 #Locked after being processed, so final consumption of data is done at the end
@@ -165,72 +168,84 @@ class PubbleProductionConfig(models.Model):
                 if (issue) :
                     ids = self.ids_by_issue_and_date(adv_issues, issue, date)
 
+                #all billing lines related to article consolidated as accompanying text
+                related_costs = self.pretty_billing_lines(billing_lines) 
+
                 for billing_line in billing_lines :
                     #billing line becomes record with 1 article as parent and sibling orders and publications
                     record = {}
                     
                     #freelancer should be in system otherwise false
+                    ingevoerdDoor   = billing_line['ingevoerdDoor']
                     freelancer      = self.findPartnerByEmail(billing_line['ingevoerdDoor'])
-                    if len(freelancer)==0 :
-                        freelancer=False
-                    else :
-                        freelancer=freelancer[0]
 
                     pubble_product  = billing_line['productCode']
                     pubble_count    = billing_line['aantal']
                     date2           = self.ms_datetime_to_python_date(billing_line['gemaaktOp'])
-                    odoo_product    = self.convert_2_odoo_product(pubble_product, pubble_count)
+                    odoo_product    = self.convert_2_odoo_product(conversions,pubble_product, pubble_count)
+                    
                     #create record
-                    record['article_id'] = article_id
-                    record['product_id'] = odoo_product['product_id']
-                    record['count']      = odoo_product['count']
-                    record['freelancer'] = freelancer
-                    record['url']        = url
-                    record['remark']     = remark
-                    record['issue_ids']  = issue_ids
-                    record['year']       = year
-                    record['week']       = week
+                    record['name']                = billing_line['referentie']
+                    record['issue_date']          = date.strftime('%Y-%m-%d')
+                    record['article_id']          = article_id
+                    record['product_id']          = odoo_product['product_id']
+                    record['count']               = odoo_product['count']
+                    record['pubble_product']      = pubble_product
+                    record['pubble_count']        = pubble_count
+                    record['freelancer']          = freelancer
+                    record['url']                 = url  
+                    record['remark']              = remark
+                    record['issue_ids']           = issue_ids
+                    record['publications']        = publications_as_text
+                    record['related_costs']       = related_costs
+                    record['year']                = year
+                    record['week']                = week
                     record['issue_id']            = ids['issue_id']
                     record['analytic_account_id'] = ids['analytic_account_id']
                     record['operating_unit_id']   = ids['operating_unit_id']
                     record['commissioned_by']     = commissioned_by
+                    record['commissioned_by_xxl'] = commissioned_by_xxl
+                    record['message']             = ""   
+                    if odoo_product['product_id'] == False :
+                        record['message'] += "Pubble product/count could not be converted. Check conversion data.<br/>"
+                    if freelancer == False :
+                        record['message'] += "Email address "+ingevoerdDoor+" not found in Odoo. No payment possible.<br/>"
 
                     #search for existing record
-                    #pdb.set_trace()
-                    existing_recs = current_data.search([  ('product_id', '=', record['product_id']),
-                                                           ('article_id', '=', record['article_id'])
-                                                        ])
-                    #create if not present else adapt changes to status
+                    existing_recs = current_data.search([  ('name', '=', record['name']) ])
+
+                    #create if not present else adapt to situation
                     if len(existing_recs)==0 :
                         current_data.create(record)
                     else :
+                        #todo: updates might have changes in them, they should be indicated
+                        #pdb.set_trace()
                         current=existing_recs[0]
                         if current.processed :
-                            message += ", "+article_id+" gewijzigd na verwerking. Wijziging niet verwerkt.<br/>"
+                            record={}
+                            record['message'] = "Update after being processed is refused"
+                            current.write(record)
                         elif current.accepted :
-                            message += ", "+article_id+" gewijzigd na acceptatie. Wijziging niet verwerkt.<br/>"
+                            record={}
+                            record['message'] = "Update after being accepted is refused"
+                            current.write(record)
                         else :
-                            if current.issue_id :
-                                del record['issue_id']
-                                del record['analytic_account_id']
-                                del record['operating_unit_id']
-                                del record['issue_ids']
-                                del record['year']
-                                del record['week']
+                            #update
                             existing_recs[0].write(record)
 
             #leave testimonial with config info
-            pdb.set_trace()
-            config.latest_week    = most_recent
-            #config.latest_run     = datetime.datetime.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')+message
-            config.latest_success = datetime.date.today()
+            config.latest_success = datetime.date.today()            
+            config.latest_week    = str(datetime.date.today().isocalendar()[0])+"-"+str(datetime.date.today().isocalendar()[1])
+            
+            config.latest_run     = datetime.datetime.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')+message
             config.latest_status  = status
             config.latest_reason  = reason
             config.write({})
             _logger.info("Successfull import for dates between %s and %s", config.begin, config.end)
             return True
+
         else :
-            config.latest_run     = datetime.date.today()
+            config.latest_run     = atetime.date.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')+" stopped because of error."
             config.latest_status  = status
             config.latest_reason  = reason
             config.write({})
@@ -239,32 +254,96 @@ class PubbleProductionConfig(models.Model):
 
     @api.multi
     def findPartnerByEmail(self, email_address) :
-        result={}
-        for email in email_address :
-            id = self.env['res.partner'].search([('email','=',email)])
-            if len(id)==1 :
-                result.append(id)
-        return result
+    
+        partners = self.env['res.partner'].search([('email','=',email_address)])
+        if len(partners)==1 :
+            return partners[0].id
+        else :
+            return False
 
 
     @api.multi 
-    def convert_2_odoo_product(self, pubble_product, pubble_count) :
-        return {'product_id':'8','count':'1'}
+    def convert_2_odoo_product(self, conversions, pubble_product, pubble_count) :
+        products=conversions.search([  ('pubble_product_name','=',   pubble_product),
+                                       ('pubble_count_min',   '<=',  pubble_count),
+                                       ('pubble_count_max',   '>=',  pubble_count)
+                                     ])
+        if len(products)==1 :
+            product=products[0]
+            if product.count_conversion :
+                count = 1
+            else :
+                count = pubble_count
+            return {'product_id':product.odoo_product_id.id,'count':count}
+        else :
+            return {'product_id':False,'count':False}
+
+
 
     @api.multi
     def ids_by_issue_and_date(self, adv_issues, title, date) :
         #analytic account and company via sale.advertising.issue
         result={'issue_id':False, 'company_id':False, 'analytic_account_id':False, 'operating_unit_id':False}
         issues = adv_issues.search([('parent_id', '=', title),
-                                    ('issue_date','=', date )
+                                    ('issue_date','=', date.strftime('%Y-%m-%d') )
                                    ])    
         if len(issues)==1:
-            result['issue_id']            = result[0]['id']
-            result['company_id']          = result[0].analytic_account_id.company_id.id
-            result['analytic_account_id'] = result[0].analytic_account_id.id
+            result['issue_id']            = issues[0]['id']
+            result['company_id']          = issues[0].analytic_account_id.company_id.id
+            result['analytic_account_id'] = issues[0].analytic_account_id.id
             ou_ids = self.env['account.analytic.account'].search([('id','=',result['analytic_account_id'])])
             result['operating_unit_id']   = ou_ids.operating_unit_ids.id
         return result
+
+    @api.multi
+    def pretty_publications(self,publications) :
+        s = ""
+        for pub in publications :
+            s += pub['publicatieCode']
+            s += ", "+self.ms_datetime_to_python_date(pub['publicatieDatum']).strftime("%Y-%m-%d")
+            s += ", page "+str(pub['pagina'])
+            s += " (id : "+str(pub['id'])
+            s += ", "+str(pub['aantalTekens'])+" characters)" #<br/>"
+            s += "<ul>"
+            for photo in pub['gepubliceerdeFotos'] :
+                if photo['origineleNaam'] :
+                    pname=photo['origineleNaam']
+                else :
+                    pname="click here to see"
+                s += "<li><a href='>"+str(photo['url'])+"'>"+pname+"</a>"
+                s += " ("+photo['genomenDoor']
+                s += ", "+self.ms_datetime_to_python_date(photo['genomenOp']).strftime("%Y-%m-%d")+")"
+                #s += "Id :"+str(photo['id'])
+                #if photo['fotoCredit'] :
+                #    s += ", credit : "+photo['fotoCredit']
+                #if photo['opmerkingen'] :
+                #    s += ", remark : "+photo['opmerkingen']
+                s += "</li>"
+            s += "</ul>"
+        s += ""
+        return s
+
+    @api.multi
+    def pretty_billing_lines(self,billing_lines) :
+        s = ""
+        for line in billing_lines :
+            s += line['ingevoerdDoor']
+            s += ", "+self.ms_datetime_to_python_date(line['gemaaktOp']).strftime("%Y-%m-%d")
+            s += ": <b>"+str(line['aantal'])
+            s += " x "+line['productCode']+"</b>"
+            s += " (ref:"+str(line['referentie'])+")"
+            s += "<br/>"
+        s += ""
+        return s
+
+
+
+    @api.multi
+    def pretty_json(self,text) :
+        s = json.dumps(text, indent=4, sort_keys=True)
+        s = s.replace("\n","<br />\n")
+        s = s.replace("    ","\t")
+        return s
 
 
     

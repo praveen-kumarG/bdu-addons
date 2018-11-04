@@ -24,9 +24,9 @@
 
           <group name="production_status" string="Production status">
             <group>
+              <field name="latest_success" readonly="1"/> 
               <field name="latest_week"    readonly="1"/> 
               <field name="latest_run"     readonly="1" widget="html"/> 
-              <field name="latest_success" readonly="1"/> 
               <field name="latest_status"  readonly="1"/> 
               <field name="latest_reason"  readonly="1"/> 
             </group>
@@ -79,15 +79,15 @@
   </record> 
 
   <!-- Menu group -->
-  <menuitem name= "Pubble production" 
+  <menuitem name= "Pubble admittance" 
             id= "menu_pubble_production" 
-            parent="reverse_billing.menu_action_revbil"  
+            parent="reverse_billing.menu_action_revbil_main"  
             sequence= "100"
   />
 
   <!-- Menu item --> 
   <menuitem id="pubble_production_data_config_menuitem" 
-    name="Pubble connector" 
+    name="Connector" 
     action="config_pubble_production_data_connector"
     parent="menu_pubble_production"
     sequence="125"

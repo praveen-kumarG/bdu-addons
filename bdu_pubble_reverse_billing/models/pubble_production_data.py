@@ -1,57 +1,150 @@
 # -*- coding: utf-8 -*-
+import datetime, pdb
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 class PubbleProductionData(models.Model):
-    _name            = 'pubble.production.data'
-    _description     = 'Collected Pubble production data'
+    _name               = 'pubble.production.data'
+    _description        = 'Collected Pubble production data'
+
+    #unique reference and name in one
+    name                = fields.Char('Pubble reference') 
 
     #billing line belongs to one article with article attributes
-    article_id        = fields.Integer('Article')
-    product_id        = fields.Many2one('product.product',              string='Product')
-    count             = fields.Integer('Count')
-    freelancer        = fields.Many2one('res.partner',                  string='Freelancer')
-    url               = fields.Char('Url')
-    remark            = fields.Char('werktitel')
+    article_id          = fields.Integer('Article')
+    product_id          = fields.Many2one('product.product',              string='Product')
+    count               = fields.Integer('Count')
+    pubble_product      = fields.Char('Pubble product')
+    pubble_count        = fields.Integer('Pubble count')
+    freelancer          = fields.Many2one('res.partner',                  string='Freelancer')
+    url                 = fields.Char('Url')
+    remark              = fields.Char('Werktitel')
 
     #first issue (hence ou) reported takes the costs, other publications administered for reference
-    issue_id          = fields.Many2one('sale.advertising.issue',       string='Issue')
-    analytic_account_id   = fields.Many2one('account.analytic.account', string='Analytic account', store=True)
-    operating_unit_id = fields.Many2one('operating.unit',               string='Operating Unit')
-    issue_ids         = fields.Many2one('sale.advertising.issue',       string='Issues')
+    issue_id            = fields.Many2one('sale.advertising.issue',       string='Issue')
+    analytic_account_id = fields.Many2one('account.analytic.account',     string='Analytic account', 
+                                                                          store=True)
+    operating_unit_id   = fields.Many2one('operating.unit',               string='Operating Unit')
+    issue_ids           = fields.Many2one('sale.advertising.issue',       string='Issues')
+    publications        = fields.Char('Publications')
+    related_costs       = fields.Char('Related costs')
   
     #time stamp : first issue has preference over time of acceptance, locked after processed
-    year              = fields.Integer('Year')
-    week              = fields.Integer('Week')
+    issue_date          = fields.Date('Issue date')
+    year                = fields.Integer('Year')
+    week                = fields.Integer('Week')
 
     #empty, one or more
-    commissioned_by   = fields.Char('Commissioned by') #Many2one('res.partner',              string='Commissioned by')
-
+    commissioned_by     = fields.Char('Commissioned by')
+    commissioned_by_xxl = fields.Char('Commissioned by') 
     #status fields
-    accepted          = fields.Boolean('OK')
-    processed         = fields.Boolean('Processed')
-
-    #unique reference,
-    key               = fields.Char(compute="compute_key",              string='Unique key') 
-    _sql_constraints  = [('Article & product combined', 'unique(key)', 'Article ID and product already defined. Should be unique.' )]
-
+    accepted            = fields.Boolean('OK')
+    processed           = fields.Boolean('Processed')
+    message             = fields.Char('Info')
     
+
+    @api.onchange('accepted')
+    def onchange_accepted(self) :
+        pdb.set_trace()
+        if self.accepted and not self.freelancer :
+            raise ValidationError("No freelancer to pay. Add freelancer first before accepting.")
+            return False
+        if not self.accepted :
+            if not self.issue_id :
+                self.year = False
+                self.week = False
+            return True
+        if self.accepted and self.freelancer :
+            if not self.issue_id :
+                self.year=str(datetime.date.today().isocalendar()[0])
+                self.week=str(datetime.date.today().isocalendar()[1])
+        return True
+
     @api.multi
-    @api.depends('article_id', 'product_id')
-    def compute_prod_cat(self):
-        key = str(article_id)+"-"+str(product)
+    def accept(self) :
+        self.accepted = not self.accepted
         return
 
     @api.multi
-    @api.depends('accepted')
-    def toggle_accepted(self) :
-        if accepted :
-            #todo: 
-            self.year=2018
-            self.week=42
-        else :
-            if not issue_id :
-                self.year=False
-                self.week=False
+    def push_to_sow(self) :
+        selection=self.env['pubble.production.data'].browse(self.env.context.get('active_ids'))
+        already_processed     = 0
+        not_accepted          = 0
+        not_operating_unit_id = 0
+        not_freelancer        = 0
+        not_product_id        = 0
+        not_issue_id          = 0
+
+        #check first
+        for line in selection :
+            if line.processed :
+                already_processed += 1
+            if not line.accepted :
+                not_accepted += 1
+            if not line.operating_unit_id :
+                not_operating_unit_id += 1
+            if not line.freelancer :
+                not_freelancer += 1
+            if not line.product_id :
+                not_product_id += 1
+            if not line.issue_id :
+                not_issue_id += 1
+        
+        if (already_processed + not_accepted + not_operating_unit_id + not_freelancer + not_product_id + not_issue_id) > 0 :
+            message = "Your selection can not be processed !\n"
+            if already_processed > 0 :
+                message += str(already_processed)+" already processed records\n"
+            if not_accepted>0 :
+                message += str(not_accepted)+" records that are not accepted\n"
+            if not_operating_unit_id>0 :
+                message += str(not_operating_unit_id)+" records without operating unit (check advertising issue definitions)\n"
+            if not_freelancer > 0 :
+                message += str(not_freelancer)+" records with a missing freelancer\n"
+            if not_product_id > 0 :
+                message += str(not_product_id)+" records have missing product (check pubble product conversion definitions)\n"
+            if not_issue_id > 0 :
+                message += str(not_issue_id)+" records have missing issue (check advertising issue definitions)\n"
+            raise ValidationError(message)
+            return False
+        
+        #al ok, then we process per OU (can be different company, depending on user's authorizations)
+        operating_units=selection.read_group([('operating_unit_id','!=',False)],{'operating_unit_id'},{'operating_unit_id'})
+        for operating_unit in operating_units :
+            
+            ou_id = operating_unit['operating_unit_id'][0]
+            ou    = self.env['operating.unit'].browse(ou_id)
+            c_id  = ou.company_id.id
+            ou_selection = selection.search([('operating_unit_id','=', ou_id)])
+            
+            #create batch            
+            batch={}
+            batch['name']       = "Freelancers_redactie_week_"+str(datetime.datetime.today().isocalendar()[1])
+            batch['date_batch'] = datetime.datetime.today().strftime("%Y-%m-%d")
+            batch['company_id'] = c_id
+            batch['comment']    = "Pushed from Pubble admittance"
+            batch_rec = self.env['sow.batch'].create(batch)
+
+            #sow_lines
+            for line in ou_selection :
+                sow_line={}
+                sow_line['batch_id']           = batch_rec.id
+                sow_line['name']               = line.remark
+                sow_line['issue_id']           = line.issue_id.id
+                sow_line['partner_id']         = line.freelancer.id
+                sow_line['employee']           = False
+                sow_line['product_category_id']= line.product_id.categ_id.id
+                sow_line['product_id']         = line.product_id.id
+                sow_line['account_id']         = line.product_id.property_account_expense_id.id
+                sow_line['quantity']           = line.count
+                #not used
+                sow_line['page']               = 0
+                sow_line['nr_of_columns']      = 0
+                #save and force price update
+                revbil_sow_rec = self.env['revbil.statement.of.work'].create(sow_line)
+                revbil_sow_rec._onchange_calculatePrice()   
+                
+                #mark line done to prevent duplicate invoicing
+                line.write({'processed':True})
         return
 
 
@@ -62,4 +155,6 @@ class PubbleProductionData(models.Model):
             fields.remove('year')
         if 'week' in fields :
             fields.remove('week')
-        return super(mis_pubble_kpi, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+        if 'article_id' in fields and 'article_id' not in groupby :
+            fields.remove('article_id')
+        return super(PubbleProductionData, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
