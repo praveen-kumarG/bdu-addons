@@ -155,7 +155,7 @@
 
   <!-- Push to SOW action -->
   <record id="validate_push_to_sow_view_action2" model="ir.actions.server"> 
-      <field name="name">Push to SOW batch Two</field> 
+      <field name="name">Push to SOW batch</field> 
       <field name="model_id" ref="model_pubble_production_data"/> 
       <field name="code">
         action = model.push_to_sow()
@@ -165,7 +165,7 @@
   <!-- Push to SOW Menu item in action/more menu -->
   <record model="ir.values" id="revbil_statement_of_work_make_invoice2">
       <field name="model_id" ref="model_pubble_production_data" />
-      <field name="name">Push to SOW batch 2</field>
+      <field name="name">Push to SOW batch</field>
       <field name="key2">client_action_multi</field>
       <field name="value" eval="'ir.actions.server,' + str(ref('validate_push_to_sow_view_action2'))" />
       <field name="key">action</field>
