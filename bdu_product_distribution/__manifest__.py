@@ -31,6 +31,7 @@
     'data'    : [
                  #'security/security.xml',
                  #'security/ir.model.access.csv',
+                 'reports/reports.xml',
                  'views/orderline_adaptions.xml',
                  'views/distribution.xml'
                 ],

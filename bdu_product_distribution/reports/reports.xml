@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    
+    <report
+        id="bdu_product_distribution.action_distribution_confirmation"
+        model="sale.order"
+        string="Distribution list"
+        report_type="qweb-html"
+        name="bdu_product_distribution.report_distribution_confirmation"
+    />
+
+    <template id="report_distribution_confirmation" >
+        <t t-call="report.html_container">
+            <t t-call="report.external_layout">
+                <t t-foreach="docs" t-as="o">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <span t-esc="'Offerte : '+str(o.name)"/>
+                    </div>
+                </div>
+                <div class="page">
+                    <!-- header  -->
+                    <div class="row bg-primary">                  
+                        <div class="col-xs-5">
+                            Bezorgingsgebied
+                        </div>
+                        <div class="col-xs-1">
+                            Aantal adressen
+                        </div>
+                        <div class="col-xs-3">
+                            Titel
+                        </div>
+                        <div class="col-xs-3">
+                            Datum (nu nog van order)
+                        </div>
+                    </div>
+
+                    <!-- content -->
+                    
+                    <t t-foreach="o.order_line" t-as="l">
+                    <t t-foreach="l.area_ids"   t-as="a">
+
+                        <div class="row">                
+                            <div class="col-xs-5">                                 
+                                <t t-if="a.zip">
+                                    <span t-esc="str(a.zip)+' '+str(a.city)"/>
+                                </t>                               
+                                <t t-if="not a.zip">
+                                    <span t-esc="str('n.a.')"/>
+                                </t>
+                            </div>   
+
+                            <div class="col-xs-1">
+                                    <span t-esc="str(a.folder_addresses)"/>
+                            </div>  
+
+                            <div class="col-xs-3">                                 
+                                <t t-if="a.title_id.name">
+                                    <span t-field="a.title_id.name"/>
+                                </t>                               
+                                <t t-if="not a.title_id.name">
+                                    <span t-esc="str(' ')"/>
+                                </t>
+                            </div>
+
+                            <div class="col-xs-3">
+                                <span t-esc="o.date_order" t-options='{"widget": "date"}'/>
+                            </div>   
+
+                        </div>
+                    </t>
+                    </t>
+
+                </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
