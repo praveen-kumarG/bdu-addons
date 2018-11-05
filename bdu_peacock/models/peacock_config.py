@@ -232,8 +232,10 @@ class PeacockConfig(models.Model):
         for key, value in dict.iteritems() :
             element = etree.Element(key)
             new_node.append(element)
-            if type(value) in [str, unicode, int, float] :
+            if type(value) in [str, int, float] :
                 element.text = str(value)
+            elif type(value)==unicode :
+                element.text = value.encode("ascii","replace")
             elif type(value)==bool :
                 element.text = str(value)
             elif key.endswith('ids') :
@@ -249,13 +251,16 @@ class PeacockConfig(models.Model):
                 sub_node.text = str(value[0])
                 sub_node = etree.Element('name')
                 element.append(sub_node) 
-                sub_node.text = str(value[1])
+                sub_node.text = value[1].encode("ascii","replace")
             elif type(value)==tuple :
                 n=0
                 for v in value :
                     sub_node = etree.Element('_'+str(n))
                     element.append(sub_node) 
-                    sub_node.text = str(v)
+                    if type(v)==unicode :
+                        sub_node.text = v.encode("ascii", "replace")
+                    else :
+                        sub_node.text = str(v)
                     n += 1
             else : #object
                 self.add_element(element, value, key)
