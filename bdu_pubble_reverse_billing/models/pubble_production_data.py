@@ -43,26 +43,26 @@ class PubbleProductionData(models.Model):
     message             = fields.Char('Info')
     
 
+    #works only on the field at client side, not the button changing it
     @api.onchange('accepted')
     def onchange_accepted(self) :
-        pdb.set_trace()
         if self.accepted and not self.freelancer :
             raise ValidationError("No freelancer to pay. Add freelancer first before accepting.")
-            return False
+            self.accepted = False
+            return 
         if not self.accepted :
-            if not self.issue_id :
-                self.year = False
-                self.week = False
-            return True
+            return 
         if self.accepted and self.freelancer :
-            if not self.issue_id :
+            if not self.issue_date :
                 self.year=str(datetime.date.today().isocalendar()[0])
                 self.week=str(datetime.date.today().isocalendar()[1])
-        return True
+        return 
 
     @api.multi
     def accept(self) :
         self.accepted = not self.accepted
+        #button is not triggering client side onchange
+        self.onchange_accepted()
         return
 
     @api.multi
