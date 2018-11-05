@@ -14,6 +14,8 @@ class PubbleProductionData(models.Model):
     article_id          = fields.Integer('Article')
     product_id          = fields.Many2one('product.product',              string='Product')
     count               = fields.Integer('Count')
+    unit_price          = fields.Float('Unit price')
+    total_price         = fields.Float('Total')
     pubble_product      = fields.Char('Pubble product')
     pubble_count        = fields.Integer('Pubble count')
     freelancer          = fields.Many2one('res.partner',                  string='Freelancer')

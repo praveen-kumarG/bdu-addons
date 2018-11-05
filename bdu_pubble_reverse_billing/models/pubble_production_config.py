@@ -183,16 +183,30 @@ class PubbleProductionConfig(models.Model):
                     pubble_count    = billing_line['aantal']
                     date2           = self.ms_datetime_to_python_date(billing_line['gemaaktOp'])
                     odoo_product    = self.convert_2_odoo_product(conversions,pubble_product, pubble_count)
-                    
+                    if freelancer and odoo_product['count'] and odoo_product['product_id'] :
+                        unit_price  = freelancer.property_product_pricelist.get_product_price(odoo_product['product_id'], odoo_product['count'], freelancer)
+                        total_price = unit_price * odoo_product['count']
+                    else :
+                        unit_price  = 0
+                        total_price = 0
+
                     #create record
                     record['name']                = billing_line['referentie']
                     record['issue_date']          = date.strftime('%Y-%m-%d')
                     record['article_id']          = article_id
-                    record['product_id']          = odoo_product['product_id']
+                    if odoo_product['product_id'] :
+                       record['product_id']       = odoo_product['product_id'].id
+                    else :
+                        record['product_id']      = False
                     record['count']               = odoo_product['count']
+                    record['unit_price']          = unit_price
+                    record['total_price']         = total_price
                     record['pubble_product']      = pubble_product
                     record['pubble_count']        = pubble_count
-                    record['freelancer']          = freelancer
+                    if freelancer :
+                        record['freelancer']      = freelancer.id
+                    else:
+                        record['freelancer']      = False
                     record['url']                 = url  
                     record['remark']              = remark
                     record['issue_ids']           = issue_ids
@@ -257,7 +271,7 @@ class PubbleProductionConfig(models.Model):
     
         partners = self.env['res.partner'].search([('email','=',email_address)])
         if len(partners)==1 :
-            return partners[0].id
+            return partners[0]
         else :
             return False
 
@@ -274,7 +288,7 @@ class PubbleProductionConfig(models.Model):
                 count = 1
             else :
                 count = pubble_count
-            return {'product_id':product.odoo_product_id.id,'count':count}
+            return {'product_id':product.odoo_product_id,'count':count}
         else :
             return {'product_id':False,'count':False}
 
