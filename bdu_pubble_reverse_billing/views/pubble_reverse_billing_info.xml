@@ -14,7 +14,7 @@
           <field name="product_id"/> 
           <field name="total_price"/> 
           <field name="issue_id"/>
-          <field name="issue_ids"/>  
+          <field name="titles"/>  
           <field name="name"/> 
           <field name="url" string="Article" widget="url"/> 
           <field name="remark"/> 
@@ -101,7 +101,7 @@
       <field name="arch" type="xml"> 
       <pivot> 
           <field name="issue_date" interval="week"  type="col"/> 
-          <field name="issue_id"/> 
+          <field name="title"/> 
           <field name="total_price" type="measure" /> 
       </pivot> 
       </field> 
@@ -117,7 +117,7 @@
 
           <field name="freelancer"/>
           <field name="commissioned_by"/>
-          <field name="issue_ids"/>
+          <field name="titles"/>
 
           <filter string="One week ago" domain="[
             ('issue_date', '&gt;=',(datetime.date.today()

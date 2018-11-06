@@ -75,18 +75,18 @@ class PubbleProductionConfig(models.Model):
             _logger.info("Cannot run automated_do_collect of reverse billing info. Need a valid configuration")
             return False
         else :
-            self = configurations[0]
+            config = configurations[0]
             #get info for last week up until today
             weekday       = datetime.date.today().isoweekday() #mo=1...su=7 
-            self.begin    = datetime.date.today()-datetime.timedelta(weeks=-7-weekday)
-            self.end      = datetime.date.today()
-            self.write({})
+            config.begin  = datetime.date.today()-datetime.timedelta(days=7+weekday)
+            config.end    = datetime.date.today()
+            config.write({})
             return self.do_collect()
 
     
     @api.multi 
     def do_collect(self):
-        config = self[0] 
+        config = self.env['pubble.production.config'].search([])[0] 
         if not config.begin or not config.end :
             raise ValidationError("Please provide begin and end date")
             return False
@@ -148,7 +148,7 @@ class PubbleProductionConfig(models.Model):
                 #Locked after being processed, so final consumption of data is done at the end
                 title      = False
                 issue_date = False
-                issue_ids  = False
+                titles     = False
                 if (len(publications)>0) :
                     compare_date= datetime.date(2999,12,31)
                     for publication in publications :
@@ -159,10 +159,10 @@ class PubbleProductionConfig(models.Model):
                             year = issue_date.isocalendar()[0]
                             week = issue_date.isocalendar()[1]
                             compare_date=current_issue_date
-                        if issue_ids :
-                            issue_ids += ",\n"+publication['publicatieCode']
+                        if titles :
+                            titles += ",\n"+publication['publicatieCode']
                         else:
-                            issue_ids  = publication['publicatieCode']
+                            titles  = publication['publicatieCode']
 
                 #get accounting info
                 if (title) :
@@ -209,14 +209,16 @@ class PubbleProductionConfig(models.Model):
                         record['freelancer']      = False
                     record['url']                 = url  
                     record['remark']              = remark
-                    record['issue_ids']           = issue_ids
+                    record['titles']              = titles
                     record['publications']        = publications_as_text
                     record['related_costs']       = related_costs
                     record['year']                = year
                     record['week']                = week
                     if ids['issue_id'] :
+                        record['title']           = title
                         record['issue_id']        = ids['issue_id']
                     else :
+                        record['title']           = False
                         record['issue_id']        = False
                     record['analytic_account_id'] = ids['analytic_account_id']
                     record['operating_unit_id']   = ids['operating_unit_id']
@@ -232,7 +234,7 @@ class PubbleProductionConfig(models.Model):
                     existing_recs = current_data.search([  ('name', '=', record['name']) ])
 
                     #if freelancer not in Odoo then skip record
-                    if True : #freelancer :
+                    if freelancer :
                         #create if not present else adapt to situation
                         if len(existing_recs)==0 :
                             current_data.create(record)

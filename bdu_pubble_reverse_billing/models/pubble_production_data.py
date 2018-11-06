@@ -23,11 +23,12 @@ class PubbleProductionData(models.Model):
     remark              = fields.Char('Werktitel')
 
     #first issue (hence ou) reported takes the costs, other publications administered for reference
+    title               = fields.Char('Title')
     issue_id            = fields.Many2one('sale.advertising.issue',       string='Issue')
     analytic_account_id = fields.Many2one('account.analytic.account',     string='Analytic account', 
                                                                           store=True)
     operating_unit_id   = fields.Many2one('operating.unit',               string='Operating Unit')
-    issue_ids           = fields.Char('Issues')
+    titles              = fields.Char('Title')
     publications        = fields.Char('Publications')
     related_costs       = fields.Char('Related costs')
   
@@ -50,6 +51,18 @@ class PubbleProductionData(models.Model):
     def onchange_accepted(self) :
         if self.accepted and not self.freelancer :
             raise ValidationError("No freelancer to pay. Add freelancer first before accepting.")
+            self.accepted = False
+            return 
+        if self.accepted and not self.operating_unit_id :
+            raise ValidationError("No operating unit. Check advertising issue.")
+            self.accepted = False
+            return 
+        if self.accepted and not self.product_id :
+            raise ValidationError("No product. Check product conversion.")
+            self.accepted = False
+            return 
+        if self.accepted and not self.issue_id :
+            raise ValidationError("No issue. Check Pubble title code and date, as well as advertising issue.")
             self.accepted = False
             return 
         if not self.accepted :

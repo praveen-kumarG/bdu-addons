@@ -2,7 +2,7 @@
 <openerp>
     <data>
 
-        <!-- Name of batch added -->
+        <!-- Add field "name" to tree view -->
         <record model="ir.ui.view" id="sow_batch_tree_view">
             <field name="name">sow.batch.tree.view</field>
             <field name="model">sow.batch</field>
