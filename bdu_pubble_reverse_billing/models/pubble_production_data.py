@@ -27,7 +27,7 @@ class PubbleProductionData(models.Model):
     analytic_account_id = fields.Many2one('account.analytic.account',     string='Analytic account', 
                                                                           store=True)
     operating_unit_id   = fields.Many2one('operating.unit',               string='Operating Unit')
-    issue_ids           = fields.Many2one('sale.advertising.issue',       string='Issues')
+    issue_ids           = fields.Char('Issues')
     publications        = fields.Char('Publications')
     related_costs       = fields.Char('Related costs')
   

@@ -160,9 +160,9 @@ class PubbleProductionConfig(models.Model):
                             week = issue_date.isocalendar()[1]
                             compare_date=current_issue_date
                         if issue_ids :
-                            issue_ids += publication['publicatieCode']
+                            issue_ids += ",\n"+publication['publicatieCode']
                         else:
-                            issue_id = publication['publicatieCode']
+                            issue_ids  = publication['publicatieCode']
 
                 #get accounting info
                 if (title) :
@@ -214,7 +214,10 @@ class PubbleProductionConfig(models.Model):
                     record['related_costs']       = related_costs
                     record['year']                = year
                     record['week']                = week
-                    record['issue_id']            = ids['issue_id']
+                    if ids['issue_id'] :
+                        record['issue_id']        = ids['issue_id']
+                    else :
+                        record['issue_id']        = False
                     record['analytic_account_id'] = ids['analytic_account_id']
                     record['operating_unit_id']   = ids['operating_unit_id']
                     record['commissioned_by']     = commissioned_by
@@ -228,8 +231,8 @@ class PubbleProductionConfig(models.Model):
                     #search for existing record
                     existing_recs = current_data.search([  ('name', '=', record['name']) ])
 
-                    #if freelancer not in Odoo then neglected
-                    if freelancer :
+                    #if freelancer not in Odoo then skip record
+                    if True : #freelancer :
                         #create if not present else adapt to situation
                         if len(existing_recs)==0 :
                             current_data.create(record)
@@ -260,7 +263,7 @@ class PubbleProductionConfig(models.Model):
             return True
 
         else :
-            config.latest_run     = datetime.date.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')+" stopped because of error."
+            config.latest_run     = datetime.datetime.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')+" stopped because of error."
             config.latest_status  = status
             config.latest_reason  = reason
             config.write({})
@@ -269,7 +272,6 @@ class PubbleProductionConfig(models.Model):
 
     @api.multi
     def findPartnerByEmail(self, email_address) :
-    
         partners = self.env['res.partner'].search([('email','=',email_address)])
         if len(partners)==1 :
             return partners[0]
