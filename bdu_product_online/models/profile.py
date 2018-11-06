@@ -8,6 +8,7 @@ class SearchProfile(models.Model):
 	profile_cat  = fields.Char('Profile category')
 	name         = fields.Char('Profile',                 required=True)
 	color        = fields.Integer('Color index')
+	remark       = fields.Char('Remark')
 
 """
 Color index	Tags odoo 10

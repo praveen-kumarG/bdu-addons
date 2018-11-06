@@ -15,6 +15,7 @@
                     <!-- attachments on orderline -->
                     <group attrs="{'invisible' : [('prod_cat','not in', 'Online')]}">
                             <field name="attachment_ids" widget="many2many_binary" class="oe_inline"/>
+                            <field name="url_to_material" />
                     </group>
 
                     <group name="Custom product info" attrs="{'invisible' : [('prod_cat','not in', 'Online')]}">

@@ -12,6 +12,7 @@
           <field name="freelancer"/> 
           <field name="count"/> 
           <field name="product_id"/> 
+          <field name="total_price"/> 
           <field name="issue_id"/>
           <field name="issue_ids"/>  
           <field name="name"/> 
@@ -92,6 +93,21 @@
     </field> 
   </record> 
 
+
+  <!-- pivot view -->
+  <record id="view_pivot_pubble_production_data" model="ir.ui.view"> 
+  <field name="name">Pubble production data</field>
+      <field name="model">pubble.production.data</field>
+      <field name="arch" type="xml"> 
+      <pivot> 
+          <field name="issue_date" interval="year"  type="col"/> 
+          <field name="issue_id"/> 
+          <field name="total_price" type="measure" /> 
+      </pivot> 
+      </field> 
+  </record>
+
+
   <!-- Search filter -->
   <record id="view_filter_pubble_production_data" model="ir.ui.view">
     <field name="name">Pubble production data filter</field>
@@ -141,7 +157,7 @@
   <act_window id="show_pubble_production_data" 
               name="Editorial output" 
               res_model="pubble.production.data" 
-              view_mode="tree,form" 
+              view_mode="tree,form,pivot" 
   /> 
   
   <!-- Menu item --> 
