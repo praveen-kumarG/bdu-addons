@@ -12,7 +12,8 @@
         </header>
 
           <br/>
-          <group name="connector_config" string="Connector configuration"><div colspan="2">
+          <group name="connector_config" string="Connector configuration">
+            <div colspan="2">
               <p>Use "$begin" and "$end to define flexible dates in your query.</p>
             </div>
             <field name="server"/> 
