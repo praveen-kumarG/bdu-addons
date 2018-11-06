@@ -100,7 +100,7 @@
       <field name="model">pubble.production.data</field>
       <field name="arch" type="xml"> 
       <pivot> 
-          <field name="issue_date" interval="year"  type="col"/> 
+          <field name="issue_date" interval="week"  type="col"/> 
           <field name="issue_id"/> 
           <field name="total_price" type="measure" /> 
       </pivot> 

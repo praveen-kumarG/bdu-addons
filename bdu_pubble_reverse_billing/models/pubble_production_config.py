@@ -76,10 +76,10 @@ class PubbleProductionConfig(models.Model):
             return False
         else :
             self = configurations[0]
-            #calculate begin and end for last week
-            #todo:
-            self.begin = datetime.date.today()
-            self.end   = datetime.date.today()
+            #get info for last week up until today
+            weekday       = datetime.date.today().isoweekday() #mo=1...su=7 
+            self.begin    = datetime.date.today()-datetime.timedelta(weeks=-7-weekday)
+            self.end      = datetime.date.today()
             self.write({})
             return self.do_collect()
 
@@ -121,7 +121,7 @@ class PubbleProductionConfig(models.Model):
                 article_id         = article['id']
                 author             = article['auteur']
                 working_title      = article['werktitel']
-                date               = self.ms_datetime_to_python_date(article['gemaakt'])
+                article_date       = self.ms_datetime_to_python_date(article['gemaakt'])
                 url                = article['pubbleUrl']
                 remark             = article['werktitel']
                 #related info
@@ -140,33 +140,33 @@ class PubbleProductionConfig(models.Model):
                         commissioned_by     += ",\n"+order['gemaaktDoor']
                         commissioned_by_xxl += ",\n"+order['gemaaktDoor']+" aan "+order['toegewezenAan']
 
-                #publication steers cost and time stamp
-                if (len(publications)>0) :
-                    #todo: sort on publication date
-                    title = publications[0]['publicatieCode']
-                else :
-                    title = False
 
                 #other publications as informational text added
                 publications_as_text = self.pretty_publications(publications) 
 
-                #Timestamp filled by first publication (precendence) or time of acceptance
+                #First publication steers cost taking title and moment
                 #Locked after being processed, so final consumption of data is done at the end
+                title      = False
+                issue_date = False
+                issue_ids  = False
                 if (len(publications)>0) :
-                    issue_ids=False
                     compare_date= datetime.date(2999,12,31)
                     for publication in publications :
-                        issue_date = self.ms_datetime_to_python_date(publication['publicatieDatum'])
-                        if issue_date < compare_date :
-                            issue = publication['publicatieCode']
+                        current_issue_date = self.ms_datetime_to_python_date(publication['publicatieDatum'])
+                        if current_issue_date < compare_date :
+                            title = publication['publicatieCode']
+                            issue_date = current_issue_date
                             year = issue_date.isocalendar()[0]
                             week = issue_date.isocalendar()[1]
-                            compare_date=issue_date
-                            #todo: issue_ids : ....aanvullen met nieuwe issue
+                            compare_date=current_issue_date
+                        if issue_ids :
+                            issue_ids += publication['publicatieCode']
+                        else:
+                            issue_id = publication['publicatieCode']
 
                 #get accounting info
-                if (issue) :
-                    ids = self.ids_by_issue_and_date(adv_issues, issue, date)
+                if (title) :
+                    ids = self.ids_by_issue_and_date(adv_issues, title, issue_date)
 
                 #all billing lines related to article consolidated as accompanying text
                 related_costs = self.pretty_billing_lines(billing_lines) 
@@ -192,7 +192,7 @@ class PubbleProductionConfig(models.Model):
 
                     #create record
                     record['name']                = billing_line['referentie']
-                    record['issue_date']          = date.strftime('%Y-%m-%d')
+                    record['issue_date']          = issue_date.strftime('%Y-%m-%d')
                     record['article_id']          = article_id
                     if odoo_product['product_id'] :
                        record['product_id']       = odoo_product['product_id'].id
@@ -228,24 +228,25 @@ class PubbleProductionConfig(models.Model):
                     #search for existing record
                     existing_recs = current_data.search([  ('name', '=', record['name']) ])
 
-                    #create if not present else adapt to situation
-                    if len(existing_recs)==0 :
-                        current_data.create(record)
-                    else :
-                        #todo: updates might have changes in them, they should be indicated
-                        #pdb.set_trace()
-                        current=existing_recs[0]
-                        if current.processed :
-                            record={}
-                            record['message'] = "Update after being processed is refused"
-                            current.write(record)
-                        elif current.accepted :
-                            record={}
-                            record['message'] = "Update after being accepted is refused"
-                            current.write(record)
+                    #if freelancer not in Odoo then neglected
+                    if freelancer :
+                        #create if not present else adapt to situation
+                        if len(existing_recs)==0 :
+                            current_data.create(record)
                         else :
-                            #update
-                            existing_recs[0].write(record)
+                            #changes after accepted and processed are refused
+                            current=existing_recs[0]
+                            if current.processed :
+                                record={}
+                                record['message'] = "Update after being processed is refused"
+                                current.write(record)
+                            elif current.accepted :
+                                record={}
+                                record['message'] = "Update after being accepted is refused"
+                                current.write(record)
+                            else :
+                                #update
+                                existing_recs[0].write(record)
 
             #leave testimonial with config info
             config.latest_success = datetime.date.today()            
@@ -259,7 +260,7 @@ class PubbleProductionConfig(models.Model):
             return True
 
         else :
-            config.latest_run     = atetime.date.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')+" stopped because of error."
+            config.latest_run     = datetime.date.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')+" stopped because of error."
             config.latest_status  = status
             config.latest_reason  = reason
             config.write({})
@@ -295,11 +296,11 @@ class PubbleProductionConfig(models.Model):
 
 
     @api.multi
-    def ids_by_issue_and_date(self, adv_issues, title, date) :
+    def ids_by_issue_and_date(self, adv_issues, title, issue_date) :
         #analytic account and company via sale.advertising.issue
         result={'issue_id':False, 'company_id':False, 'analytic_account_id':False, 'operating_unit_id':False}
         issues = adv_issues.search([('parent_id', '=', title),
-                                    ('issue_date','=', date.strftime('%Y-%m-%d') )
+                                    ('issue_date','=', issue_date.strftime('%Y-%m-%d') )
                                    ])    
         if len(issues)==1:
             result['issue_id']            = issues[0]['id']
@@ -313,7 +314,7 @@ class PubbleProductionConfig(models.Model):
     def pretty_publications(self,publications) :
         s = ""
         for pub in publications :
-            s += pub['publicatieCode']
+            s += (pub['publicatieCode'] or "")
             s += ", "+self.ms_datetime_to_python_date(pub['publicatieDatum']).strftime("%Y-%m-%d")
             s += ", page "+str(pub['pagina'])
             s += " (id : "+str(pub['id'])
