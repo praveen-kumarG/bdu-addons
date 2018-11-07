@@ -14,7 +14,7 @@
           <field name="product_id"/> 
           <field name="total_price"/> 
           <field name="issue_id"/>
-          <field name="issue_ids"/>  
+          <field name="titles"/>  
           <field name="name"/> 
           <field name="url" string="Article" widget="url"/> 
           <field name="remark"/> 
@@ -100,8 +100,8 @@
       <field name="model">pubble.production.data</field>
       <field name="arch" type="xml"> 
       <pivot> 
-          <field name="issue_date" interval="year"  type="col"/> 
-          <field name="issue_id"/> 
+          <field name="issue_date" interval="week"  type="col"/> 
+          <field name="title"/> 
           <field name="total_price" type="measure" /> 
       </pivot> 
       </field> 
@@ -117,10 +117,7 @@
 
           <field name="freelancer"/>
           <field name="commissioned_by"/>
-          <field name="issue_ids"/>
-
-          <filter string="My orders" domain="[('commissioned_by','=', uid)]"  />
-          <separator/>
+          <field name="titles"/>
 
           <filter string="One week ago" domain="[
             ('issue_date', '&gt;=',(datetime.date.today()
@@ -136,7 +133,7 @@
           ]"/>
           <separator/>
 
-          <filter string="Ready" domain="[
+          <filter string="Confirmed" domain="[
             ('accepted', '=',True),
             ('processed','=',False)
           ]"/>
@@ -162,7 +159,7 @@
   
   <!-- Menu item --> 
   <menuitem id="show_pubble_production_data_menu" 
-            name="Editorial production" 
+            name="Production data" 
             action="show_pubble_production_data"
             parent="menu_pubble_production" 
             sequence="100"
@@ -170,8 +167,8 @@
 
 
   <!-- Push to SOW action -->
-  <record id="validate_push_to_sow_view_action2" model="ir.actions.server"> 
-      <field name="name">Push to SOW batch</field> 
+  <record id="validate_push_to_sow_view_action" model="ir.actions.server"> 
+      <field name="name">Push to Finance</field> 
       <field name="model_id" ref="model_pubble_production_data"/> 
       <field name="code">
         action = model.push_to_sow()
@@ -181,9 +178,9 @@
   <!-- Push to SOW Menu item in action/more menu -->
   <record model="ir.values" id="revbil_statement_of_work_make_invoice2">
       <field name="model_id" ref="model_pubble_production_data" />
-      <field name="name">Push to SOW batch</field>
+      <field name="name">Push to Finance</field>
       <field name="key2">client_action_multi</field>
-      <field name="value" eval="'ir.actions.server,' + str(ref('validate_push_to_sow_view_action2'))" />
+      <field name="value" eval="'ir.actions.server,' + str(ref('validate_push_to_sow_view_action'))" />
       <field name="key">action</field>
       <field name="model">pubble.production.data</field>
   </record>

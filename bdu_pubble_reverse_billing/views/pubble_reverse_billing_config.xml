@@ -13,6 +13,9 @@
 
           <br/>
           <group name="connector_config" string="Connector configuration">
+            <div colspan="2">
+              <p>Use "$begin" and "$end to define flexible dates in your query.</p>
+            </div>
             <field name="server"/> 
             <field name="method"/> 
           </group>
@@ -56,9 +59,11 @@
 
           <group name="documentation" string="Summary" col="1">
               <p>Pubble provides an API by which we can collect the editorial, photo and video production information together with additional expenses, related publications and commissioned-by data.</p>
-              <p>Normal configuration expects a daily automated task calling the automated_do_collect procedure from the pubble.production.config object. This method uses the current system date to calculate last week to collect the corresponding period's info. </p> 
-              <p>Apart from the initial configuration, the user may use this interface to collect information for dates that differ from the automated process. To circumvent processing (i.e. paying) twice the article ID and declarable product are used as a unique key to detect doubles. This way reruns it should be safe to do a re-run.</p>
-              <p>Notice that products administered in Pubble have an Odoo counterpart in either the general or vendor (freelancer) specific price list. An Odoo pricelist product also assumes products are predefined.</p>              
+              <p>Normal configuration expects a daily automated task calling the automated_do_collect procedure from the pubble.production.config object. When using this method the system date is used to calculate last week to collect the corresponding period's info up till today. </p> 
+              <p>Apart from the initial configuration, the user may use this interface to collect information for dates that differ from the automated process. To circumvent processing (i.e. paying) twice the Pubble reference ID is used as a unique key to detect doubles. This way it should be safe to do a re-run.</p>
+              <p>Notice that products administered in Pubble have an Odoo counterpart in either the general or vendor (freelancer) specific price list. An Odoo pricelist product also assumes products are predefined and have an account.</p>
+              <p>Finally advertising issues should have (title) code and dates that correspond to what Pubble is sending. They also should have analytical accounts, operating unit and a company attached to them.
+              </p>              
               <p/>
               <p/>
               <a href="https://www.pubble.nl/" target="_blank"> More about Pubble</a>
@@ -79,7 +84,7 @@
   </record> 
 
   <!-- Menu group -->
-  <menuitem name= "Pubble admittance" 
+  <menuitem name= "Pubble import" 
             id= "menu_pubble_production" 
             parent="reverse_billing.menu_action_revbil_main"  
             sequence= "100"
