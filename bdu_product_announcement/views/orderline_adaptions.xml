@@ -11,32 +11,32 @@
         
                 <!-- custom attributes go here -->
                 <xpath expr="//field[@name='order_line']/form/label[@for='name']" position="before">
-                    <group attrs="{'invisible' : [('prod_cat','not in', 'Announcement')]}">
+                    <group attrs="{'invisible' : [('custom_orderline','not in', 'Announcement')]}">
                             <field name="url_to_material" />
                     </group>
 
-                    <group name="Custom product info" attrs="{'invisible' : [('prod_cat','not in', 'Announcement')]}">
+                    <group name="Custom product info" attrs="{'invisible' : [('custom_orderline','not in', 'Announcement')]}">
                         
                         <group name="custom product info left column">
                             <label for="" string="Meta data"/> 
                             <newline/> 
-                            <field name="firstname" attrs="{'required' : [('prod_cat','in', 'Announcement')]}"/>
-                            <field name="lastname"  attrs="{'required' : [('prod_cat','in', 'Announcement')]}"/>
-                            <field name="city"      attrs="{'required' : [('prod_cat','in', 'Announcement')]}"/>
+                            <field name="announcement_firstname" attrs="{'required' : [('custom_orderline','in', 'Announcement')]}"/>
+                            <field name="announcement_lastname"  attrs="{'required' : [('custom_orderline','in', 'Announcement')]}"/>
+                            <field name="announcement_city"      attrs="{'required' : [('custom_orderline','in', 'Announcement')]}"/>
                             <newline/>
-                            <field name="from_date" attrs="{'required' : [('prod_cat','in', 'Announcement')]}"/>
-                            <field name="to_date"   attrs="{'required' : [('prod_cat','in', 'Announcement')]}"/>
+                            <field name="announcement_from_date" attrs="{'required' : [('custom_orderline','in', 'Announcement')]}"/>
+                            <field name="announcement_to_date"   attrs="{'required' : [('custom_orderline','in', 'Announcement')]}"/>
                         </group>
 
                         <group name="custom product info right column">
-                            <label for="adv_issue_ids" string="Published in"/> 
+                            <label for="announcement_adv_issue_ids" string="Published in"/> 
                             <newline/>
-                            <field name="adv_issue_ids" nolabel="1" 
+                            <field name="announcement_adv_issue_ids" nolabel="1" 
                                    domain="[('parent_id','!=', False),('parent_id','not in',('Online'))]" 
                                    options="{'no_open': True,'no_create': True, 'no_create_edit': True}" 
                                    context="{'search_view_ref':'bdu_product_announcement.announcement_view_filter',
                                              'tree_view_ref':'bdu_product_announcement.announcement_tree_view' }"
-                                   attrs="{'required'  : [('prod_cat','in', 'Announcement')]}"/>
+                                   attrs="{'required'  : [('custom_orderline','in', 'Announcement')]}"/>
                         </group>
 
                     </group>

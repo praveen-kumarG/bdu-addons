@@ -9,13 +9,13 @@
             <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="arch" type="xml">
 
-                <!-- sale procedure on sales tab -->
+                <!-- custom handling selection per product template on sales tab -->
                 <xpath expr="//page[@name='sales']" position="inside">
                     <div name="Custom handling" >
                         <separator string="Custom orderlines"/>
                         <group>
                             <group>
-                                <field name="prod_cat" string="Customize for"/>
+                                <field name="custom_orderline" string="Customize for"/>
                             </group>
                         </group>
                         <separator/>
@@ -25,18 +25,17 @@
             </field>                               
         </record>
 
-
-         <record  model="ir.ui.view" id="product_category_form_product_base">
+        <!-- custom handling may be selected on category level too -->
+        <record  model="ir.ui.view" id="product_category_form_product_base">
             <field name="name">product.category.form.product.base.view</field>
             <field name="model">product.category</field>
             <field name="inherit_id" ref="product.product_category_form_view"/>
-            <!--field name="inherit_id" ref="bdu_pubble_soap.product_category_form_view_pubble"/-->
             <field name="arch" type="xml">
                 <field name="type" position="after">
-                    <field name="prod_cat" string="Customize for"/>
+                    <field name="custom_orderline" string="Customize for"/>
                 </field>
             </field>
-         </record>
+        </record>
 
 
     </data>

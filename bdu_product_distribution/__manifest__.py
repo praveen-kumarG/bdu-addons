@@ -29,9 +29,10 @@
                  'folders',
                 ],
     'data'    : [
-                 #'security/security.xml',
-                 #'security/ir.model.access.csv',
-                 'reports/reports.xml',
+                 #'security/security.xml',             #no additional models
+                 #'security/ir.model.access.csv',      #no additional models
+                 'reports/appendix_distribution.xml',
+                 'reports/list_for_distributors.xml',
                  'views/orderline_adaptions.xml',
                  'views/distribution.xml'
                 ],

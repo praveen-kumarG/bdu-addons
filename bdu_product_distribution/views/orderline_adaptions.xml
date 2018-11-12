@@ -9,25 +9,24 @@
             <field name="priority" eval="40"/>
             <field name="arch" type="xml">
         
-                <!-- custom attributes go here -->
+                <!-- custom attributes to show on orderline according to custom handling -->
                 <xpath expr="//field[@name='order_line']/form/label[@for='name']" position="before">
-                    <group name="Custom product info" attrs="{'invisible' : [('prod_cat','not in', 'Distribution')]}">
+                    <group name="Custom product info"            attrs="{'invisible' : [('custom_orderline','not in', 'Distribution')]}">
                         <group name="custom product info left column">  
-                            <field name="area_id" string="Distribution area" domain="" 
+                            <field name="distribution_item"      attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"/>
+                            <field name="distribution_from_date" attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"/>
+                            <field name="distribution_to_date"   attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"/>
+                        </group>
+                        <group     name="custom product info right column">
+                            <field name="distribution_count_all" attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"/>
+                            <field name="distribution_central"   attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"/>
+                        </group>
+                        <field     name="distribution_area_ids" 
+                                   string="Distribution areas"   attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"
+                                   domain="" 
                                    options="{'no_open': True,'no_create': True, 'no_create_edit': True}" 
-                                   attrs="{'invisible': [('area_id','=', False)]}"/>
-                        </group>
-                        <group name="custom product info right column">
-                            <field name="distributor"
-                                   attrs="{'invisible': [('distributor','=', False)]}"/>
-                        </group>
-                        <field name="area_ids" 
-                               string="Distribution areas" 
-                               attrs="{'invisible': [('area_id','!=', False),('area_ids','=', [])]}" 
-                               domain="" 
-                               options="{'no_open': True,'no_create': True, 'no_create_edit': True}" 
-                               context="{'search_view_ref':'bdu_product_distribution.distribution_area_view_filter',
-                                         'tree_view_ref':'bdu_product_distribution.distribution_areas_tree_view' }"/>
+                                   context="{'search_view_ref':'bdu_product_distribution.distribution_area_view_filter',
+                                             'tree_view_ref':'bdu_product_distribution.distribution_areas_tree_view' }"/>
                     </group>
                 </xpath>  
 

@@ -177,7 +177,10 @@ class PubbleProductionConfig(models.Model):
                     
                     #freelancer should be in system otherwise false
                     ingevoerdDoor   = billing_line['ingevoerdDoor']
-                    freelancer      = self.findPartnerByEmail(billing_line['ingevoerdDoor'])
+                    searchresult    = self.findPartnerByEmail(billing_line['ingevoerdDoor'])
+                    freelancer      = searchresult['partner']
+                    if not freelancer and message.find(searchresult['message'])==-1 and searchresult['message'].find('@bdu.nl')==-1 :
+                        message +=searchresult['message']
 
                     pubble_product  = billing_line['productCode']
                     pubble_count    = billing_line['aantal']
@@ -224,7 +227,7 @@ class PubbleProductionConfig(models.Model):
                     record['operating_unit_id']   = ids['operating_unit_id']
                     record['commissioned_by']     = commissioned_by
                     record['commissioned_by_xxl'] = commissioned_by_xxl
-                    record['message']             = ""   
+                    record['message']             = message   
                     if odoo_product['product_id'] == False :
                         record['message'] += "Pubble product/count could not be converted. Check conversion data.<br/>"
                     if freelancer == False :
@@ -257,7 +260,7 @@ class PubbleProductionConfig(models.Model):
             config.latest_success = datetime.date.today()            
             config.latest_week    = str(datetime.date.today().isocalendar()[0])+"-"+str(datetime.date.today().isocalendar()[1])
             
-            config.latest_run     = datetime.datetime.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')+message
+            config.latest_run     = datetime.datetime.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')+"<br/>"+message
             config.latest_status  = status
             config.latest_reason  = reason
             config.write({})
@@ -275,10 +278,21 @@ class PubbleProductionConfig(models.Model):
     @api.multi
     def findPartnerByEmail(self, email_address) :
         partners = self.env['res.partner'].search([('email','=',email_address)])
+        
         if len(partners)==1 :
-            return partners[0]
+            if partners[0].supplier :
+                return {'message' : '', 'partner' : partners[0]}
+            else : 
+                return {'message' : "Found one partner with email address "+email_address+", but this is not a supplier<br/>",
+                        'partner' : False}
+        
+        elif len(partners)>1 :
+            return {'message' : "Multiple entries for "+email_address+", please deduplicate<br/>",
+                    'partner' : False}
+
         else :
-            return False
+            return {'message' : "email address "+email_address+" not found<br/>",
+                    'partner' : False}
 
 
     @api.multi 

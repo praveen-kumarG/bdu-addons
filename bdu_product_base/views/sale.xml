@@ -12,7 +12,7 @@
 
                 <!-- contact person with same restrictions -->
                 <xpath expr="//field[@name='partner_shipping_id']" position="after">
-                    <field name="partner_shipping_id" required="False" 
+                    <field name="customer_contact" required="False" 
                            context="{'default_parent_id': partner_id, 'default_type':'contact'}" 
                            domain="[('is_company', '=', False), ('customer', '=', True),('parent_id', '=', partner_id),('type', '=', 'contact')]" 
                            options="{&quot;always_reload&quot;: True}" 
@@ -27,7 +27,7 @@
 
                 <!-- field available in client for dynamic forms, i.e. custom product handling  -->
                 <xpath expr="//field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
-                    <field string="Category" name="prod_cat" readonly="True" invisible="1"/>
+                    <field string="Custom handling for" name="custom_orderline" readonly="True" invisible="1"/>
                 </xpath> 
 
 

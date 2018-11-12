@@ -22,9 +22,9 @@
     <field name="inherit_id" ref="sale_advertising_order.view_advertising_issue_filter" />
     <field name="arch" type="xml">
 
-      <!-- custom additions here -->
+      <!-- Filter to select websites only -->
       <xpath expr="//separator" position="after">
-        <filter string="Websites" domain="[('title','=','ONLINE')]"/>
+        <filter string="Websites" domain="[('parent_id','=','Online')]"/>
         <separator/>
       </xpath>
 

@@ -8,9 +8,12 @@
 
     'description': """
         Collect editor's and photographer's results from Pubble into Odoo.\n
-        Present info to facilitate audit by content manager.\n
-        Groups info by chief editor (additional field on advertising issues).\n
-        Convert admitted info into reverse billing invoice lines.
+        Freelancers must have one (and only one) matching email address in res.partner and must be a supplier.\n
+        Contributors with an email address containing "@bdu.nl" will be skipped.\n
+        Collected info will be present together with commissioning, publication and sibling work to facilitate easy auditing by content manager.\n
+        Several filters and grouping options added as well as a pivot view to check against budgets.\n
+        Accepted work may checked after which additional updates are not accepted. Unchecking makes updating available again.\n
+        Accepted work may be selected and push to Finance as a SOW batch (action from the action menu).After pushing to SOW batch one cannot uncheck anymore.\n
     """,
 
     'author'  : "D. Prosee",

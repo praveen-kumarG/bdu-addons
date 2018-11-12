@@ -9,41 +9,40 @@
             <field name="priority" eval="40"/>
             <field name="arch" type="xml">
         
-                <!-- custom attributes go here -->
+                <!-- custom attributes to show on orderline according selected custom handling -->
                 <xpath expr="//field[@name='order_line']/form/label[@for='name']" position="before">
 
                     <!-- attachments on orderline -->
-                    <group attrs="{'invisible' : [('prod_cat','not in', 'Online')]}">
-                            <field name="attachment_ids" widget="many2many_binary" class="oe_inline"/>
-                            <field name="url_to_material" />
+                    <group attrs="{'invisible' : [('custom_orderline','not in', 'Online')]}">
+                            <field name="online_attachment_ids" widget="many2many_binary" class="oe_inline"/>
+                            <field name="online_url_to_material" />
                     </group>
 
-                    <group name="Custom product info" attrs="{'invisible' : [('prod_cat','not in', 'Online')]}">
+                    <group name="Custom product info" attrs="{'invisible' : [('custom_orderline','not in', 'Online')]}">
                         
                         <group name="custom product info left column">
                             <label for="" string="How to serve"/> 
                             <newline/> 
-                            <field name="landing_page" attrs="{'required' : [('prod_cat','in', 'Online')]}"/>
-                            <field name="retarget"     attrs="{'required' : [('prod_cat','in', 'Online')]}"/>
-                            <field name="profile"      widget="many2many_tags"    placeholder="Tags..."
-                                                       attrs="{'required' : [('prod_cat','in', 'Online')]}"/>
+                            <field name="online_landing_page" attrs="{'required' : [('custom_orderline','in', 'Online')]}"/>
+                            <field name="online_retarget"     attrs="{'required' : [('custom_orderline','in', 'Online')]}"/>
+                            <field name="online_profile"      widget="many2many_tags"    placeholder="Tags..."
+                                                       attrs="{'required' : [('custom_orderline','in', 'Online')]}"/>
                             <newline/>
-                            <field name="from_date"    attrs="{'required' : [('prod_cat','in', 'Online')]}"/>
-                            <field name="to_date"      attrs="{'required' : [('prod_cat','in', 'Online')]}"/>
+                            <field name="online_from_date"    attrs="{'required' : [('custom_orderline','in', 'Online')]}"/>
+                            <field name="online_to_date"      attrs="{'required' : [('custom_orderline','in', 'Online')]}"/>
                         </group>
 
                         <group name="custom product info right column">
                             <label for="adv_issue_ids" string="Where to serve"/> 
                             <newline/>
-                            <field name="adv_issue_ids" nolabel="1" 
+                            <field name="online_adv_issue_ids" nolabel="1" 
                                    domain="[('parent_id','=', 'Online')]" 
                                    options="{'no_open': True,'no_create': True, 'no_create_edit': True}" 
                                    context="{'search_view_ref':'bdu_product_online.online_view_filter',
                                              'tree_view_ref':'bdu_product_online.online_tree_view' }"/>
                         </group>
 
-                        <field name="layout_remark" string="Production remark" 
-                                                        attrs="{'required' : [('prod_cat','in', 'Online')]}"/>
+                        <field name="online_notes"            attrs="{'required' : [('custom_orderline','in', 'Online')]}"/>
 
                     </group>
 

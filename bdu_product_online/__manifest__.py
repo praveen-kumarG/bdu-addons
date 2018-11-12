@@ -12,8 +12,7 @@
         - custom handling on orderline form for:\n
            * Display bannering,\n 
            * Social advertising,\n
-           * Video advertising and \n
-           * Webvertorials\n\n
+           * Video advertising \n\n
 
         Usage:\n
         - define products within custom handling \'Online\' , found on product tab \'Sale\'\n
