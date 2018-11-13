@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- injection of product specific user interaction elements -->
+        <record model="ir.ui.view" id="sale_product_base_form_view">
+            <field name="name">sale.product.base.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="priority" eval="30"/>
+            <field name="arch" type="xml">
+
+                <!-- contact person with same restrictions -->
+                <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                    <field name="customer_contact" required="False" 
+                           context="{'default_parent_id': partner_id, 'default_type':'contact'}" 
+                           domain="[('is_company', '=', False), ('customer', '=', True),('parent_id', '=', partner_id),('type', '=', 'contact')]" 
+                           options="{&quot;always_reload&quot;: True}" 
+                           attrs="{'readonly':[('state','in', ['cancel','done'])]}"
+                           groups="sale.group_delivery_invoice_address" />
+                </xpath>
+
+                <!-- orderlines should be editable in a form view -->
+                <xpath expr="//field[@name='order_line']/tree" position="attributes">
+                    <attribute name="editable"></attribute>
+                </xpath>    
+
+                <!-- field available in client for dynamic forms, i.e. custom product handling  -->
+                <xpath expr="//field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
+                    <field string="Custom handling for" name="custom_orderline" readonly="True" invisible="1"/>
+                </xpath> 
+
+
+            </field>                               
+        </record>
+    </data>
+</openerp>    
+
+<!-- todo:  replace partner_shipping_id by customer_contact -->   

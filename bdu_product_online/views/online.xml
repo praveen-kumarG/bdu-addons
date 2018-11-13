@@ -1,0 +1,36 @@
+<?xml version="1.0"?> 
+<odoo>
+
+  <!-- List view of websites derived from advertising issues --> 
+  <record id="online_tree_view" model="ir.ui.view"> 
+    <field name="name">Websites</field> 
+    <field name="model">sale.advertising.issue</field> 
+    <field name="arch" type="xml"> 
+      <tree string="Issues" toolbar="1"> 
+          <field name="code"           string="Issue"/> 
+          <field name="default_note"   string="Title"/>
+      </tree> 
+    </field> 
+  </record> 
+
+  <!-- Form view  can use form of sale advertising issue --> 
+  
+  <!-- search filter  -->
+  <record id="online_view_filter" model="ir.ui.view">
+    <field name="name">Online filter</field>
+    <field name="model">sale.advertising.issue</field>
+    <field name="inherit_id" ref="sale_advertising_order.view_advertising_issue_filter" />
+    <field name="arch" type="xml">
+
+      <!-- Filter to select websites only -->
+      <xpath expr="//separator" position="after">
+        <filter string="Websites" domain="[('parent_id','=','Online')]"/>
+        <separator/>
+      </xpath>
+
+    
+    </field>
+  </record>
+
+
+</odoo>

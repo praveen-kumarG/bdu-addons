@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Add field "name" to tree view -->
+        <record model="ir.ui.view" id="sow_batch_tree_view">
+            <field name="name">sow.batch.tree.view</field>
+            <field name="model">sow.batch</field>
+            <field name="inherit_id" ref="reverse_billing.sow_batch_tree_view" />
+            <field name="priority" eval="25"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='date_batch']" position='after'>
+                    <field name="name"/>
+                </xpath>        
+
+            </field>                               
+        </record>
+
+
+        <!-- page number and number of columns is not used -->
+        <record model="ir.ui.view" id="sow_batch_form">
+            <field name="name">sow.batch.form</field>
+            <field name="model">sow.batch</field>
+            <field name="inherit_id" ref="reverse_billing.sow_batch_form" />
+            <field name="priority" eval="25"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//tree/field[@name='page_number']" position='replace'>
+                    <field name="page_number" invisible="1"/>
+                </xpath>        
+
+                <xpath expr="//tree/field[@name='nr_of_columns']" position='replace'>
+                    <field name="nr_of_columns" invisible="1"/>
+                </xpath>        
+
+
+            </field>                               
+        </record>
+
+
+    </data>
+</openerp>       
+ 

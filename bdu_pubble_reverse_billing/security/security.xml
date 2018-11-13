@@ -1,0 +1,14 @@
+<openerp>
+    <data>
+        <record id="pubble_reverse_billing_data" model="res.groups">
+        <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="name">Pubble reverse billing data</field>
+        </record>
+    </data>
+    <data>
+        <record id="pubble_reverse_billing_config" model="res.groups">
+        <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="name">Pubble reverse billing config</field>
+        </record>
+    </data>
+</openerp>

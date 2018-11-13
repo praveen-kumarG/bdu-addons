@@ -24,7 +24,7 @@
     'version': '10.0',
 
     # depends on mis_builder to find menu location (see views)
-    'depends': ['base', 
+    'depends': [
                 'sale_advertising_order',     #to convert title name into analytic account 
                ],
 

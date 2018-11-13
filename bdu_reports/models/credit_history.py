@@ -41,8 +41,8 @@ class credit_history(models.Model):
         #source data
         #groupby    =['date_due','account_manager_id','partner_id']
         #sumfields  =['amount_total','residual']
-        open_invoices = self.env['account.invoice'].search([  ('state','=','open'),   ('type','in',('out_invoice', 'out_refund'))  ])
-
+        open_invoices = self.env['account.invoice'].search([  ('state','=','open'),   ('type','in',('out_invoice', 'out_refund','customer_invoice','customer_refund'))  ])
+        
         #accumulate per partner within date ranges relative to due date
         d = {}
         for oi in open_invoices :
@@ -68,12 +68,12 @@ class credit_history(models.Model):
 
             if partner_id in d :
                 d[partner_id]['at_lte8d']     += at_lte8d
-                d[partner_id]['res_lte8d']    += res_lte8d,
-                d[partner_id]['at_lte35d']    += at_lte35d,
-                d[partner_id]['res_lte35d']   += res_lte35d,
-                d[partner_id]['at_gt35d']     += at_gt35d,
-                d[partner_id]['res_gt35d']    += res_gt35d,
-                d[partner_id]['amount_total'] += at_lte8d  + at_lte35d + at_gt35d,
+                d[partner_id]['res_lte8d']    += res_lte8d
+                d[partner_id]['at_lte35d']    += at_lte35d
+                d[partner_id]['res_lte35d']   += res_lte35d
+                d[partner_id]['at_gt35d']     += at_gt35d
+                d[partner_id]['res_gt35d']    += res_gt35d
+                d[partner_id]['amount_total'] += at_lte8d  + at_lte35d + at_gt35d
                 d[partner_id]['residual']     += res_lte8d + res_lte35d + res_gt35d
             else :
                 d[partner_id] = { 'year'        : year,
