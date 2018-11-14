@@ -1,0 +1,39 @@
+<?xml version="1.0"?> 
+<odoo>
+
+  <!-- List view  --> 
+  <record id="view_tree_pubble_product_conversion" model="ir.ui.view"> 
+    <field name="name">Pubble product_conversion</field> 
+    <field name="model">pubble.product.conversion</field> 
+    <field name="arch" type="xml"> 
+      <tree string="Pubble product conversion" editable="bottom"> 
+          <field name="pubble_product_name"/>  
+          <field name="pubble_count_min"/> 
+          <field name="pubble_count_max"/> 
+          <field name="count_conversion"/> 
+          <field name="odoo_product_id"/>
+      </tree> 
+    </field> 
+  </record> 
+
+  <!-- No Form view because of editable tree view -->
+
+  <!-- No Search filter -->
+ 
+  <!-- Action  --> 
+  <act_window id="show_pubble_product_conversion" 
+              name="Show product conversion" 
+              res_model="pubble.product.conversion" 
+              view_mode="tree,form" 
+  /> 
+  
+  <!-- Menu item --> 
+  <menuitem id="show_pubble_product_conversion_menu" 
+            name="Products" 
+            action="show_pubble_product_conversion"
+            parent="menu_pubble_production" 
+            sequence="120"
+  /> 
+
+
+</odoo>

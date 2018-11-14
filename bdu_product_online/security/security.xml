@@ -1,0 +1,8 @@
+<openerp>
+    <data>
+        <record id="online_profile" model="res.groups">
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="name">Online profiles</field>
+        </record>
+    </data>
+</openerp>

@@ -16,7 +16,7 @@
     'license' : "LGPL-3", 
     'category': 'Connector',
     'version' : '10.0',
-    'depends' : [
+    'depends' : ['account'
                 ],
     'data'    : [
                  'security/security.xml',

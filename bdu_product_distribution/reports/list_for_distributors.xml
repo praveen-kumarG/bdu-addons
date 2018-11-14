@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+
+      <!-- print menu entry -->
+      <report
+          id="bdu_product_distribution.action_list_for_distributors"
+          string="List for distributors"
+          model="sale.order"
+          report_type="qweb-pdf"
+          name="bdu_product_distribution.report_list_for_distributors"
+          file="bdu_product_distribution.list_for_distributors"
+          paperformat="bdu_account.paperformat_bdu_layout"
+          attachment="((object.state not in ('sale','done')) and ('Distributor list for quotation '+object.name.replace('SO',''))+'.pdf') or ((object.state in ('sale','done')) and ('Distributor list for sale Order '+object.name.replace('SO',''))+'.pdf')"
+          attachment_use = "False"
+      />
+
+      <!-- addresses per order per order line per distributor -->
+      <template id="bdu_product_distribution.report_list_for_distributors">
+        <t t-foreach="docs" t-as="doc">
+          <t t-call="bdu_account.external_layout_bdu">
+            <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})"/> 
+            <t t-foreach="doc.order_line" t-as="line">
+              <span t-if="line.custom_orderline in ['Distribution']">  
+                <t t-set="distributors"  t-value="line.list_for_distributors()"/>
+                <div class="page">
+                  <div class="oe_structure"/>
+                  <div t-foreach="distributors" t-as="d" style="page-break-before: always;">
+                    <div class="row mb16">
+                      <div class="col-xs-12">
+                        <h2 t-esc="'Verspreidingsgebied voor '+str(line.distribution_item)"/>
+                      </div>      
+                    </div>              
+                    <div class="row mb32 col-xs-12">
+                        <t t-esc="'Verspreider :'+str(d['name'])+' '+str(d['street'])+' '+ str(d['zip'])+' '+str(d['city'])"/>
+                        <t t-if="not line.distribution_count_all">
+                            <span t-esc="str('Alleen Ja/Ja')"/>
+                        </t>
+                        <t t-if="line.distribution_count_all">
+                            <span t-esc="str('Alle adressen')"/>
+                        </t>    
+                    </div>              
+                    <table class="table table-condensed mt32">
+                      <thead>
+                        <th class="text-left">Bezorgingsgebied</th>
+                        <th class="text-right">Aantal adressen</th>
+                        <th class="text-left">Titel</th>
+                        <th class="text-left">Tijdvak bezorging</th>
+                      </thead>
+                      <t t-foreach="d['areas']" t-as="a">
+                        <tr>          
+                          <td class="text-left">                                 
+                            <t t-if="a['zip']">
+                                <span t-esc="str(a['zip'])+' '+str(a['city'])"/>
+                            </t>                               
+                            <t t-if="not a['zip']">
+                                <span t-esc="str('n.a.')"/>
+                            </t>
+                          </td>   
+                          <td class="text-right">
+                            <t t-if="not line.distribution_count_all">
+                                <span t-esc="str(d['folder_addresses'])"/>
+                            </t>
+                            <t t-if="line.distribution_count_all">
+                                <span t-esc="str(d['total_addresses'])"/>
+                            </t>
+                          </td>
+                          <td class="text-left">
+                              <t t-if="a['title_id']">
+                                  <span t-esc="a['title_id'][1]"/>
+                              </t>
+                              <t t-if="not a['title_id']  ">
+                                  <span t-esc="str(' ')"/>
+                              </t>
+                          </td> 
+                          <td class="text-left">
+                              <span t-esc="line.distribution_from_date" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                              <span t-esc="str(' - ')"/>
+                              <span t-esc="line.distribution_to_date" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                          </td>   
+                        </tr>
+                      </t>
+                      <!-- Totals -->
+                      <tr class="border-black"> 
+                        <td class="text-left"> 
+                          <strong>Totaal aantal adressen :</strong>
+                        </td> 
+                        <td class="text-right">
+                          <t t-if="line.distribution_count_all">
+                            <t t-esc="d['total_addresses']"/> 
+                          </t>
+                          <t t-if="not line.distribution_count_all">
+                            <t t-esc="d['folder_addresses']"/> 
+                          </t>
+                        </td> 
+                        <td class="text-left"/> 
+                        <td class="text-left"/> 
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </span>
+            </t>
+          </t>
+        </t>
+      </template>
+   
+
+
+
+
+    </data>
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="sale_product_distribution_form_view">
+            <field name="name">sale.product.distribution.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="priority" eval="40"/>
+            <field name="arch" type="xml">
+        
+                <!-- custom attributes to show on orderline according to custom handling -->
+                <xpath expr="//field[@name='order_line']/form/label[@for='name']" position="before">
+                    <group name="Custom product info"            attrs="{'invisible' : [('custom_orderline','not in', 'Distribution')]}">
+                        <group name="custom product info left column">  
+                            <field name="distribution_item"      attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"/>
+                            <field name="distribution_from_date" attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"/>
+                            <field name="distribution_to_date"   attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"/>
+                        </group>
+                        <group     name="custom product info right column">
+                            <field name="distribution_count_all" attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"/>
+                            <field name="distribution_central"   attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"/>
+                        </group>
+                        <field     name="distribution_area_ids" 
+                                   string="Distribution areas"   attrs="{'required' : [('custom_orderline','in', 'Distribution')]}"
+                                   domain="" 
+                                   options="{'no_open': True,'no_create': True, 'no_create_edit': True}" 
+                                   context="{'search_view_ref':'bdu_product_distribution.distribution_area_view_filter',
+                                             'tree_view_ref':'bdu_product_distribution.distribution_areas_tree_view' }"/>
+                    </group>
+                </xpath>  
+
+
+            </field>                               
+        </record>
+    </data>
+</openerp>       
