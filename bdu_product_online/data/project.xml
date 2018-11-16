@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="project.project" id="project_online">
+        <field name="name">Online</field>
+    </record>
+
+
+
+    <record model="project.task.type" id="project_online_configure_ad_server">
+        <field name="name">Configure ad server</field>
+    </record>
+    <record model="project.task.type" id="project_online_configure_monitor">
+        <field name="name">Configure monitor</field>
+    </record>
+    <record model="project.task.type" id="project_online_reporting">
+        <field name="name">Reporting</field>
+    </record>
+    <record model="project.task.type" id="project_online_review_campaign">
+        <field name="name">Review campaign</field>
+    </record>
+    <record model="project.task.type" id="project_online_cancel">
+        <field name="name">Online order cancelled</field>
+    </record>
+</odoo>

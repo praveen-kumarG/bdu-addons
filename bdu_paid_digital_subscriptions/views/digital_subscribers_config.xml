@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<odoo>
+
+  <!--  Form view for accountant info collection and shipping --> 
+  <record id="view_form_digital_subscribers_connector" model="ir.ui.view">
+    <field name="name">Digital subscribers connector</field>
+    <field name="model">digital.subscribers.config</field> 
+    <field name="arch" type="xml">
+      <form string="Digital subscribers connector" create="false" edit="false" action="false" 
+                                     class="oe_form_configuration">
+        <header > 
+        </header>
+
+          <br/>
+          <group name="connector_config" string="Connector configuration">
+            <field name="server"/> 
+            <field name="directory"/>  
+            <field name="user"/> 
+            <field name="password"/>  
+            <field name="offset_days"/>  
+            <field name="subscriber_ref"/>  
+            <field name="tempdir"/> 
+          </group>
+          <button name="save_config" type="object" 
+            string="Save" class="oe_highlight" /> 
+          <br/>
+          <br/>
+
+          <group name="production_status" string="Production status" col="2">
+              <field name="latest_run"        readonly="1" widget="html"/> 
+              <field name="latest_status"     readonly="1" widget="html"/> 
+          </group>
+          <br/>
+          <br/>
+
+          <group name="manual_send" string="Manual send" >
+            <div colspan="2">
+              <p>Enter the date for which subscriptions should be active and press "Send" to send subscription update to website.</p>
+            </div>
+            <group>
+              <field name="active_date"/>
+            </group>
+            <group>
+            </group>
+          </group>
+          <button string="Send" name="do_send" type="object" class="oe_highlight"/>
+          <br/>
+          <br/>
+
+
+          <group name="documentation" string="Summary" col="1">
+              <p>This connector collects active subscriptions for either the given date (manual send) or system date + offset in days (automated run).</p>
+              <p>Eligable subscriptions have a title with a digital paywall, have orderline state 'sale' and have a delivery period that is active for the given date.</p>
+              <p>The result is packed in files with a maximum of 10.0000 subscribers. The files are then moved to the given ftp server.</p> 
+              <p>Shipping can be done manually using the Send-button above, or automatically via scheduled actions calling the automated_run method of the digital.subscribers.config object.</p>  
+              <p>The websites are currently hosted by Yourhosting and supported by Dutch Open Projects (DOP).</p>
+              <p/>
+              <a href="https://yourhosting.nl" target="_blank"> More about Yourhosting</a>
+              <a href="https://dop.net" target="_blank"> More about DOP</a>
+          </group>
+
+
+      </form>
+    </field>
+  </record> 
+
+  <!-- Connection info via server action and submenu-->
+  <record id="digital_subscribers_connector_action" model="ir.actions.server"> 
+    <field name="name">Digital subscribers</field> 
+    <field name="model_id" ref="model_digital_subscribers_config"/> 
+    <field name="code">
+      action = model.default_view()
+    </field>
+  </record> 
+
+  <!-- Menu item to open digital subscribers connector --> 
+  <menuitem id="digital_subscribers_connector_menuitem" 
+    name="Digital subscribers" 
+    action="digital_subscribers_connector_action"
+    sequence="205"
+    parent="sales_team.menu_sale_config" 
+     /> 
+
+
+</odoo>

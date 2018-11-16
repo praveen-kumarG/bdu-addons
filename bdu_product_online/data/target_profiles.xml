@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="online.profile" id="G1">
+        <field name="name">Male</field>
+        <field name="profile_cat">Gender</field>
+        <field name="color">1</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="G2">
+        <field name="name">Female</field>
+        <field name="profile_cat">Gender</field>
+        <field name="color">1</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="G3">
+        <field name="name">Other</field>
+        <field name="profile_cat">Gender</field>
+        <field name="color">1</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="E1">
+        <field name="name">Low</field>
+        <field name="profile_cat">Education level</field>
+        <field name="color">2</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="E2">
+        <field name="name">Medium</field>
+        <field name="profile_cat">Education level</field>
+        <field name="color">2</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="E3">
+        <field name="name">High</field>
+        <field name="profile_cat">Education level</field>
+        <field name="color">2</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="A1">
+        <field name="name">18-34</field>
+        <field name="profile_cat">Age</field>
+        <field name="color">3</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="A2">
+        <field name="name">35-49</field>
+        <field name="profile_cat">Age</field>
+        <field name="color">3</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="A3">
+        <field name="name">50+</field>
+        <field name="profile_cat">Age</field>
+        <field name="color">3</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SC1">
+        <field name="name">Low D</field>
+        <field name="profile_cat">Social class</field>
+        <field name="color">4</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SC2">
+        <field name="name">Middle B2, C</field>
+        <field name="profile_cat">Social class</field>
+        <field name="color">4</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SC3">
+        <field name="name">High A, B1</field>
+        <field name="profile_cat">Social class</field>
+        <field name="color">4</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="I1">
+        <field name="name">Low</field>
+        <field name="profile_cat">Income</field>
+        <field name="color">5</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="I2">
+        <field name="name">Middle</field>
+        <field name="profile_cat">Income</field>
+        <field name="color">5</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="I3">
+        <field name="name">High</field>
+        <field name="profile_cat">Income</field>
+        <field name="color">5</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI1">
+        <field name="name">Automotive</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI2">
+        <field name="name">Business &amp; Finance</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI3">
+        <field name="name">Careers</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI4">
+        <field name="name">Family and relationships</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI5">
+        <field name="name">Food &amp; Drink</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI6">
+        <field name="name">Healthy living</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI7">
+        <field name="name">Home &amp; Garden</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI8">
+        <field name="name">News</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI9">
+        <field name="name">Entertainment</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI10">
+        <field name="name">Culture</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI11">
+        <field name="name">Football</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI12">
+        <field name="name">Shopping</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI13">
+        <field name="name">Sports</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI14">
+        <field name="name">Style &amp; Fashion</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI15">
+        <field name="name">Technology &amp; Computing </field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+    <record model="online.profile" id="SI16">
+        <field name="name">Travel</field>
+        <field name="profile_cat">Special Interest</field>
+        <field name="color">6</field>
+        <field name="remark"></field>
+    </record>
+</odoo>
