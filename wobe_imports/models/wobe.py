@@ -925,7 +925,7 @@ class Job(models.Model):
             massPerKG, wastePerKG = {}, {}
             for booklet in edition.booklet_ids:
                 paper_weight = booklet.paper_weight
-                massKG = booklet.calculated_mass * edition.gross_quantity / 1000.0
+                massKG = booklet.calculated_mass * edition.net_quantity / 1000.0
                 wasteKG = booklet.calculated_mass * edition.waste_total / 1000.0
                 if paper_weight in massPerKG:
                     massPerKG[paper_weight] += massKG
