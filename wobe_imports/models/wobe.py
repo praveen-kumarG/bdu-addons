@@ -922,42 +922,59 @@ class Job(models.Model):
         NetRollProducts = {}
         WasteRollProducts = {}
         for edition in job.edition_ids:
-            #Ratio-Width per PaperType
-            # ratioSum = {}
+            massPerKG, wastePerKG = {}, {}
+            for booklet in edition.booklet_ids:
+                paper_weight = booklet.paper_weight
+                massKG = booklet.calculated_mass * edition.net_quantity / 1000.0
+                wasteKG = booklet.calculated_mass * edition.waste_total / 1000.0
+                if paper_weight in massPerKG:
+                    massPerKG[paper_weight] += massKG
+                else:
+                    massPerKG[paper_weight] = massKG
+                if paper_weight in wastePerKG:
+                    wastePerKG[paper_weight] += wasteKG
+                else:
+                    wastePerKG[paper_weight] = wasteKG
+
+            # Ratio-Width per PaperType
+            ratioSum = {}
             tot_width = 0.0
             for roll in edition.paper_product_ids:
                 mass, width = _get_MassWidth(roll.product_id)
                 number = int(roll.number_rolls)
-                tot_width += width * number
-                # if mass not in ratioSum:
-                #     ratioSum[mass] = {'width_mass_total': width * number}
-                # else:
-                #     ratioSum[mass]['width_mass_total'] += width * number
+                # tot_width += width * number
+                if mass not in ratioSum:
+                    ratioSum[mass] = {'width_mass_total': width * number}
+                else:
+                    ratioSum[mass]['width_mass_total'] += width * number
 
-            NetMass = edition.net_mass
-            WasteMass = edition.waste_mass
-
+            # NetMass = edition.net_mass
+            # WasteMass = edition.waste_mass
             # Paper Rolls
             for roll in edition.paper_product_ids:
                 mass, width = _get_MassWidth(roll.product_id)
-                # num_mass = ratioSum[mass]['width_mass_total']
+                num_mass = ratioSum[mass]['width_mass_total']
+                num_mass = num_mass if num_mass > 0 else 1
+
                 num_width = width * int(roll.number_rolls)
 
                 # Net Production: (in Kg)
-                if tot_width and tot_width > 0:
-                    Qty = (NetMass / tot_width * num_width)
-                    if roll.product_id in NetRollProducts:
-                        NetRollProducts[roll.product_id] += Qty
-                    else:
-                        NetRollProducts[roll.product_id] = Qty
+                # if tot_width and tot_width > 0:
+                NetMass = massPerKG[str(mass)]
+                Qty = (NetMass / num_mass * num_width)
+                if roll.product_id in NetRollProducts:
+                    NetRollProducts[roll.product_id] += Qty
+                else:
+                    NetRollProducts[roll.product_id] = Qty
 
                 # Waste Production: (in Kg)
-                if tot_width and tot_width > 0:
-                    Qty = (WasteMass / tot_width * num_width)
-                    if roll.product_id in WasteRollProducts:
-                        WasteRollProducts[roll.product_id] += Qty
-                    else:
-                        WasteRollProducts[roll.product_id] = Qty
+                # if tot_width and tot_width > 0:
+                WasteMass = wastePerKG[str(mass)]
+                Qty = (WasteMass / num_mass * num_width)
+                if roll.product_id in WasteRollProducts:
+                    WasteRollProducts[roll.product_id] += Qty
+                else:
+                    WasteRollProducts[roll.product_id] = Qty
 
         for product_id, qty in NetRollProducts.iteritems():
             lines.append({'productObj': product_id, 'name': 'Net Paper: ' + str(product_id.name), 'product_uom_qty': qty})
