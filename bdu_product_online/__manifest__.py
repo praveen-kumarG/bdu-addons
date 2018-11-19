@@ -36,7 +36,9 @@
                  'security/ir.model.access.csv',
                  'views/orderline_adaptions.xml',
                  'views/online.xml',
-                 'views/profile.xml'
+                 'views/profile.xml',
+                 'data/project.xml',
+                 'data/target_profiles.xml',
                 ],
     'demo'    : [
                 ],
