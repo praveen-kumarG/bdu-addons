@@ -185,9 +185,8 @@
 			</div> 
         	<div class="row mb32">
         		<!-- Sorry, no time to make it flexible -->
-        		<div class="col-xs-12 text-left">BDU media</div>
-        		<div class="col-xs-12 text-left">T.a.v. A. Molenkamp</div>
-        		<div class="col-xs-12 text-left">Marconistraat 33</div>
+        		<div class="col-xs-12 text-left">BDU Print</div>
+        		<div class="col-xs-12 text-left">Marconistraat 10 - 14</div>
         		<div class="col-xs-12 text-left">3771AM Barneveld</div>
         	</div>
         </template>

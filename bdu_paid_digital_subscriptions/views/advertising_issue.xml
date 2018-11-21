@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="sale_advertising_issue_form_view2">
+            <field name="name">sale.advertisig.issue.form.view2</field>
+            <field name="model">sale.advertising.issue</field>
+            <field name="inherit_id" ref="sale_advertising_order.sale_advertising_issue_form" />
+            <field name="priority" eval="25"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='subscription_title']" position='after'>
+                    <field name="digital_paywall"/>
+                </xpath>        
+
+            </field>                               
+        </record>
+    </data>
+</openerp>       
+ 
