@@ -138,7 +138,9 @@ class PubbleProductionConfig(models.Model):
                         commissioned_by_xxl = order['gemaaktDoor']+" aan "+order['toegewezenAan']
                     else :
                         commissioned_by     += ",\n"+order['gemaaktDoor']
-                        commissioned_by_xxl += ",\n"+order['gemaaktDoor']+" aan "+order['toegewezenAan']
+                        commissioned_by_xxl += ",<br/>"+order['gemaaktDoor']+" aan "+order['toegewezenAan']
+                    if order['productCode'] != False and order['productCode'] != "None" and order['productCode'] != "" and order['productCode'] != "null":
+                        commissioned_by_xxl += " ("+str(order['productCode']) +")"
 
 
                 #other publications as informational text added
@@ -149,6 +151,8 @@ class PubbleProductionConfig(models.Model):
                 title      = False
                 issue_date = False
                 titles     = False
+                year       = False
+                week       = False
                 if (len(publications)>0) :
                     compare_date= datetime.date(2999,12,31)
                     for publication in publications :
@@ -167,6 +171,8 @@ class PubbleProductionConfig(models.Model):
                 #get accounting info
                 if (title) :
                     ids = self.ids_by_issue_and_date(adv_issues, title, issue_date)
+                else :
+                    ids = {}
 
                 #all billing lines related to article consolidated as accompanying text
                 related_costs = self.pretty_billing_lines(billing_lines) 
@@ -174,13 +180,15 @@ class PubbleProductionConfig(models.Model):
                 for billing_line in billing_lines :
                     #billing line becomes record with 1 article as parent and sibling orders and publications
                     record = {}
+                    revbil_msg = ""
                     
                     #freelancer should be in system otherwise false
                     ingevoerdDoor   = billing_line['ingevoerdDoor']
                     searchresult    = self.findPartnerByEmail(billing_line['ingevoerdDoor'])
                     freelancer      = searchresult['partner']
                     if not freelancer and message.find(searchresult['message'])==-1 and searchresult['message'].find('@bdu.nl')==-1 :
-                        message +=searchresult['message']
+                        message   += searchresult['message']
+                        revbil_msg = searchresult['message']
 
                     pubble_product  = billing_line['productCode']
                     pubble_count    = billing_line['aantal']
@@ -227,7 +235,7 @@ class PubbleProductionConfig(models.Model):
                     record['operating_unit_id']   = ids['operating_unit_id']
                     record['commissioned_by']     = commissioned_by
                     record['commissioned_by_xxl'] = commissioned_by_xxl
-                    record['message']             = message   
+                    record['message']             = revbil_msg   
                     if odoo_product['product_id'] == False :
                         record['message'] += "Pubble product/count could not be converted. Check conversion data.<br/>"
                     if freelancer == False :

@@ -82,6 +82,7 @@ class PubbleProductionData(models.Model):
 
     @api.multi
     def push_to_sow(self) :
+        pdb.set_trace()
         selection=self.env['pubble.production.data'].browse(self.env.context.get('active_ids'))
         already_processed     = 0
         not_accepted          = 0
@@ -89,6 +90,8 @@ class PubbleProductionData(models.Model):
         not_freelancer        = 0
         not_product_id        = 0
         not_issue_id          = 0
+        not_product_categ     = 0
+        not_product_expense_account = 0
 
         #check first
         for line in selection :
@@ -104,8 +107,12 @@ class PubbleProductionData(models.Model):
                 not_product_id += 1
             if not line.issue_id :
                 not_issue_id += 1
+            if not line.product_id.categ_id :
+                not_product_categ += 1
+            if not line.product_id.property_account_expense_id :
+                not_product_expense_account += 1
         
-        if (already_processed + not_accepted + not_operating_unit_id + not_freelancer + not_product_id + not_issue_id) > 0 :
+        if (already_processed + not_accepted + not_operating_unit_id + not_freelancer + not_product_id + not_issue_id + not_product_categ + not_product_expense_account) > 0 :
             message = "Your selection can not be processed !\n"
             if already_processed > 0 :
                 message += str(already_processed)+" already processed records\n"
@@ -119,6 +126,10 @@ class PubbleProductionData(models.Model):
                 message += str(not_product_id)+" records have missing product (check pubble product conversion definitions)\n"
             if not_issue_id > 0 :
                 message += str(not_issue_id)+" records have missing issue (check advertising issue definitions)\n"
+            if not_product_categ > 0 :
+                message += str(not_product_categ)+" records have missing product category on product (check product for missing product category)\n"
+            if not_product_expense_account > 0 :
+                message += str(not_product_expense_account)+" records have products with missing expense account (check product for missing expense account)\n"
             raise ValidationError(message)
             return False
         
@@ -133,7 +144,9 @@ class PubbleProductionData(models.Model):
             
             #create batch            
             batch={}
-            batch['name']       = "Freelancers_redactie_week_"+str(datetime.datetime.today().isocalendar()[1])
+            batch['name']       = "Freelancers_redactie_"+ou.name
+            batch['name']      += "_"+str( (datetime.datetime.today()-timedelta(weeks=1)).isocalendar()[0])
+            batch['name']      += "_"+str( (datetime.datetime.today()-timedelta(weeks=1)).isocalendar()[1])
             batch['date_batch'] = datetime.datetime.today().strftime("%Y-%m-%d")
             batch['company_id'] = c_id
             batch['comment']    = "Pushed from Pubble admittance"
