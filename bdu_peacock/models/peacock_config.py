@@ -19,6 +19,7 @@ class PeacockConfig(models.Model):
     user           = fields.Char(string='User')
     password       = fields.Char(string='Password')
     days           = fields.Integer(string='History in days')
+    pretty_print   = fields.Boolean(string='Pretty print XML')
 
     latest_run     = fields.Char(string='Latest run',     help="Date of latest run of Announcement connector")
     latest_status  = fields.Char(string='Latest status',  help="Log of latest run")
@@ -59,10 +60,10 @@ class PeacockConfig(models.Model):
         config.write({})
         return 
 
-    def ship_file(self, dict, filename, conn):
+    def ship_xml_file(self, xml, filename, conn):
         config = self[0]
         f = open(config.tempdir+"/"+filename,"w")
-        data = json.dumps(dict)
+        data = etree.tostring(xml, pretty_print=self.pretty_print)
         f.write(data)
         f.close
 
@@ -185,14 +186,14 @@ class PeacockConfig(models.Model):
                                                         'code',                      \
                                                      ])
 
-        #process into xml file 
-        root         = etree.Element('report')
+        #process into xml files 
+        #root         = etree.Element('report')
         chapter_am   = etree.Element('account_move')
         chapter_aml  = etree.Element('account_move_line')
         chapter_aa   = etree.Element('account_account')
-        root.append(chapter_am)
-        root.append(chapter_aml)
-        root.append(chapter_aa)
+        #root.append(chapter_am)
+        #root.append(chapter_aml)
+        #root.append(chapter_aa)
 
         #files as chapters in one xml document
         for am_record in am :
@@ -201,7 +202,7 @@ class PeacockConfig(models.Model):
             self.add_element(chapter_aml, aml_record, 'record')
         for aa_record in aa :
             self.add_element(chapter_aa, aa_record, 'record')
-        xml = etree.tostring(root, pretty_print=False) #pretty_print=True makes it readable but introduces a.o. \n chars
+        #xml = etree.tostring(root, pretty_print=False) #pretty_print=True makes it readable but introduces a.o. \n chars
 
         # Initiate File Transfer Connection
         try:
@@ -212,10 +213,13 @@ class PeacockConfig(models.Model):
             return False
 
         #Transfer files
-        self.ship_file(xml, 'report.xml',            ftp)
-        self.ship_file(am,  'account_move.txt',      ftp)
-        self.ship_file(aml, 'account_move_line.txt', ftp)
-        self.ship_file(aa,  'account_account.txt',   ftp)
+        #self.ship_file(xml, 'report.xml',            ftp)
+        #self.ship_file(am,  'account_move.txt',      ftp)
+        #self.ship_file(aml, 'account_move_line.txt', ftp)
+        #self.ship_file(aa,  'account_account.txt',   ftp)
+        self.ship_xml_file(chapter_am,  'account_move.xml', ftp)
+        self.ship_xml_file(chapter_aml, 'account_move_line.xml', ftp)
+        self.ship_xml_file(chapter_aa,  'account_account.xml', ftp)
 
         #report and exit positively
         ftp.close()

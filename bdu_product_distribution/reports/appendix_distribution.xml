@@ -8,37 +8,40 @@
         	<!-- the notification on the front page -->
             <xpath expr="//t[@id='appendix_notification']" position="inside"> 
                 <span t-if="line.custom_orderline in ['Distribution']"> 
-		            <li t-esc="'Verspreidingsgebied voor '+str(line.distribution_item)"/>
+		              <li t-esc="'Verspreidingsgebied voor '+str(line.distribution_item)"/>
 	                <span t-if="not line.distribution_central"> 
-						<li t-esc="'Adressen verspreiders voor '+str(line.distribution_item)"/>
-					</span>
+						          <li t-esc="'Adressen verspreiders voor '+str(line.distribution_item)"/>
+					        </span>
 	                <span t-if="line.distribution_central"> 
-						<li t-esc="'Afleveradres te verspreiden items'"/>
-					</span>
-					<li t-esc="'Algemene voorwaarden voor verspreiding'"/>
-				</span>
+						          <li t-esc="'Afleveradres te verspreiden items'"/>
+					        </span>
+					        <!--li t-esc="'Algemene voorwaarden voor verspreiding'"/-->
+				        </span>
             </xpath>
             
 
         	<!-- the appendix actually consists of three appendices -->
             <xpath expr="//t[@id='appendices']" position="inside"> 
-                <span t-if="line.custom_orderline in ['Distribution']">  	
-	               <div style="page-break-before: always;">
-	                   	<t t-call="bdu_product_distribution.appendix_distribution_addresses"/>  
-	               </div>	
-	                <span t-if="not line.distribution_central"> 
-		               <div style="page-break-before: always;">
-		                   	<t t-call="bdu_product_distribution.appendix_distributor_addresses"/>  
-		               </div>	
-		            </span>
-	                <span t-if="line.distribution_central"> 
-		               <div style="page-break-before: always;">
-		                   	<t t-call="bdu_product_distribution.appendix_central_distribution"/>  
-		               </div>	
-		            </span>
-	               <div style="page-break-before: always;">
-	                   	<t t-call="bdu_product_distribution.appendix_distribution_terms_and_conditions"/>
-	               </div>
+                <span t-if="line.custom_orderline in ['Distribution']">  
+                    <!-- 1st appendix -->	
+  	                <div style="page-break-before: always;">
+  	                   	<t t-call="bdu_product_distribution.appendix_distribution_addresses"/>  
+  	                </div>	
+                    <!-- 2nd appendix -->
+  	                <span t-if="not line.distribution_central"> 
+  		                <div style="page-break-before: always;">
+  		                   	<t t-call="bdu_product_distribution.appendix_distributor_addresses"/>  
+  		                </div>	
+  		              </span>
+  	                <span t-if="line.distribution_central"> 
+  		                <div style="page-break-before: always;">
+  		                   	<t t-call="bdu_product_distribution.appendix_central_distribution"/>  
+  		                </div>	
+  		              </span>
+                    <!-- 3rd appendix -->
+  	                <!--div style="page-break-before: always;">
+  	                   	<t t-call="bdu_product_distribution.appendix_distribution_terms_and_conditions"/>
+  	                </div-->
                 </span>
             </xpath>
 
@@ -140,8 +143,8 @@
                                 <span t-esc="d['name']"/>
                             </td>  
                             <td class="text-left">
-                                <span t-esc="d['street']"/><br/>
-                                <span t-esc="d['zip'] + str(' ') + d['city']"/>
+                                <span t-esc="str(d['street'])"/><br/>
+                                <span t-esc="str(d['zip']) + str(' ') + str(d['city'])"/>
                             </td>   
                             <td class="text-left">
                                     <span t-esc="d['phone']"/>
@@ -194,10 +197,7 @@
 
         <!-- distribution has its own terms and conditions -->
         <template id="bdu_product_distribution.appendix_distribution_terms_and_conditions">
-        	terms and conditions\n
-        	blabla\n
-        	...\n
-        	and some more
+        	Terms and conditions. Info follows from Antoine Middelkamp
         </template>
 
 
