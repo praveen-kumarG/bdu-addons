@@ -53,23 +53,26 @@ class ProductDistributionOrderLine(models.Model):
         for entry in summary :
             result={}
             if entry['user_id'] : 
-                partner = self.env['res.partner'].browse(entry['user_id'][0])
-                result = {
-                    'user_id': partner.id,
-                    'name'   : partner.name,
-                    'street' : partner.street,
-                    'zip'    : partner.zip,
-                    'city'   : partner.city,
-                    'phone'  : partner.phone
+                user    = self.env['res.users'].browse(entry['user_id'][0])
+                partner = user.partner_id
+                result  = {
+                    'user_id'   : user.id,
+                    'partner_id': partner.id,
+                    'name'      : partner.name,
+                    'street'    : (partner.street or '-'),
+                    'zip'       : (partner.zip  or '-'),
+                    'city'      : (partner.city or '-'),
+                    'phone'     : (partner.phone or '-')
                 }
             else :
                 result = {
-                    'user_id': False,
-                    'name'   : "Nader te bepalen",
-                    'street' : "-",
-                    'zip'    : "",
-                    'city'   : "",
-                    'phone'  : "-"
+                    'user_id'   : False,
+                    'partner_id': False,
+                    'name'      : "Nader te bepalen",
+                    'street'    : "-",
+                    'zip'       : "-",
+                    'city'      : "-",
+                    'phone'     : "-"
                 }
             result['total_addresses']  = entry['total_addresses']
             result['folder_addresses'] = entry['folder_addresses']
