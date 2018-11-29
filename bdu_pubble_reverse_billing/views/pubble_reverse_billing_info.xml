@@ -1,0 +1,190 @@
+<?xml version="1.0"?> 
+<odoo>
+
+  <!-- List view  --> 
+  <record id="view_tree_pubble_production_data" model="ir.ui.view"> 
+    <field name="name">Pubble production data</field> 
+    <field name="model">pubble.production.data</field> 
+    <field name="arch" type="xml"> 
+      <tree string="Pubble production data" edit="false" create="false"> 
+          <field name="operating_unit_id"/>  
+          <field name="week"/> 
+          <field name="freelancer"/> 
+          <field name="remark"/> 
+          <field name="count"/> 
+          <field name="product_id"/> 
+          <field name="total_price"/> 
+          <field name="issue_id"/>
+          <field name="titles"/>  
+          <field name="name"/> 
+          <field name="url" string="Article" widget="url"/> 
+          <!-- candidate for fields_get xml injection to spare two columns -->
+          <field name="commissioned_by"/> 
+          <button type="object" string="&#10004;" name="accept" class="oe_highlight" 
+                  attrs="{'invisible':[('processed', '=', True)]}" 
+          />
+          <field name="accepted"/>
+          <field name="processed"/>
+      </tree> 
+    </field> 
+  </record> 
+
+  <!-- Form view --> 
+  <record id="view_form_pubble_production_data" model="ir.ui.view"> 
+    <field name="name">Pubble production data</field> 
+    <field name="model">pubble.production.data</field> 
+    <field name="arch" type="xml"> 
+      <form string="Pubble production data" edit="false" create="false" >
+        
+        <group>
+          <group>
+            <field name="freelancer"/>
+            <field name="message" widget="html"/>
+          </group>
+          <group> 
+            <field name="accepted"/>
+            <field name="processed"/>
+          </group>  
+        </group>
+
+        <group>
+          <group>
+            <field name="operating_unit_id"/> 
+            <field name="issue_id"/>
+          </group>
+          <group> 
+            <field name="year" widget="char"/>  
+            <field name="week"/> 
+          </group>
+        </group>
+
+        <group>
+          <group>
+            <field name="count"/>  
+            <field name="product_id"/> 
+          </group>
+          <group>
+            <field name="pubble_count" widget="char"/>  
+            <field name="pubble_product"/> 
+          </group>
+        </group>
+
+        <group>
+          <group>
+            <field name="remark"/> 
+            <field name="commissioned_by_xxl"/> 
+          </group>
+          <group>
+            <field name="name"/> 
+            <field name="url" widget="html"/> 
+          </group>
+        </group>
+
+        <group>
+          <group> 
+            <field name="publications" widget="html"/>
+          </group>
+          <group>
+            <field name="related_costs" widget="html"/>
+          </group>
+        </group> 
+
+      </form> 
+    </field> 
+  </record> 
+
+
+  <!-- pivot view -->
+  <record id="view_pivot_pubble_production_data" model="ir.ui.view"> 
+  <field name="name">Pubble production data</field>
+      <field name="model">pubble.production.data</field>
+      <field name="arch" type="xml"> 
+      <pivot> 
+          <field name="issue_date" interval="week"  type="col"/> 
+          <field name="title"/> 
+          <field name="total_price" type="measure" /> 
+      </pivot> 
+      </field> 
+  </record>
+
+
+  <!-- Search filter -->
+  <record id="view_filter_pubble_production_data" model="ir.ui.view">
+    <field name="name">Pubble production data filter</field>
+    <field name="model">pubble.production.data</field>
+    <field name="arch" type="xml">
+      <search string="Search Pubble production data">
+
+          <field name="freelancer"/>
+          <field name="commissioned_by"/>
+          <field name="titles"/>
+
+          <filter string="One week ago" domain="[
+            ('issue_date', '&gt;=',(datetime.date.today()
+                                   +relativedelta(weeks=-2, days=1, weekday=0)).strftime('%Y-%m-%d')),
+            ('issue_date', '&lt;=',(datetime.date.today()
+                                   +relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d'))
+          ]"/>
+          <filter string="Two weeks ago" domain="[
+            ('issue_date', '&gt;=',(datetime.date.today()
+                                   +relativedelta(weeks=-3, days=1, weekday=0)).strftime('%Y-%m-%d')),
+            ('issue_date', '&lt;=',(datetime.date.today()
+                                   +relativedelta(weeks=-2, weekday=6)).strftime('%Y-%m-%d'))
+          ]"/>
+          <separator/>
+
+          <filter string="Confirmed" domain="[
+            ('accepted', '=',True),
+            ('processed','=',False)
+          ]"/>
+
+          <group expand="0" string="Group By">
+              <filter string="Operating Unit" domain="[]" context="{'group_by':'operating_unit_id'}"/>
+              <filter string="Freelancer" domain="[]" context="{'group_by':'freelancer'}"/>
+              <filter string="Commissioned by"  domain="[]" context="{'group_by':'commissioned_by'}"/>
+              <filter string="Issue by"  domain="[]" context="{'group_by':'issue_id'}"/>
+          </group>
+
+      </search>
+    </field>
+  </record>
+
+
+  <!-- Action  --> 
+  <act_window id="show_pubble_production_data" 
+              name="Editorial output" 
+              res_model="pubble.production.data" 
+              view_mode="tree,form,pivot" 
+  /> 
+  
+  <!-- Menu item --> 
+  <menuitem id="show_pubble_production_data_menu" 
+            name="Production data" 
+            action="show_pubble_production_data"
+            parent="menu_pubble_production" 
+            sequence="100"
+  />  
+
+
+  <!-- Push to SOW action -->
+  <record id="validate_push_to_sow_view_action" model="ir.actions.server"> 
+      <field name="name">Push to Finance</field> 
+      <field name="model_id" ref="model_pubble_production_data"/> 
+      <field name="code">
+        action = model.push_to_sow()
+      </field>
+  </record>  
+
+  <!-- Push to SOW Menu item in action/more menu -->
+  <record model="ir.values" id="revbil_statement_of_work_make_invoice2">
+      <field name="model_id" ref="model_pubble_production_data" />
+      <field name="name">Push to Finance</field>
+      <field name="key2">client_action_multi</field>
+      <field name="value" eval="'ir.actions.server,' + str(ref('validate_push_to_sow_view_action'))" />
+      <field name="key">action</field>
+      <field name="model">pubble.production.data</field>
+  </record>
+
+
+
+</odoo>

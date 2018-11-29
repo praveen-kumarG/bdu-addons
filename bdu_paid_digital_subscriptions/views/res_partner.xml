@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partners_form_bdu_account2" model="ir.ui.view">
+        <field name="name">BDU subscription partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="bdu_account.view_partners_form_bdu_account"/>
+        <field name="arch" type="xml">
+           
+            <field name="exact_id" position="after">
+                <field name="afas_id"/>
+            </field>
+            
+        </field>
+    </record>
+</odoo>

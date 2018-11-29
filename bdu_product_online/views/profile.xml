@@ -1,0 +1,52 @@
+<?xml version="1.0"?> 
+<odoo>
+
+  <!-- List target profiles to edit --> 
+  <record id="online_profile_tree_view" model="ir.ui.view"> 
+    <field name="name">Profiles</field> 
+    <field name="model">online.profile</field> 
+    <field name="arch" type="xml"> 
+      <tree string="Profiles" toolbar="1" editable="bottom"> 
+          <field name="profile_cat"       /> 
+          <field name="name"              />
+          <field name="color"             />
+          <field name="remark"            />
+      </tree> 
+    </field> 
+  </record> 
+
+  <!-- Form view  can use form of sale advertising issue --> 
+  
+  <!-- search filter  -->
+  <record id="online_profile_view_filter" model="ir.ui.view">
+    <field name="name">Online profile filter</field>
+    <field name="model">online.profile</field>
+    <field name="arch" type="xml">
+      
+       <search string="Search online profiles">
+          <field name="profile_cat"/>
+          <field name="name"/>
+          <group expand="0" string="Group By">
+              <filter string="Category" domain="[]" context="{'group_by':'profile_cat'}"/>
+          </group>
+      </search>
+
+    </field>
+  </record>
+
+  <!-- Action to open tree view --> 
+  <act_window id="show_online_profile_tree" 
+    name="Online profiles" 
+    res_model="online.profile" 
+    view_mode="tree" /> 
+  
+  <!-- Menu item to open profiles --> 
+   <menuitem id="online_profile_menuitem" 
+    name="Target profiles" 
+    action="show_online_profile_tree"
+    sequence="205"
+    parent="sales_team.menu_sale_config" 
+     /> 
+
+
+</odoo>

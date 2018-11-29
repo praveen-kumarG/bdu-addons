@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<odoo>
+
+  <!--  Form view  --> 
+  <record id="view_form_pubble_production_data_connector" model="ir.ui.view">
+    <field name="name">Pubble production data connector</field>
+    <field name="model">pubble.production.config</field> 
+    <field name="arch" type="xml">
+      <form string="Pubble production data connector" create="false" action="false" 
+                                     class="oe_form_configuration">
+        <header > 
+        </header>
+
+          <br/>
+          <group name="connector_config" string="Connector configuration" 
+            groups="bdu_pubble_reverse_billing.pubble_reverse_billing_config">
+            <div colspan="2">
+              <p>Use "$begin" and "$end to define flexible dates in your query.</p>
+            </div>
+            <field name="server"/> 
+            <field name="method"/> 
+          </group>
+          <button name="save_config" type="object" 
+            groups="bdu_pubble_reverse_billing.pubble_reverse_billing_config"
+            string="Save" class="oe_highlight" /> 
+          <br/>
+          <br/>
+
+
+          <group name="production_status" string="Production status">
+            <group>
+              <field name="latest_success" readonly="1"/> 
+              <field name="latest_week"    readonly="1"/> 
+              <field name="latest_run"     readonly="1" widget="html"/> 
+              <field name="latest_status"  readonly="1"/> 
+              <field name="latest_reason"  readonly="1"/> 
+            </group>
+            <group>
+            </group>
+          </group>
+          <br/>
+          <br/>
+
+
+
+          <group name="manual_run" string="Manual collect" 
+            groups="bdu_pubble_reverse_billing.pubble_reverse_billing_config">
+            <div colspan="2">
+              <p>Enter dates and press "Collect" to collect records for given period. </p>
+            </div>
+            <group>
+              <field name="begin"/> 
+              <field name="end"/> 
+            </group>
+            <group>
+            </group>
+          </group>
+          <button string="Collect" name="do_collect" type="object" class="oe_highlight" 
+                  groups="bdu_pubble_reverse_billing.pubble_reverse_billing_config"/>
+          <br/>
+          <br/>
+
+
+          <group name="documentation" string="Summary" col="1" 
+            groups="bdu_pubble_reverse_billing.pubble_reverse_billing_config">
+              <p>Pubble provides an API by which we can collect the editorial, photo and video production information together with additional expenses, related publications and commissioned-by data.</p>
+              <p>Normal configuration expects a daily automated task calling the automated_do_collect procedure from the pubble.production.config object. When using this method the system date is used to calculate last week to collect the corresponding period's info up till today. </p> 
+              <p>Apart from the initial configuration, the user may use this interface to collect information for dates that differ from the automated process. To circumvent processing (i.e. paying) twice the Pubble reference ID is used as a unique key to detect doubles. This way it should be safe to do a re-run.</p>
+              <p>Notice that products administered in Pubble have an Odoo counterpart in either the general or vendor (freelancer) specific price list. An Odoo pricelist product also assumes products are predefined and have an account.</p>
+              <p>Finally advertising issues should have (title) code and dates that correspond to what Pubble is sending. They also should have analytical accounts, operating unit and a company attached to them.
+              </p>              
+              <p/>
+              <p/>
+              <a href="https://www.pubble.nl/" target="_blank"> More about Pubble</a>
+          </group>
+
+
+      </form>
+    </field>
+  </record> 
+
+  <!-- use main menu from reverse billing module for groups in this module -->
+   <record id="reverse_billing.menu_action_revbil_main" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4,ref('bdu_pubble_reverse_billing.pubble_reverse_billing_data','bdu_pubble_reverse_billing.pubble_reverse_billing_config'))]"/>
+    </record>
+
+  <!-- Menu group -->
+  <menuitem name= "Pubble import" 
+            id= "menu_pubble_production" 
+            parent="reverse_billing.menu_action_revbil_main"  
+            sequence= "100"
+  />
+
+  <!-- Action to start connector -->
+  <record id="config_pubble_production_data_connector" model="ir.actions.server"> 
+    <field name="name">Pubble production data connector</field> 
+    <field name="model_id" ref="model_pubble_production_config"/> 
+    <field name="code">
+      action = model.default_view()
+    </field>
+  </record> 
+
+  <!-- Menu item for connector --> 
+  <menuitem id="pubble_production_data_config_menuitem" 
+    name="Connector" 
+    action="config_pubble_production_data_connector"
+    parent="menu_pubble_production"
+    sequence="125"
+     /> 
+
+
+</odoo>

@@ -1,0 +1,205 @@
+<odoo>
+    <data>
+
+    	<!-- use customization hook -->
+        <template id="bdu_product_distribution.appendix_distribution_report" 
+        	      inherit_id="bdu_product_base.report_saleorder_document">
+
+        	<!-- the notification on the front page -->
+            <xpath expr="//t[@id='appendix_notification']" position="inside"> 
+                <span t-if="line.custom_orderline in ['Distribution']"> 
+		              <li t-esc="'Verspreidingsgebied voor '+str(line.distribution_item)"/>
+	                <span t-if="not line.distribution_central"> 
+						          <li t-esc="'Adressen verspreiders voor '+str(line.distribution_item)"/>
+					        </span>
+	                <span t-if="line.distribution_central"> 
+						          <li t-esc="'Afleveradres te verspreiden items'"/>
+					        </span>
+					        <!--li t-esc="'Algemene voorwaarden voor verspreiding'"/-->
+				        </span>
+            </xpath>
+            
+
+        	<!-- the appendix actually consists of three appendices -->
+            <xpath expr="//t[@id='appendices']" position="inside"> 
+                <span t-if="line.custom_orderline in ['Distribution']">  
+                    <!-- 1st appendix -->	
+  	                <div style="page-break-before: always;">
+  	                   	<t t-call="bdu_product_distribution.appendix_distribution_addresses"/>  
+  	                </div>	
+                    <!-- 2nd appendix -->
+  	                <span t-if="not line.distribution_central"> 
+  		                <div style="page-break-before: always;">
+  		                   	<t t-call="bdu_product_distribution.appendix_distributor_addresses"/>  
+  		                </div>	
+  		              </span>
+  	                <span t-if="line.distribution_central"> 
+  		                <div style="page-break-before: always;">
+  		                   	<t t-call="bdu_product_distribution.appendix_central_distribution"/>  
+  		                </div>	
+  		              </span>
+                    <!-- 3rd appendix -->
+  	                <!--div style="page-break-before: always;">
+  	                   	<t t-call="bdu_product_distribution.appendix_distribution_terms_and_conditions"/>
+  	                </div-->
+                </span>
+            </xpath>
+
+
+        </template>
+
+
+
+
+        <!-- first appendix lists home delivery areas --> 
+        <template id="bdu_product_distribution.appendix_distribution_addresses">     
+   			<div>       
+	            <div class="row mb32">
+	                <div class="col-xs-12">
+	                    <h2 t-esc="'Bijlage : verspreidingsgebied voor '+str(line.distribution_item)"/>
+	                </div>      
+	            </div>	            
+                <table class="table table-condensed mt32">
+                    <thead>
+                        <th class="text-left">Bezorgingsgebied</th>
+                        <th class="text-right">Aantal adressen</th>
+                        <th class="text-left">Titel</th>
+                        <th class="text-left">Tijdvak bezorging</th>
+                    </thead>
+                        <t t-foreach="line.distribution_area_ids" t-as="a">
+                            <tr>          
+                                <td class="text-left">                                 
+                                    <t t-if="a.zip">
+                                        <span t-esc="str(a.zip)+' '+str(a.city)"/>
+                                    </t>                               
+                                    <t t-if="not a.zip">
+                                        <span t-esc="str('n.a.')"/>
+                                    </t>
+                                </td>   
+                                <td class="text-right">
+                  			    			<t t-if="not line.distribution_count_all">
+                                    	<span t-esc="str(a.folder_addresses)"/>
+                                	</t>
+                  			    			<t t-if="line.distribution_count_all">
+                                    	<span t-esc="str(a.total_addresses)"/>
+                                	</t>
+                                </td>
+                                <td class="text-left">
+                                    <t t-if="a.title_id.name">
+                                        <span t-field="a.title_id.name"/>
+                                    </t>
+                                    <t t-if="not a.title_id.name">
+                                        <span t-esc="str(' ')"/>
+                                    </t>
+                                </td> 
+                                <td class="text-left">
+                                    <span t-esc="line.distribution_from_date" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                                    <span t-esc="str(' - ')"/>
+                                    <span t-esc="line.distribution_to_date" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                                </td>   
+                            </tr>
+                        </t>
+                        <!-- Totals -->
+                        <tr class="border-black"> 
+          					<td class="text-left"> 
+          						<strong>Totaal aantal adressen :</strong>
+          					</td> 
+          					<td class="text-right">
+          						<t t-if="line.distribution_count_all">
+          							<t t-esc="sum([a.total_addresses for a in line.distribution_area_ids])"/> 
+          						</t>
+          						<t t-if="not line.distribution_count_all">
+          							<t t-esc="sum([a.folder_addresses for a in line.distribution_area_ids])"/> 
+          						</t>
+          					</td> 
+          					<td class="text-left"/> 
+		          			<td class="text-left"/> 
+        	           	</tr>
+                </table>
+	  		</div>
+        </template>
+
+
+
+
+        <!-- second appendix lists distributors addresses and number of items to be deposited there -->
+        <template id="bdu_product_distribution.appendix_distributor_addresses">
+	        	<div class="row mb32">
+					<div class="col-xs-12">
+					     <h2 t-esc="'Bijlage : adressen verspreiders voor '+str(line.distribution_item)"/>
+					</div>     
+				</div>   
+    			<t t-set="distributors"  t-value="line.sum_by_distributor()"/>
+                <table class="table table-condensed mt32">
+                    <thead>
+                        <th class="text-left">Naam</th>
+                        <th class="text-left">Adres</th>
+                        <th class="text-left">Telefoon</th>
+                        <th class="text-right">Aantal</th>
+                    </thead>
+                    <t t-foreach="distributors" t-as="d">
+                        <tr>          
+                            <td class="text-left">  
+                                <span t-esc="d['name']"/>
+                            </td>  
+                            <td class="text-left">
+                                <span t-esc="str(d['street'])"/><br/>
+                                <span t-esc="str(d['zip']) + str(' ') + str(d['city'])"/>
+                            </td>   
+                            <td class="text-left">
+                                    <span t-esc="d['phone']"/>
+                            </td>  
+                            <td class="text-right">
+              			    	<t t-if="not line.distribution_count_all">
+                                	<span t-esc="str(d['folder_addresses'])"/>
+                            	</t>
+              			    	<t t-if="line.distribution_count_all">
+                                	<span t-esc="str(d['total_addresses'])"/>
+                            	</t>
+                            </td>
+                        </tr>
+                    </t>
+                    <tr class="border-black"> 
+      					<td class="text-left"/> 
+	          			<td class="text-left"/>
+      					<td class="text-right"> 
+      						<strong>Totaal :</strong>
+      					</td> 
+      					<td class="text-right">
+      						<t t-if="line.distribution_count_all">
+      							<t t-esc="sum([d['total_addresses'] for d in distributors])"/> 
+      						</t>
+      						<t t-if="not line.distribution_count_all">
+      							<t t-esc="sum([d['folder_addresses'] for d in distributors])"/> 
+      						</t>
+      					</td>  
+    	           	</tr>
+                </table>
+        </template>
+
+
+
+         <!-- second appendix may just be address for central delivery   -->
+        <template id="bdu_product_distribution.appendix_central_distribution">
+        	<div class="row mb32">
+				<div class="col-xs-12">
+				     <t t-esc="'Afleveradres te verspreiden items voor '+str(line.distribution_item)"/>
+				</div>     
+			</div> 
+        	<div class="row mb32">
+        		<!-- Sorry, no time to make it flexible -->
+        		<div class="col-xs-12 text-left">BDU Print</div>
+        		<div class="col-xs-12 text-left">Marconistraat 10 - 14</div>
+        		<div class="col-xs-12 text-left">3771AM Barneveld</div>
+        	</div>
+        </template>
+	    
+
+        <!-- distribution has its own terms and conditions -->
+        <template id="bdu_product_distribution.appendix_distribution_terms_and_conditions">
+        	Terms and conditions. Info follows from Antoine Middelkamp
+        </template>
+
+
+    </data>
+</odoo>

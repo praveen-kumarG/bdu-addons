@@ -1,0 +1,8 @@
+<openerp>
+    <data>
+        <record id="digital_subscribers_connector" model="res.groups">
+        <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="name">Digital subscribers connector</field>
+        </record>
+    </data>
+</openerp>

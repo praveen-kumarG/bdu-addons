@@ -1,0 +1,18 @@
+<odoo>
+    <data noupdate="1">
+         <record id="pubble_production_api" model="pubble.production.config">
+            <field name="server">ws.pubble.nl</field>
+            <field name="method">/Content.svc/getArticleStatsByDate?api=P3K556GAL9MM74ZG900RT43GHT1NB&amp;fromDate=$begin&amp;toDate=$end&amp;dbname=nhbdudata"</field>
+
+            <field name="$latest_week"></field>
+            <field name="$latest_run"></field>
+            <field name="$latest_success"></field>
+            <field name="$latest_status"></field>
+            <field name="$latest_reason"></field> 
+
+            <field name="$begin">20180329</field>
+            <field name="$end">20180329</field>
+          </record>
+
+    </data>
+</odoo>
