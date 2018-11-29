@@ -182,15 +182,24 @@ class PubbleProductionConfig(models.Model):
                     record = {}
                     revbil_msg = ""
                     
-                    #freelancer should be in system otherwise false
-                    ingevoerdDoor   = billing_line['ingevoerdDoor']
-                    searchresult    = self.findPartnerByEmail(billing_line['ingevoerdDoor'])
+                    #skip reverse billing line if bdu, or user generated content or not published and not approved
+                    credit   = billing_line['credit']
+                    if credit.find('@bdu.nl') > -1 :
+                        continue
+                    if credit.find('Ingezonden via website') > -1 :
+                        continue
+                    pubble_product  = billing_line['productCode']
+                    if pubble_product.find('tekst') > -1 and len(publications)==0 :
+                        continue
+
+                    #search freelancer
+                    searchresult    = self.findPartnerByEmail(billing_line['credit'])
                     freelancer      = searchresult['partner']
                     if not freelancer and message.find(searchresult['message'])==-1 and searchresult['message'].find('@bdu.nl')==-1 :
                         message   += searchresult['message']
                         revbil_msg = searchresult['message']
 
-                    pubble_product  = billing_line['productCode']
+                    #other info
                     pubble_count    = billing_line['aantal']
                     date2           = self.ms_datetime_to_python_date(billing_line['gemaaktOp'])
                     odoo_product    = self.convert_2_odoo_product(conversions,pubble_product, pubble_count)
@@ -239,7 +248,7 @@ class PubbleProductionConfig(models.Model):
                     if odoo_product['product_id'] == False :
                         record['message'] += "Pubble product/count could not be converted. Check conversion data.<br/>"
                     if freelancer == False :
-                        record['message'] += "Email address "+ingevoerdDoor+" not found in Odoo. No payment possible.<br/>"
+                        record['message'] += "Email address "+credit+" not found in Odoo. No payment possible.<br/>"
 
                     #search for existing record
                     existing_recs = current_data.search([  ('name', '=', record['name']) ])
@@ -368,7 +377,7 @@ class PubbleProductionConfig(models.Model):
     def pretty_billing_lines(self,billing_lines) :
         s = ""
         for line in billing_lines :
-            s += line['ingevoerdDoor']
+            s += line['credit']
             s += ", "+self.ms_datetime_to_python_date(line['gemaaktOp']).strftime("%Y-%m-%d")
             s += ": <b>"+str(line['aantal'])
             s += " x "+line['productCode']+"</b>"
