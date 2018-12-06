@@ -133,7 +133,7 @@ class DigitalSubscribersConfig(models.Model):
             ('subscription', '=', True),
             ('state', '=', 'sale'),
             ('title', 'in', td),
-            ('product_template_id.digital_subscription', '=', True),
+            #('product_template_id.digital_subscription', '=', True),
         ]
         digital_subscriptions = orderlines.search(domain).sorted(key=lambda r: r.order_id.partner_shipping_id) 
         if len(digital_subscriptions)==0 :
