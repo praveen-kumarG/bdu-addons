@@ -144,12 +144,17 @@ class DigitalSubscribersConfig(models.Model):
         subscribers_list ={}
 
         for dc in digital_subscriptions :
+            #skip if cancelled (temp cancel is neglected)
+            if date_cancel and date.cancel <= self.active_date :
+                continue
+            #calc reference according configuration
             s_nr = dc.order_id.partner_shipping_id.ref
             if config.subscriber_ref == 'old' :
                 if dc.order_id.partner_shipping_id.zeno_id :
                     s_nr = dc.order_id.partner_shipping_id.zeno_id
                 if dc.order_id.partner_shipping_id.afas_id :
                     s_nr = dc.order_id.partner_shipping_id.afas_id
+            #add authorization if subcriber already available, else make new subscriber entry with this authorization
             if s_nr in subscribers_list :
                 if subscribers_list[s_nr]['titles'].find(str(dc.title.name)) == -1 :
                     subscribers_list[s_nr]['titles'] += ', '+str(dc.title.name)
