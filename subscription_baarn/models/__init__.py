@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-from odoo import http
 
+from . import res_partner

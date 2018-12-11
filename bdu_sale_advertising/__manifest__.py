@@ -46,6 +46,7 @@ Note that results from title based filtering may differ from salesteam filter as
                     #'bdu_crm',
     			   ],
     'data'    	 : [
+		            "data/mail_template_data.xml",
 		            "views/sale_advertising_order_line_filter_view.xml",
                     "views/sale_advertising_issue_form_view.xml",
     			   ],

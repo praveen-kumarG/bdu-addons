@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <record id="view_order_form_advertising_inherited" model="ir.ui.view">
+      <field name="name">sale.order.form.advertising.inherited</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale_advertising_order.view_order_form_advertising"/>
+      <field name="arch" type="xml">
+        <field name="display_discount_to_customer" position="after">
+          <field name="magazine"/>
+        </field>
+        <xpath expr="//field[@name='multi_line_number']" position="after">
+          <field name="magazine" readonly="True" string="Vakmedia" />
+        </xpath>
+      </field>
+    </record>
+
+  </data>
+</odoo>

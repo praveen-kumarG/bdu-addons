@@ -129,7 +129,7 @@
                         <filter string="Order" domain="[]" context="{'group_by':'order_id'}"/>
                         <filter string="Issue Date" domain="[]" context="{'group_by':'issue_date'}"/>
                         <filter string="Title" domain="[]" context="{'group_by':'title'}"/>
-                        <filter string="Salesteam" domain="[]" context="{'group_by':'order_team_id''}"/>
+                        <filter string="Salesteam" domain="[]" context="{'group_by':'order_team_id'}"/>
                         <filter string="Salesperson" domain="[]" context="{'group_by':'salesman_id'}"/>
                         <filter string="Account Manager" domain="[]" context="{'group_by':'partner_acc_mgr'}"/>
                     </group>

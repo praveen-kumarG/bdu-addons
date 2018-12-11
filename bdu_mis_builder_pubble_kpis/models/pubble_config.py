@@ -115,6 +115,9 @@ class PubbleConfig(models.Model):
 
             #lookup values and other init
             title_accounts = self.env['sale.advertising.issue'].search([('parent_id','=', False)])
+            _logger.info("sale.advertising.issue titles found : ")
+            for t in title_accounts :
+                _logger.info("content of default_note : %s", t['default_note'])
             pubble_kpis = self.env['mis.pubble.kpi']
 
             json_anwser = json.loads(answer)

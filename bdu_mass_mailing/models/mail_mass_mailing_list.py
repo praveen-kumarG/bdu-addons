@@ -9,8 +9,6 @@ class MassMailingList(models.Model):
     def action_sync(self):
         """Sync contacts in dynamic lists."""
         # Skip non-dynamic lists
-#        import pdb;
-#        pdb.set_trace()
         dynamic = self.filtered("dynamic")
         for one in dynamic:
             sync_domain = safe_eval(one.sync_domain) + [("email", "!=", False),'|',
