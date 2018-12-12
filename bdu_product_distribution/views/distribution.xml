@@ -20,6 +20,7 @@
           <field name="folder_addresses"  string="Folders"/> 
           <field name="number_no_no"      string="No No"    invisible="1"/> 
           <field name="number_yes_no"     string="Yes No"   invisible="1"/> 
+          <field name="title_id"             string="Title"/> 
           <field name="user_id"           string="Distributor"/> 
       </tree> 
     </field> 
@@ -87,7 +88,38 @@
           </group>
       </search>
 
-    </field>
+    </field>                             
+  </record>
+
+
+  <!-- additional fields in standard logistics table tree  -->
+  <record model="ir.ui.view" id="folders.view_logistics_address_table_tree_inherited">
+      <field name="name">Logistics Address Table Tree</field>
+      <field name="model">logistics.address.table</field>
+      <field name="inherit_id" ref="folders.view_logistics_address_table_tree" />
+      <field name="priority" eval="40"/>
+      <field name="arch" type="xml">
+          <xpath expr="//field[@name='zip']" position="after">
+                      <field name="zip_2"    />
+                      <field name="nr_from"  />
+                      <field name="nr_until" />
+          </xpath>  
+      </field>                               
+  </record>
+
+  <!-- additional fields in standard logistics table form -->
+  <record model="ir.ui.view" id="folders.view_logistics_address_table_form_inherited">
+      <field name="name">Logistics Address Table Form</field>
+      <field name="model">logistics.address.table</field>
+      <field name="inherit_id" ref="folders.view_logistics_address_table_form" />
+      <field name="priority" eval="40"/>
+      <field name="arch" type="xml">
+          <xpath expr="//field[@name='zip']" position="after">
+                      <field name="zip_2"    />
+                      <field name="nr_from"  />
+                      <field name="nr_until" />
+          </xpath>  
+      </field>                               
   </record>
 
 

@@ -150,10 +150,10 @@
                                     <span t-esc="d['phone']"/>
                             </td>  
                             <td class="text-right">
-              			    	<t t-if="not line.distribution_count_all">
+              			    	    <t t-if="not line.distribution_count_all">
                                 	<span t-esc="str(d['folder_addresses'])"/>
                             	</t>
-              			    	<t t-if="line.distribution_count_all">
+              			    	    <t t-if="line.distribution_count_all">
                                 	<span t-esc="str(d['total_addresses'])"/>
                             	</t>
                             </td>
