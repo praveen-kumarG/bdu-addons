@@ -77,10 +77,10 @@
                           </td> 
                           <td class="text-left">
                               <span t-esc="line.distribution_from_date" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
-                              <span t-esc="' (week '+time.strftime('%U', time.strptime(line.distribution_from_date, '%Y-%m-%d'))+')'"/>
+                              <span t-esc="' (week '+time.strftime('%W', time.strptime(line.distribution_from_date, '%Y-%m-%d'))+')'"/>
                               <span t-esc="str(' - ')"/>
                               <span t-esc="line.distribution_to_date" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
-                              <span t-esc="' (week '+time.strftime('%U', time.strptime(line.distribution_to_date, '%Y-%m-%d'))+')'"/>
+                              <span t-esc="' (week '+time.strftime('%W', time.strptime(line.distribution_to_date, '%Y-%m-%d'))+')'"/>
                           </td>   
                         </tr>
                       </t>
