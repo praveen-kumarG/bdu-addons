@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime, pdb
+import datetime
 from odoo import api, fields, models
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 

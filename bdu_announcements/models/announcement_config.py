@@ -120,10 +120,12 @@ class AnnouncementConfig(models.Model):
                 oldest_synced  = announcement['write_date']
                 ok_recs       += 1
                 message       += "<br>"+str(announcement.order_id.name)+" - "+str(announcement.id)+" : Synced"
+            elif result == "no connection" :
+                all_good       = False
+                message       += "<br>"+str(announcement.order_id.name)+" - "+str(announcement.id)+" : No communication, check your network config"
             else : #bad response
                 all_good       = False
                 errors        += 1
-                status         = result.split(',')[1]
                 message       += "<br>"+str(announcement.order_id.name)+" - "+str(announcement.id)+" : Bad response, reason = "+result.split(',', 2)[2]
 
 
@@ -141,7 +143,7 @@ class AnnouncementConfig(models.Model):
         else :
             config.oldest_synced  = oldest_synced
             config.latest_run     = datetime.datetime.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')
-            config.latest_status  = status
+            config.latest_status  = "Error(s)"
             prologue              = "%d lines without material. %d errors. %d records OK. Oldest_non_synced kept at first error/no material." % (no_material, errors, ok_recs)
             config.latest_reason  = prologue+message
             config.write({})
@@ -189,12 +191,14 @@ class AnnouncementConfig(models.Model):
                 publications.append(publication)
             payload['publications'] = json.dumps(publications)
 
-            #send it
-            #response=requests.post(url, data=payload, headers=headers)
-            response = requests.request("POST", url, data=payload, headers=headers)
+            #send it, give answer as triplet or plain ok
+            try :
+                response = requests.request("POST", url, data=payload, headers=headers)
+            except :
+                return "no connection"
             if response.status_code == requests.codes.ok :  # equal 200 ok
                 return "ok"
-            elif response.status_code == 502 :
+            elif response.status_code in list(range(100, 600)) :
                 return "bad response,"+str(response.status_code)+", "+response.content
             else:
                 #pdb.set_trace()

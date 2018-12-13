@@ -27,20 +27,21 @@
                 <div class="page">
                   <div class="oe_structure"/>
                   <div t-foreach="distributors" t-as="d" style="page-break-before: always;">
-                    <div class="row mb16">
-                      <div class="col-xs-12">
-                        <h2 t-esc="'Verspreidingsgebied voor '+str(line.distribution_item)"/>
-                      </div>      
-                    </div>              
+                    
                     <div class="row mb32 col-xs-12">
-                        <t t-esc="'Verspreider :'+str(d['name'])+' '+str(d['street'])+' '+ str(d['zip'])+' '+str(d['city'])"/>
+                        <h2 t-esc="'Verspreider : '+str(d['name'])+' '+str(d['street'])+' '+ str(d['zip'])+' '+str(d['city'])"/>
+                    </div>
+
+                    <div class="row mb16 col-xs-12">
+                        <t t-esc="'Verspreidingsgebied voor '+str(line.distribution_item)"/> 
                         <t t-if="not line.distribution_count_all">
-                            <span t-esc="str('Alleen Ja/Ja')"/>
+                            <span t-esc="str(' (Alleen Ja/Ja)')"/>
                         </t>
                         <t t-if="line.distribution_count_all">
-                            <span t-esc="str('Alle adressen')"/>
+                            <span t-esc="str(' (Alle adressen)')"/>
                         </t>    
-                    </div>              
+                    </div>                       
+                    
                     <table class="table table-condensed mt32">
                       <thead>
                         <th class="text-left">Bezorgingsgebied</th>
@@ -59,12 +60,12 @@
                             </t>
                           </td>   
                           <td class="text-right">
-                            <t t-if="not line.distribution_count_all">
-                                <span t-esc="str(d['folder_addresses'])"/>
-                            </t>
-                            <t t-if="line.distribution_count_all">
-                                <span t-esc="str(d['total_addresses'])"/>
-                            </t>
+                              <t t-if="not line.distribution_count_all">
+                                  <span t-esc="str(a['folder_addresses'])"/>
+                              </t>
+                              <t t-if="line.distribution_count_all">
+                                  <span t-esc="str(a['total_addresses'])"/>
+                              </t>
                           </td>
                           <td class="text-left">
                               <t t-if="a['title_id']">
@@ -76,8 +77,10 @@
                           </td> 
                           <td class="text-left">
                               <span t-esc="line.distribution_from_date" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                              <span t-esc="' (week '+time.strftime('%W', time.strptime(line.distribution_from_date, '%Y-%m-%d'))+')'"/>
                               <span t-esc="str(' - ')"/>
                               <span t-esc="line.distribution_to_date" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                              <span t-esc="' (week '+time.strftime('%W', time.strptime(line.distribution_to_date, '%Y-%m-%d'))+')'"/>
                           </td>   
                         </tr>
                       </t>
