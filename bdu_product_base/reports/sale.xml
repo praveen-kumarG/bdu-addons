@@ -64,7 +64,7 @@
                             <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Disc.(%)</th>
                             <th class="text-right">Taxes</th>
                             <th class="text-right" groups="sale.group_show_price_subtotal">Price</th>
-                            <th class="text-right price_tax_included" groups="sale.group_show_price_total">Total Price</th>
+                            <!--th class="text-right price_tax_included" groups="sale.group_show_price_total">Total Price</th-->
                         </tr>
                    </thead>
                    <tbody class="sale_tbody">
@@ -98,9 +98,9 @@
                                     <td class="text-right" groups="sale.group_show_price_subtotal">
                                         <span t-field="l.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
                                     </td>
-                                    <td class="text-right" groups="sale.group_show_price_total">
+                                    <!--td class="text-right" groups="sale.group_show_price_total">
                                         <span t-field="l.price_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
-                                    </td>
+                                    </td-->
                                 </tr>
                             </t>
 
