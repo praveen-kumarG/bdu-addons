@@ -501,7 +501,9 @@
                     </table>
                 </div>
             </div>
-
+            <p t-if="o.payment_term_id and o.type != 'out_refund'" class='text-center' style="padding-left:30px;padding-right:70px;padding-top:30px;">
+                <span t-field="o.payment_term_id.note"/>
+            </p>
         </div>
     </t>
 </template>
