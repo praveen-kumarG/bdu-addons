@@ -359,7 +359,7 @@
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
 
         <div class="page" style="font-family: 'Titillium Web', sans-serif;page-break-after:always;">
-            <div class="row" style="padding-left:85px;padding-right:15px;">
+            <div class="row" style="padding-left:30px;padding-right:15px;">
                 <div class="row">
                     <div name="invoice_address" class="col-xs-5 col-xs-offset-7">
                         <address t-field="o.partner_id"
@@ -371,8 +371,8 @@
                 <h2>
                     <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">Invoice</span>
                     <span t-if="o.type == 'out_invoice' and o.state == 'proforma2'">PRO-FORMA</span>
-                    <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
-                    <span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
+                    <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft INVOICE</span>
+                    <span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Cancelled INVOICE</span>
                     <span t-if="o.type == 'out_refund'">Refund</span>
                     <span t-if="o.type == 'in_refund'">Vendor Refund</span>
                     <span t-if="o.type == 'in_invoice'">Vendor Bill</span>
@@ -410,46 +410,45 @@
                 <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
             </div>
 
-            <!--BDUMedia - if regular order attached-->
-            <div class="row" style="padding-left:85px;padding-right:15px;">
+            <!--BDUMedia - if subscription order -->
+            <div class="row" style="padding-left:30px;padding-right:15px;">
                 <table class="table table-condensed table-padding">
                     <thead>
                         <tr>
-                            <th width="10%">Date</th>
-                            <th width="20%">Description/ short content</th>
-                            <th width="10%" class="text-right">Volume</th>
-                            <t t-if="o.partner_id.is_ad_agency"><th width="10%" class="text-right">Unit Price</th></t>
-                            <th width="10%" class="text-right">Tax Excluded Price</th>
+                            <th width="16%">Volume</th>
+                            <th width="67%">Description/ short content</th>
+                            <th width="17%" class="text-right">Tax Excluded Price</th>
                         </tr>
                     </thead>
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l">
-                            <td>
-                                <span t-field="o.date_invoice"/>
-                            </td>
-                            <td>
-                                <span t-field="l.name"/>
-                                <t t-if="l.product_id"> - <span t-field="l.product_id.name"/></t>
-                                <t t-if="not l.product_id and o.name"> - <span t-field="o.name"/></t>
-                            </td>
-                            <td class="text-right">
+                            <td class="text-left">
                                 <span t-field="l.quantity"/>
                             </td>
-                            <t t-if="o.partner_id.is_ad_agency">
-                                <td class="text-right">
-                                    <span t-field="l.price_unit"/>
-                                </td>
-                            </t>
+                            <td class="text-left">
+                                <!-- Normal use -->
+                                <t t-if="not 'Afas id' in l.name">
+                                    <span t-field="l.name"/>
+                                </t>
+                                <!-- Circumvent migrated orderline with non ccommunicatable info by composing info-->
+                                <t t-if="'Afas id:' in l.name">
+                                    <span t-field="l.product_id.name"/>
+                                    <span t-esc="str(' van ')"/>
+                                    <span t-field="l.start_date"/>
+                                    <span t-esc="str(' tot ')"/>
+                                    <span t-field="l.end_date"/>
+                                </t>
+                            </td>
                             <td class="text-right">
-                                <span t-if="o.type == 'out_refund'">-</span><span t-field="l.price_subtotal"
-                                    t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                <span t-if="o.type == 'out_refund'">-</span>
+                                <span t-field="l.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <div class="row" style="padding-left:85px;page-break-inside:avoid;">
+            <div class="row" style="padding-left:30px;page-break-inside:avoid;">
                 <div class="col-xs-4 pull-right">
                     <table class="table table-condensed">
                         <tr class="border-black">
@@ -469,7 +468,8 @@
                         <tr class="border-black">
                             <td><strong>Total</strong></td>
                             <td class="text-right">
-                                 <span t-if="o.type == 'out_refund'">-</span><span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                 <span t-if="o.type == 'out_refund'">-</span>
+                                 <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                             </td>
                         </tr>
                     </table>
@@ -477,7 +477,7 @@
             </div>
 
             <!--&lt;!&ndash; DO NOT REMOVE THIS TABLE. MANDATORY IN SOME COUNTRIES &ndash;&gt;-->
-            <div class="row" t-if="len(o.tax_line_ids) > 1" style="padding-left:75px;padding-right:15px;">
+            <div class="row" t-if="len(o.tax_line_ids) > 1" style="padding-left:30px;padding-right:15px;">
                 <div class="col-xs-6">
                     <table class="table table-condensed">
                         <thead>
