@@ -23,7 +23,8 @@
                  'sale',
                  'product',
                  'sale_advertising_order',
-                 'bdu_account'
+                 'bdu_account',
+                 'operating_unit_report_layout'
                 ],
     'data'    : [
                  'views/sale.xml',

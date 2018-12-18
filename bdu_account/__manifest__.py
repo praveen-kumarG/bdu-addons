@@ -38,11 +38,11 @@ This module adds customization as per BDU Media
     """,
     'author'  : 'Magnus - Willem Hulshof',
     'website' : 'http://www.magnus.nl',
-    'depends' : ['account', 'sale_advertising_order', 'account_bank_statement_import_camt',
+    'depends' : ['account', 'bdu_sale_advertising_order', 'account_bank_statement_import_camt',
                  'partner_contact_gender','purchase', 'account_invoice_refund_link',
                  'partner_sector','base_partner_sequence','account_credit_control',
                  'account_analytic_required', 'account_type_inactive', 'account_type_menu',
-                 'account_type_multi_company'
+                 'account_type_multi_company', 'operating_unit_report_layout'
     ],
     'data' : [
             "security/ir.model.access.csv",

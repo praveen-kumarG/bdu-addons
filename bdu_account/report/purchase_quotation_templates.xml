@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 <template id="report_purchasequotation_document1">
-    <t t-call="bdu_account.external_layout_bdu">
+    <t t-call="operating_unit_report_layout.external_layout_ou">
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
         <div class="page" style="font-family: 'Titillium Web', sans-serif;">
             <div class="oe_structure"/>

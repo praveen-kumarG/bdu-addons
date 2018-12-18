@@ -4,7 +4,7 @@
 <!-- cannot replace document because other xpath's so new base doc -->
 <template id="bdu_product_base.report_saleorder_document">
   <t t-foreach="docs" t-as="doc">
-    <t t-call="bdu_account.external_layout_bdu">
+    <t t-call="operating_unit_report_layout.external_layout_ou">
         <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})"/>
         <div class="page">
             <div class="oe_structure"/>

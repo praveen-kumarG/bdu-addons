@@ -2,29 +2,6 @@
 <openerp>
     <data>
 
-    <template id="bdu_account.report_assets_common" name="bdu_account report assets common" inherit_id="report.assets_common">
-        <xpath expr="." position="inside">
-            <link href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;subset=latin-ext" rel="stylesheet"/>
-        </xpath>
-    </template>
-
-    <record id="paperformat_bdu_layout" model="report.paperformat">
-        <field name="name">European A4 - BDU Layout</field>
-        <field name="default" eval="True"/>
-        <field name="format">A4</field>
-        <field name="page_height">0</field>
-        <field name="page_width">0</field>
-        <field name="orientation">Portrait</field>
-        <field name="margin_top">45</field>
-        <field name="margin_bottom">35</field><!--before it was 23, changed to avoid overlapping of lines-->
-        <field name="margin_left">0</field>
-        <field name="margin_right">7</field>
-        <field name="header_line" eval="False"/>
-        <field name="header_spacing">45</field>
-        <field name="dpi">90</field>
-    </record>
-
-
     <report
         id="account.account_invoices"
         model="account.invoice"
@@ -32,7 +9,7 @@
         report_type="qweb-pdf"
         name="account.report_invoice"
         file="account.report_invoice"
-        paperformat="bdu_account.paperformat_bdu_layout"
+        paperformat="operating_unit_report_layout.paperformat_ou_layout"
     />
     <report
         id="sale.report_sale_order"
@@ -41,7 +18,7 @@
         report_type="qweb-pdf"
         file="sale.report_saleorder"
         name="sale.report_saleorder"
-        paperformat="bdu_account.paperformat_bdu_layout"
+        paperformat="operating_unit_report_layout.paperformat_ou_layout"
     />
     <report
         string="Purchase Order"
@@ -50,7 +27,7 @@
         report_type="qweb-pdf"
         name="purchase.report_purchaseorder"
         file="purchase.report_purchaseorder"
-        paperformat="bdu_account.paperformat_bdu_layout"
+        paperformat="operating_unit_report_layout.paperformat_ou_layout"
     />
 
     <report
@@ -60,7 +37,7 @@
         report_type="qweb-pdf"
         name="purchase.report_purchasequotation"
         file="purchase.report_purchasequotation"
-        paperformat="bdu_account.paperformat_bdu_layout"
+        paperformat="operating_unit_report_layout.paperformat_ou_layout"
     />
 
     <report
@@ -70,7 +47,7 @@
         report_type="qweb-pdf"
         name="stock.report_deliveryslip"
         file="stock.report_deliveryslip"
-        paperformat="bdu_account.paperformat_bdu_layout"
+        paperformat="operating_unit_report_layout.paperformat_ou_layout"
     />
 
     <report
@@ -80,7 +57,7 @@
         report_type="qweb-pdf"
         name="purchase.report_purchaseorder"
         file="purchase.report_purchaseorder"
-        paperformat="bdu_account.paperformat_bdu_layout"
+        paperformat="operating_unit_report_layout.paperformat_ou_layout"
     />
 
     <report
@@ -90,7 +67,7 @@
         report_type="qweb-pdf"
         name="purchase.report_purchasequotation"
         file="purchase.report_purchasequotation"
-        paperformat="bdu_account.paperformat_bdu_layout"
+        paperformat="operating_unit_report_layout.paperformat_ou_layout"
     />
 
     <report
@@ -100,7 +77,7 @@
         report_type="qweb-pdf"
         name="stock.report_deliveryslip"
         file="stock.report_deliveryslip"
-        paperformat="bdu_account.paperformat_bdu_layout"
+        paperformat="operating_unit_report_layout.paperformat_ou_layout"
     />
 
     <report
@@ -111,7 +88,7 @@
         name="account_credit_control.report_credit_control_summary"
         file="account_credit_control.report_credit_control_summary"
         auto="False"
-        paperformat="bdu_account.paperformat_bdu_layout"
+        paperformat="operating_unit_report_layout.paperformat_ou_layout"
     />
 
     </data>

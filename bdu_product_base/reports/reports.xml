@@ -8,7 +8,7 @@
 	        report_type="qweb-pdf"
 	        name="bdu_product_base.report_saleorder_document"
 	        file="bdu_product_base.report_saleorder_base"
-	        paperformat="bdu_account.paperformat_bdu_layout"
+	        paperformat="operating_unit_report_layout.paperformat_ou_layout"
 	        attachment="((object.state not in ('sale','done')) and ('Quotation '+object.name.replace('SO',''))+'.pdf') or ((object.state in ('sale','done')) and ('Sale Order '+object.name.replace('SO',''))+'.pdf')"
 	        attachment_use = "True"
 	    />

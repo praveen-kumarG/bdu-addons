@@ -2,7 +2,7 @@
 <odoo>
 <data>
 
-<template id="external_layout_bdu">
+<template id="operating_unit_report_layout.external_layout_ou">
     <!-- Multicompany -->
     <t t-if="not o and doc">
         <t t-set="o" t-value="doc"/>
@@ -28,24 +28,12 @@
         <t t-set="ou" t-value="o.env.ref('bdu_account.bdumedia_media')"/>
     </t>
 
-    <t t-call="bdu_account.external_layout_bdu_header" />
+    <t t-call="operating_unit_report_layout.external_layout_ou_header" />
     <t t-raw="0" />
 </template>
 
-<template id="external_layout_bdu_header">
-    <div class="header">
-        <div class="row">
-            <div class="row backgroundimage" style="position:relative;font-size:3em;
-                        width:100%;height:100%;z-index:1000;padding-left:5px;">
-                <img t-if="ou.logo" t-att-src="'data:image/png;base64,%s' % ou.report_background_image1"
-                        style="width:100%; display: block;"/>
-            </div>
-        </div>
-    </div>
-</template>
-
 <template id="report_invoice_document1">
-    <t t-call="bdu_account.external_layout_bdu">
+    <t t-call="operating_unit_report_layout.external_layout_ou">
 
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
 
@@ -252,7 +240,7 @@
                     </thead>
                     <tbody class="invoice_tbody">
                         <tr t-foreach="o.invoice_line_ids" t-as="l">
-                            <td><span t-field="l.sale_line_ids.order_id.issue_date"/>
+                            <td><span t-field="l.sale_line_ids.issue_date"/>
                             </td>
                             <td class="text-right">
                                 <t t-if="l.uom_id.uom_type == 'bigger'">
@@ -354,7 +342,7 @@
 
 
 <template id="report_invoice_document2">
-    <t t-call="bdu_account.external_layout_bdu">
+    <t t-call="operating_unit_report_layout.external_layout_ou">
 
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
 
