@@ -4,7 +4,7 @@
 		<report
 	        id="bdu_product_base.report_saleorder_base"
 	        model="sale.order"
-	        string="Quotation / Order pdf"
+	        string="Quotation / Order with appendices"
 	        report_type="qweb-pdf"
 	        name="bdu_product_base.report_saleorder_document"
 	        file="bdu_product_base.report_saleorder_base"

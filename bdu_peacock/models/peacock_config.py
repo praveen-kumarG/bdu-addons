@@ -19,6 +19,7 @@ class PeacockConfig(models.Model):
     user           = fields.Char(string='User')
     password       = fields.Char(string='Password')
     days           = fields.Integer(string='History in days')
+    pretty_print   = fields.Boolean(string='Pretty print XML')
 
     latest_run     = fields.Char(string='Latest run',     help="Date of latest run of Announcement connector")
     latest_status  = fields.Char(string='Latest status',  help="Log of latest run")
@@ -59,14 +60,22 @@ class PeacockConfig(models.Model):
         config.write({})
         return 
 
-    def ship_file(self, dict, filename, conn):
+    def ship_xml_file(self, xml, filename):
         config = self[0]
+
         f = open(config.tempdir+"/"+filename,"w")
-        data = json.dumps(dict)
+        data = etree.tostring(xml, pretty_print=self.pretty_print)
         f.write(data)
         f.close
 
-        #pdb.set_trace()
+        # Initiate File Transfer Connection
+        try:
+            port_session_factory = ftputil.session.session_factory(port=21, use_passive_mode=True)
+            ftp = ftputil.FTPHost(config.server, config.user, config.password, session_factory = port_session_factory)
+        except Exception, e:
+            self.log_exception(msg, "Invalid FTP configuration")
+            return False
+
         try:
             _logger.info("Transfering " + filename)
             if config.directory :
@@ -74,13 +83,14 @@ class PeacockConfig(models.Model):
             else :
                 target = '/' + filename
             source = config.tempdir + '/' + filename
-            conn.upload(source, target)
+            ftp.upload(source, target)
         except Exception, e:
             self.log_exception(msg,"Transfer failed, quiting....")
             return False
 
+        ftp.close()
 
-        return 
+        return True
 
 
     @api.multi
@@ -133,6 +143,7 @@ class PeacockConfig(models.Model):
                                                         'create_uid',                \
                                                         'write_date',                \
                                                         'write_uid',                 \
+                                                        'date',                      \
                                                         'operating_unit_id',         \
                                                         'company_id',                \
                                                         'journal_id',                \
@@ -148,6 +159,7 @@ class PeacockConfig(models.Model):
                                                         'create_uid',                \
                                                         'write_date',                \
                                                         'write_uid',                 \
+                                                        'date',                      \
                                                         'operating_unit_id',         \
                                                         'company_id',                \
                                                         'account_id',                \
@@ -185,14 +197,10 @@ class PeacockConfig(models.Model):
                                                         'code',                      \
                                                      ])
 
-        #process into xml file 
-        root         = etree.Element('report')
+        #process into xml files 
         chapter_am   = etree.Element('account_move')
         chapter_aml  = etree.Element('account_move_line')
         chapter_aa   = etree.Element('account_account')
-        root.append(chapter_am)
-        root.append(chapter_aml)
-        root.append(chapter_aa)
 
         #files as chapters in one xml document
         for am_record in am :
@@ -200,31 +208,21 @@ class PeacockConfig(models.Model):
         for aml_record in aml :
             self.add_element(chapter_aml, aml_record, 'record')
         for aa_record in aa :
-            self.add_element(chapter_aa, aa_record, 'record')
-        xml = etree.tostring(root, pretty_print=False) #pretty_print=True makes it readable but introduces a.o. \n chars
-
-        # Initiate File Transfer Connection
-        try:
-            port_session_factory = ftputil.session.session_factory(port=21, use_passive_mode=True)
-            ftp = ftputil.FTPHost(config.server, config.user, config.password, session_factory = port_session_factory)
-        except Exception, e:
-            self.log_exception(msg, "Invalid FTP configuration")
-            return False
+            self.add_element(chapter_aa, aa_record, 'record')       
 
         #Transfer files
-        self.ship_file(xml, 'report.xml',            ftp)
-        self.ship_file(am,  'account_move.txt',      ftp)
-        self.ship_file(aml, 'account_move_line.txt', ftp)
-        self.ship_file(aa,  'account_account.txt',   ftp)
+        self.ship_xml_file(chapter_am,  'account_move.xml')
+        self.ship_xml_file(chapter_aml, 'account_move_line.xml')
+        self.ship_xml_file(chapter_aa,  'account_account.xml')
 
         #report and exit positively
-        ftp.close()
         final_msg = "File transfer for Schuiteman / Peacock succesfull"
         _logger.info(final_msg)
         config.latest_run     = datetime.datetime.utcnow().strftime('UTC %Y-%m-%d %H:%M:%S ')
         config.latest_status  = msg+final_msg
         config.write({})
         return True
+        
 
     def add_element(self, node, dict, tag ) :
         new_node  = etree.Element(tag)

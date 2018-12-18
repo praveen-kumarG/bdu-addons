@@ -1,11 +1,12 @@
 <odoo>
-    <data>
+    <data noupdate="1">
          <record id="object0" model="announcement.config">
             <field name="server">ftp.bdu.nl</field>
             <field name="directory">/subdir</field>
             <field name="user"></field>
             <field name="password"></field>
             <field name="days"></field>
+            <field name="pretty_print">True</field>
 
             <field name="latest_run"></field>
             <field name="latest_result"></field> 

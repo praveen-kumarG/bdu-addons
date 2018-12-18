@@ -37,11 +37,16 @@
 
                     <!-- content -->
                     <t t-foreach="docs" t-as="o">
-                        <!--only row if partner zip is incomplete -->
+                        <!--only row if invoice partner zip is incomplete. parent may be ok -->
                         <t t-if=" not o.partner_id.zip">
                         <div class="row">                
-                            <div class="col-xs-2"> 
-                                <span t-field="o.number"/>
+                            <div class="col-xs-2">                                 
+                                <t t-if="o.number">
+                                    <span t-field="o.number"/>
+                                </t>                               
+                                <t t-if="not o.number">
+                                    <span t-esc="str('n.a.')"/>
+                                </t>
                             </div>             
                             <div class="col-xs-1"> 
                                 <!-- using python code to remove thousand separator -->

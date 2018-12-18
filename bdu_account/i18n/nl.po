@@ -140,6 +140,7 @@ msgstr "<strong>Voor akkoord:</strong>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "<strong>Gross</strong>"
 msgstr "<strong>Totaal excl. BTW</strong>"
@@ -197,6 +198,7 @@ msgstr "<strong>Totaal gefactureerd</strong>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 #: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "<strong>Total</strong>"
@@ -230,6 +232,7 @@ msgstr "Niet alle item konden worden verzonden, de resterende items worden verzo
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Amount"
 msgstr "Bedrag"
 
@@ -250,6 +253,7 @@ msgstr "Achtergrondafbeelding voor de voorpagina"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Base"
 msgstr "Grondslag"
 
@@ -260,6 +264,7 @@ msgstr "Creditnota"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Cancelled INVOICE"
 msgstr "Geannuleerde factuur"
 
@@ -311,16 +316,33 @@ msgstr "Datum van oprichting"
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
 msgid "Date due"
-msgstr "Datum"
+msgstr "Vervaldatum"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
+msgid "Due date"
+msgstr "Vervaldatum"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
+msgid "<strong>Source:</strong>"
+msgstr "<strong>Order:</strong>"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
+msgid "<strong>Customer Code:</strong>"
+msgstr "<strong>Klantnummer:</strong>"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Description"
 msgstr "Omschrijving"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Description/ short content"
 msgstr "Omschrijving"
 
@@ -348,6 +370,7 @@ msgstr "Weergave naam"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Draft INVOICE"
 msgstr "Conceptfactuur"
 
@@ -387,6 +410,7 @@ msgstr "Instagram"
 
 #. module: bdu_account
 #: model:ir.model,name:bdu_account.model_account_invoice
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Invoice"
 msgstr "Factuur"
 
@@ -404,6 +428,7 @@ msgstr "Factuurregel"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_credit_control_summary_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Invoice date"
 msgstr "Factuurdatum"
 
@@ -486,6 +511,7 @@ msgstr "Openstaand bedrag"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "PRO-FORMA"
 msgstr "Pro-forma"
 
@@ -547,8 +573,27 @@ msgstr "Offerte aanvraag"
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Reference"
 msgstr "Referentie"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Refund"
+msgstr "Teruggaaf"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Vendor Refund"
+msgstr "Leverancier teruggaaf"
+
+#. module: bdu_account
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+msgid "Vendor Bill"
+msgstr "Inkoopfactuur"
 
 #. module: bdu_account
 #: model:ir.model,name:bdu_account.model_sale_order
@@ -612,19 +657,22 @@ msgstr "Samenvatting"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "TIN:"
 msgstr "BTW-nr:"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Tax"
 msgstr "BTW"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
 msgid "Tax Excluded Price"
-msgstr "Prijs ex BTW"
+msgstr "Prijs excl. BTW"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_purchaseorder_document1
@@ -703,8 +751,9 @@ msgstr "Via Job Queue"
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_invoice_document1
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1
+#: model:ir.ui.view,arch_db:bdu_account.report_invoice_document2
 msgid "Volume"
-msgstr "Volume"
+msgstr "Hoeveelheid"
 
 #. module: bdu_account
 #: model:ir.ui.view,arch_db:bdu_account.report_saleorder_document1

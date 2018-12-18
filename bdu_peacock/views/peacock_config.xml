@@ -17,8 +17,9 @@
             <field name="directory"/>  
             <field name="user"/> 
             <field name="password"/>  
-            <field name="days"/>  
             <field name="tempdir"/> 
+            <field name="days"/>  
+            <field name="pretty_print"/>  
           </group>
           <button name="save_config" type="object" 
             string="Save" class="oe_highlight" /> 

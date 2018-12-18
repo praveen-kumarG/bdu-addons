@@ -1,0 +1,190 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* bdu_product_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-12-12 22:59+0000\n"
+"PO-Revision-Date: 2018-12-12 22:59+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Fiscal Position Remark:"
+msgstr "Fiscale positie:"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Payment Terms:"
+msgstr "Betalingsconditie:"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "<strong>Salesperson:</strong>"
+msgstr "<strong>Verkoper:</strong>"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Shipping address:"
+msgstr "Leveradres:"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Subtotal:"
+msgstr "Subtotaal:"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "<strong>Total Without Taxes</strong>"
+msgstr "<strong>Totaal excl. BTW</strong>"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "<strong>Total</strong>"
+msgstr "<strong>Totaal</strong>"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Your Reference:"
+msgstr "Uw referentie:"
+
+#. module: bdu_product_base
+#: selection:product.category,custom_orderline:0
+#: selection:product.template,custom_orderline:0
+msgid "Announcement"
+msgstr "Familiebericht"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.sale_product_base_form_view
+msgid "Custom handling for"
+msgstr "Maatwerk voor"
+
+#. module: bdu_product_base
+#: model:ir.model.fields,field_description:bdu_product_base.field_sale_order_line_custom_orderline
+msgid "Custom orderline"
+msgstr "Aangepaste orderregel"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.product_template_form_product_base
+msgid "Custom orderlines"
+msgstr "Aangepaste orderregels"
+
+#. module: bdu_product_base
+#: model:ir.model.fields,field_description:bdu_product_base.field_delivery_carrier_custom_orderline
+#: model:ir.model.fields,field_description:bdu_product_base.field_product_category_custom_orderline
+#: model:ir.model.fields,field_description:bdu_product_base.field_product_product_custom_orderline
+#: model:ir.model.fields,field_description:bdu_product_base.field_product_template_custom_orderline
+#: model:ir.ui.view,arch_db:bdu_product_base.product_category_form_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.product_template_form_product_base
+msgid "Customize for"
+msgstr "Maatwerk voor"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Date Ordered:"
+msgstr "Order datum:"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Description"
+msgstr "Omschrijving"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Disc.(%)"
+msgstr "Kortingsperc."
+
+#. module: bdu_product_base
+#: selection:product.category,custom_orderline:0
+#: selection:product.template,custom_orderline:0
+msgid "Distribution"
+msgstr "Distributie"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Invoicing address:"
+msgstr "Factuuradres:"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Invoicing and shipping address:"
+msgstr "Factuur- en leveradres:"
+
+#. module: bdu_product_base
+#: selection:product.category,custom_orderline:0
+#: selection:product.template,custom_orderline:0
+msgid "Online"
+msgstr "Online"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Order #"
+msgstr "Ordernr."
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Price"
+msgstr "Subtotaal"
+
+#. module: bdu_product_base
+#: model:ir.model,name:bdu_product_base.model_product_category
+msgid "Product Category"
+msgstr "Product categorie"
+
+#. module: bdu_product_base
+#: model:ir.model,name:bdu_product_base.model_product_template
+msgid "Product Template"
+msgstr "Sjabloonproduct"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Quantity"
+msgstr "Hoeveelheid"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Quotation #"
+msgstr "Offerte nr."
+
+#. module: bdu_product_base
+#: model:ir.actions.report.xml,name:bdu_product_base.report_saleorder_base
+msgid "Quotation / Order with appendices"
+msgstr "Offerte / Order met bijlagen"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Quotation Date:"
+msgstr "Offertedatum:"
+
+#. module: bdu_product_base
+#: model:ir.model,name:bdu_product_base.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Orderregel"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Taxes"
+msgstr "BTW"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Total Price"
+msgstr "Totale prijs"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "Unit Price"
+msgstr "Prijs"
+
+#. module: bdu_product_base
+#: model:ir.ui.view,arch_db:bdu_product_base.report_saleorder_document
+msgid "VAT:"
+msgstr "BTW"
+
