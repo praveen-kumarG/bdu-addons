@@ -28,7 +28,8 @@
     'depends' : [
                  'bdu_product_base',
                  'folders',
-                 'operating_unit_report_layout'
+                 'operating_unit_report_layout',
+                 'report_qweb_operating_unit'
                 ],
     'data'    : [
                  #'security/security.xml',             #no additional models

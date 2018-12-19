@@ -42,7 +42,7 @@ This module adds customization as per BDU Media
                  'partner_contact_gender','purchase', 'account_invoice_refund_link',
                  'partner_sector','base_partner_sequence','account_credit_control',
                  'account_analytic_required', 'account_type_inactive', 'account_type_menu',
-                 'account_type_multi_company', 'operating_unit_report_layout'
+                 'account_type_multi_company', 'operating_unit_report_layout', 'report_qweb_operating_unit'
     ],
     'data' : [
             "security/ir.model.access.csv",

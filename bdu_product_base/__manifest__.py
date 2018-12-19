@@ -24,7 +24,8 @@
                  'product',
                  'sale_advertising_order',
                  'bdu_account',
-                 'operating_unit_report_layout'
+                 'operating_unit_report_layout',
+                 'report_qweb_operating_unit'
                 ],
     'data'    : [
                  'views/sale.xml',
